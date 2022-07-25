@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+<head>
+    <meta charset="utf-8">
+    <title>social network login - Bootdey.com</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/javascript" src="https://gc.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=FFcbxeJ_GFnjU-O7GXjUXFiQb-h1KwlL3bamrBDILvdM5qaKMZhsMnH9eVwr4vX2VF3Z7oFs6AC-_VdD63WUITDfmAh3DVfm-PZ4ZD6NgC4" charset="UTF-8"></script><script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <link href="https://netdna.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://netdna.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <!--  css для логина  -->
+    <link href="../static/login/login.css" rel="stylesheet">
+</head>
+
+<body>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+<div class="container">
+    <div id="content">
+        <div class="container-fluid">
+            <div class="lock-container">
+                <h1>Регистрация</h1>
+                <div class="panel panel-default text-center">
+                    <img src="https://bootdey.com/img/Content/avatar/avatar1.png" class="img-circle img-login">
+                    <form class="panel-body" action="/register" th:object="${user}" th:method="POST">
+                        <input class="form-control" type="text" required=""true th:field="*{username}" placeholder="userName">
+                        <input class="form-control" type="text" required=""true th:field="*{userSurname}" placeholder="userSurname">
+                        <input class="form-control" type="email" required=""true th:field="*{userEmail}" placeholder="email">
+                        <input class="form-control" type="password" th:field="*{userPassword}" placeholder="Enter Password"  required="true">
+                        <input class="form-control" type="password" th:field="*{userPasswordConfirm}" placeholder="Enter Password Again"  required="true">
+                        <button type="submit" class="btn btn-success">Зарегистрироваться <i class="fa fa-fw fa-unlock-alt"></i></button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<footer class="footer">
+    <div class="container footer-container">
+        <p class="text-muted">Place sticky footer content here.</p>
+    </div>
+</footer>
+
+<!-- скрипт для логина  -->
+<script src="../static/login/login.js"></script>
+
+</body>
+</html>
