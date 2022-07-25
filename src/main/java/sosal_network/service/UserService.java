@@ -53,7 +53,7 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public void updateUserPassword(User user){
-        user.setUserPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         userRepository.save(user);
     }
 
@@ -66,7 +66,7 @@ public class UserService implements UserDetailsService {
             return false;
         }
 
-        user.setUserPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         user.setRoles(Collections.singleton(Role.ROLE_USER));
         userRepository.save(user);
 
