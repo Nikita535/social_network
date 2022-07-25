@@ -6,11 +6,12 @@
 
     <title>social network login - Bootdey.com</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script type="text/javascript" src="https://gc.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=FFcbxeJ_GFnjU-O7GXjUXFiQb-h1KwlL3bamrBDILvdM5qaKMZhsMnH9eVwr4vX2VF3Z7oFs6AC-_VdD63WUITDfmAh3DVfm-PZ4ZD6NgC4" charset="UTF-8"></script><script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+<!--    <script type="text/javascript" src="https://gc.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=FFcbxeJ_GFnjU-O7GXjUXFiQb-h1KwlL3bamrBDILvdM5qaKMZhsMnH9eVwr4vX2VF3Z7oFs6AC-_VdD63WUITDfmAh3DVfm-PZ4ZD6NgC4" charset="UTF-8"></script>-->
+    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
     <link href="https://netdna.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://netdna.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     <!--  css для логина  -->
-    <link href="../static/login/login.css" rel="stylesheet">
+    <link href="login/login.css" rel="stylesheet">
 </head>
 
 <body>
@@ -23,9 +24,15 @@
                 <div class="panel panel-default text-center">
                     <img src="https://bootdey.com/img/Content/avatar/avatar1.png" class="img-circle img-login">
                     <form class="panel-body" th:action="@{/login}" method="post">
+                        <div th:if="${param.error}">
+                            <div class="alert alert-danger">
+                                Invalid username or password
+                            </div>
+                        </div>
                         <input class="form-control" required="true" type="text" placeholder="Введите имя" id="username" name="username" value="">
-                        <input class="form-control" required="true" type="password" placeholder="Введите пароль" id="userPassword" name="userPassword" value="">
+                        <input class="form-control" required="true" type="password" placeholder="Введите пароль" id="password" name="password" value="">
                         <button type="submit" class="btn btn-success">Login <i class="fa fa-fw fa-unlock-alt"></i></button>
+                        <a href="/register" class="btn btn-primary">Sign up </a>
                         <a href="/register" class="forgot-password">Забыли пароль?</a>
                     </form>
                     </div>
@@ -41,7 +48,7 @@
 </footer>
 
 <!-- скрипт для логина  -->
-<script src="../static/login/login.js"></script>
+<script src="login/login.js"></script>
 
 </body>
 </html>
