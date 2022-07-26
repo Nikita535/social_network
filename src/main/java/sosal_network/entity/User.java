@@ -35,6 +35,10 @@ public class User implements UserDetails {
     private String userPasswordConfirm;
     private String userEmail;
 
+    private Boolean active;
+
+    private String activationCode;
+
 
     @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
     @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))

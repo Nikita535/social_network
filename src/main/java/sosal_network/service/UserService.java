@@ -52,13 +52,6 @@ public class UserService implements UserDetailsService {
 
 
     @Transactional
-    public void updateUserPassword(User user){
-        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-        userRepository.save(user);
-    }
-
-
-    @Transactional
     public boolean saveUser(User user){
         User userFromDB = userRepository.findByUsername(user.getUsername());
 
@@ -68,14 +61,14 @@ public class UserService implements UserDetailsService {
 
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         user.setRoles(Collections.singleton(Role.ROLE_USER));
+        user.setActive(false);
+        user.setActivationCode(UUID.randomUUID().toString());
         userRepository.save(user);
 
         if (!StringUtils.isEmpty(user.getUserEmail())) {
-            String message = String.format(
-                    "Привет, %s! \n" + "Добро пожаловать. Пожалуйста, перейдите по ссылке: http://localhost:8080/activate/%s",
-                    user.getUsername()
-            );
-
+            String message = "Привет, "+user.getUsername()+"!"+
+                    " Для подтверждения своей почты перейдите по ссылке http://localhost:8080/activate/"
+                    +user.getUsername();
             emailService.sendSimpleMessage(user.getUserEmail(), message);
         }
 
@@ -111,6 +104,16 @@ public class UserService implements UserDetailsService {
             log.error(e.getClass().toString());
             return "register";
         }
+    }
+
+    public void activateUser(String username) {
+        User user = userRepository.findByUsername(username);
+        if (user.getActivationCode() == null){
+            return;
+        }
+        user.setActive(true);
+        user.setActivationCode(null);
+        userRepository.save(user);
     }
 
 }

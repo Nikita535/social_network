@@ -17,7 +17,7 @@ public class EmailService {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(To);
         message.setText(text);
-        message.setSubject("Сообщение от комапании S7");
+        message.setSubject("Сообщение от команды разработчиков");
         mailSender.send(message);
 
     }
