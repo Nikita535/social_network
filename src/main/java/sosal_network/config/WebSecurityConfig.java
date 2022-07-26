@@ -27,7 +27,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf()
                 .disable()
                 .authorizeRequests().antMatchers("/login",
-                        "/logout", "/register").permitAll()
+                        "/logout", "/register","/activate/*").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
@@ -37,7 +37,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .logout()
                 .permitAll()
-                .logoutSuccessUrl("/")
+                .logoutSuccessUrl("/login")
         ;
     }
 

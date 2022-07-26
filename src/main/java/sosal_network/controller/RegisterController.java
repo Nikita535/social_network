@@ -38,4 +38,10 @@ public class RegisterController {
         return "login";
     }
 
+    @GetMapping("/activate/{username}")
+    public String activate(Model model, @PathVariable String username){
+        userService.activateUser(username);
+        return "redirect:/login";
+    }
+
 }
