@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import sosal_network.entity.User;
 import sosal_network.service.EmailService;
 import sosal_network.service.UserService;
@@ -33,9 +34,9 @@ public class RegisterController {
 
     @PostMapping("/register")
     public String registerSave(@ModelAttribute("user") @Valid User user,
-                               Model model) {
-        userService.validateRegister(user, model);
-        return "login";
+                               Model model, RedirectAttributes redirectAttributes) {
+        userService.validateRegister(user, model,redirectAttributes);
+        return "redirect:/login";
     }
 
     @GetMapping("/activate/{username}")

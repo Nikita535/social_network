@@ -29,6 +29,11 @@
                                 Invalid username or password
                             </div>
                         </div>
+                        <div th:if="${registerSuccess}">
+                            <div class="alert alert-success">
+                                Activation code send to your Email
+                            </div>
+                        </div>
                         <input class="form-control" required="true" type="text" placeholder="Введите имя" id="username" name="username" value="">
                         <input class="form-control" required="true" type="password" placeholder="Введите пароль" id="password" name="password" value="">
                         <button type="submit" class="btn btn-success">Login <i class="fa fa-fw fa-unlock-alt"></i></button>

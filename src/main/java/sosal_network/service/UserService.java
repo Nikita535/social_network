@@ -11,10 +11,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import sosal_network.Enum.Role;
 import sosal_network.entity.User;
 import sosal_network.repository.UserRepository;
 
+import javax.mail.MessagingException;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.*;
@@ -52,7 +54,7 @@ public class UserService implements UserDetailsService {
 
 
     @Transactional
-    public boolean saveUser(User user){
+    public boolean saveUser(User user) throws MessagingException {
         User userFromDB = userRepository.findByUsername(user.getUsername());
 
         if (userFromDB != null){
@@ -67,8 +69,7 @@ public class UserService implements UserDetailsService {
 
         if (!StringUtils.isEmpty(user.getUserEmail())) {
             String message = "Привет, "+user.getUsername()+"!"+
-                    " Для подтверждения своей почты перейдите по ссылке http://localhost:8080/activate/"
-                    +user.getUsername();
+                    " Для подтверждения своей почты перейдите <a href= 'http://localhost:8080/activate/"+user.getUsername()+"'> по ссылке </a>";
             emailService.sendSimpleMessage(user.getUserEmail(), message);
         }
 
@@ -79,7 +80,7 @@ public class UserService implements UserDetailsService {
 
 
     @Transactional
-    public String validateRegister(User user, Model model){
+    public String validateRegister(User user, Model model, RedirectAttributes redirectAttributes){
 
         if (!Objects.equals(user.getPassword(), user.getUserPasswordConfirm())){
             model.addAttribute("errorConfPassword", true);
@@ -99,6 +100,7 @@ public class UserService implements UserDetailsService {
         try{
             saveUser(user);
             log.info("user add");
+            redirectAttributes.addFlashAttribute("registerSuccess", true);
             return "redirect:/login";
         } catch (Exception e){
             log.error(e.getClass().toString());
