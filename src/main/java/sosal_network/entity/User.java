@@ -26,18 +26,17 @@ import static org.aspectj.weaver.tools.cache.SimpleCacheFactory.enabled;
 public class User implements UserDetails {
 
     @Id
-    @GeneratedValue(strategy=GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private int id;
     private String username;
-
     private String userSurname;
-    private String userPassword;
+    private String password;
     @Transient
     private String userPasswordConfirm;
     private String userEmail;
 
 
-    @ElementCollection(targetClass = Role.class,fetch = FetchType.EAGER)
+    @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
     @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))
     @Enumerated(EnumType.STRING)
     private Set<Role> roles = new HashSet<>();
@@ -49,11 +48,10 @@ public class User implements UserDetails {
     public User(String userName, String userSurname, String password, String passwordConfirm, String email) {
         this.username = userName;
         this.userSurname = userSurname;
-        this.userPassword = password;
+        this.password = password;
         this.userPasswordConfirm = passwordConfirm;
         this.userEmail = email;
     }
-
 
 
     @Override
@@ -63,7 +61,7 @@ public class User implements UserDetails {
 
     @Override
     public String getPassword() {
-        return this.userPassword;
+        return this.password;
     }
 
     @Override
@@ -73,22 +71,22 @@ public class User implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return false;
+        return true;
     }
 
 
