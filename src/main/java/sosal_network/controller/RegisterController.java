@@ -10,7 +10,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import sosal_network.entity.ActivationToken;
+import sosal_network.entity.PasswordResetToken;
 import sosal_network.entity.User;
+import sosal_network.repository.ActivationTokenRepository;
 import sosal_network.service.EmailService;
 import sosal_network.service.UserService;
 
@@ -24,6 +27,8 @@ public class RegisterController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private ActivationTokenRepository activationTokenRepository;
 
     @GetMapping("/register")
     public String getForm(Model model){
@@ -38,10 +43,16 @@ public class RegisterController {
         return userService.validateRegister(user, model,redirectAttributes);
     }
 
-    @GetMapping("/activate/{username}")
-    public String activate(Model model, @PathVariable String username){
-        userService.activateUser(username);
-        return "redirect:/login";
+    /** тут изменил **/
+    @GetMapping("/activate/{code}")
+    public String activate(Model model, @PathVariable String code){
+        ActivationToken activationToken = activationTokenRepository.findByToken(code);
+        if (activationToken != null && activationToken.compareDate()) {
+            userService.activateUser(code);
+            return "redirect:/login";
+        }
+        else
+            return "invalidToken";
     }
 
 }

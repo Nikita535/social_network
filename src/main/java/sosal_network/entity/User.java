@@ -12,10 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import sosal_network.Enum.Role;
 
 import javax.persistence.*;
-import javax.validation.constraints.Size;
 import java.util.*;
-
-import static org.aspectj.weaver.tools.cache.SimpleCacheFactory.enabled;
 
 @Entity(name = "user")
 @Table(name = "users")
@@ -37,7 +34,6 @@ public class User implements UserDetails {
 
     private Boolean active;
 
-    private String activationCode;
 
 
     @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)

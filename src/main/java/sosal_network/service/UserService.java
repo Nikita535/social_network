@@ -13,8 +13,10 @@ import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import sosal_network.Enum.Role;
+import sosal_network.entity.ActivationToken;
 import sosal_network.entity.PasswordResetToken;
 import sosal_network.entity.User;
+import sosal_network.repository.ActivationTokenRepository;
 import sosal_network.repository.UserRepository;
 import sosal_network.repository.passwordTokenRepository;
 
@@ -30,6 +32,8 @@ public class UserService implements UserDetailsService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    ActivationTokenRepository activationTokenRepository;
     @Autowired
     private passwordTokenRepository passwordTokenRepository;
     @Autowired
@@ -62,6 +66,7 @@ public class UserService implements UserDetailsService {
     }
 
 
+    /** createActivationCode **/
     @Transactional
     public boolean saveUser(User user) throws MessagingException {
         User userFromDB = userRepository.findByUsername(user.getUsername());
@@ -73,15 +78,10 @@ public class UserService implements UserDetailsService {
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         user.setRoles(Collections.singleton(Role.ROLE_USER));
         user.setActive(false);
-        user.setActivationCode(UUID.randomUUID().toString());
+//        user.setActivationCode(UUID.randomUUID().toString());
         userRepository.save(user);
 
-        if (!StringUtils.isEmpty(user.getUserEmail())) {
-            String message = "Привет, " + user.getUsername() + "!" +
-                    " Для подтверждения своей почты перейдите <a href= 'http://localhost:8080/activate/" + user.getUsername() + "'> по ссылке </a>";
-            emailService.sendSimpleMessage(user.getUserEmail(), message);
-        }
-
+        createActivationCode(user.getUserEmail());
 
         return true;
     }
@@ -120,14 +120,29 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    public void activateUser(String username) {
-        User user = userRepository.findByUsername(username);
-        if (user.getActivationCode() == null) {
+    /** тут изменил **/
+    public void activateUser(String code) {
+        User user = activationTokenRepository.findByToken(code).getUser();
+        if (user == null) {
             return;
         }
         user.setActive(true);
-        user.setActivationCode(null);
+        activationTokenRepository.deleteByToken(code);
         userRepository.save(user);
+    }
+
+    /** этот метод создал **/
+    public void createActivationCode(String userEmail) throws MessagingException {
+        User user = findUserByEmail(userEmail);
+        String token = UUID.randomUUID().toString();
+        ActivationToken myToken = new ActivationToken(token, user, new Date());
+        activationTokenRepository.save(myToken);
+
+        if (!StringUtils.isEmpty(user.getUserEmail())) {
+            String message = "Привет, " + user.getUsername() + "!" +
+                    " для активации аккаунта перейдите <a href='http://localhost:8080/recover/" + token + "'>по ссылке</a>";
+            emailService.sendSimpleMessage(user.getUserEmail(), message);
+        }
     }
 
     public void createPasswordResetTokenForUser(String userEmail) throws MessagingException {

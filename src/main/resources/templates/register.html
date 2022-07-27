@@ -4,9 +4,8 @@
 
 <head>
     <meta charset="utf-8">
-    <title>social network login - Bootdey.com</title>
+    <title>social network</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!--    <script type="text/javascript" src="https://gc.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=FFcbxeJ_GFnjU-O7GXjUXFiQb-h1KwlL3bamrBDILvdM5qaKMZhsMnH9eVwr4vX2VF3Z7oFs6AC-_VdD63WUITDfmAh3DVfm-PZ4ZD6NgC4" charset="UTF-8"></script>-->
     <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
     <link href="https://netdna.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://netdna.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
@@ -26,39 +25,39 @@
                     <form class="panel-body" action="/register" th:object="${user}" th:method="POST">
                         <div th:if="${errorLenUsername}">
                             <div class="alert alert-danger">
-                                The minimum username length is 5 characters
+                                Длина имени должна быть больше 5 символов!
                             </div>
                         </div>
                         <div th:if="${errorAlreadyExistsEmail}">
                             <div class="alert alert-danger">
-                                Email already exists!
+                                Пользователь с такой почтой уже существует!
                             </div>
                         </div>
                         <div th:if="${errorConfPassword}">
                             <div class="alert alert-danger">
-                                Passwords don't match!
+                                Пароли не совпадают!
                             </div>
                         </div>
                         <div th:if="${errorAlreadyExistsUsername}">
                             <div class="alert alert-danger">
-                                A user with this nickname already exists!
+                                Пользователь с таким именем уже существует!
                             </div>
                         </div>
                         <div th:if="${errorAnomaly}">
                             <div class="alert alert-danger">
-                                Abnormal error
+                                Сегодня вам не повезло. Это неизвестная ошибка!
                             </div>
                         </div>
                         <input class="form-control" type="text" required="true" th:field="*{username}"
-                               placeholder="userName">
+                               placeholder="Введите имя">
                         <input class="form-control" type="text" required="true" th:field="*{userSurname}"
-                               placeholder="userSurname">
+                               placeholder="Введите фамилию">
                         <input class="form-control" type="email" required="true" th:field="*{userEmail}"
-                               placeholder="email">
-                        <input class="form-control" type="password" th:field="*{password}" placeholder="Enter Password"
+                               placeholder="Введите почту">
+                        <input class="form-control" type="password" th:field="*{password}" placeholder="Введите пароль"
                                required="true">
                         <input class="form-control" type="password" th:field="*{userPasswordConfirm}"
-                               placeholder="Enter Password Again" required="true">
+                               placeholder="Введите пароль еще раз" required="true">
                         <button type="submit" class="btn btn-success">Зарегистрироваться <i
                                 class="fa fa-fw fa-unlock-alt"></i></button>
                     </form>
@@ -67,11 +66,7 @@
         </div>
     </div>
 </div>
-<footer class="footer">
-    <div class="container footer-container">
-        <p class="text-muted">Place sticky footer content here.</p>
-    </div>
-</footer>
+
 
 
 <!-- скрипт для логина  -->
