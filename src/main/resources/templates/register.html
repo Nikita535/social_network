@@ -23,6 +23,31 @@
                 <div class="panel panel-default text-center">
                     <img src="https://bootdey.com/img/Content/avatar/avatar1.png" class="img-circle img-login">
                     <form class="panel-body" action="/register" th:object="${user}" th:method="POST">
+                        <div th:if="${errorLenUsername}">
+                            <div class="alert alert-danger">
+                                The minimum username length is 5 characters
+                            </div>
+                        </div>
+                        <div th:if="${errorAlreadyExistsEmail}">
+                            <div class="alert alert-danger">
+                                Email already exists!
+                            </div>
+                        </div>
+                        <div th:if="${errorConfPassword}">
+                            <div class="alert alert-danger">
+                                Passwords don't match!
+                            </div>
+                        </div>
+                        <div th:if="${errorAlreadyExistsUsername}">
+                            <div class="alert alert-danger">
+                                A user with this nickname already exists!
+                            </div>
+                        </div>
+                        <div th:if="${errorAnomaly}">
+                            <div class="alert alert-danger">
+                                Abnormal error
+                            </div>
+                        </div>
                         <input class="form-control" type="text" required="true" th:field="*{username}" placeholder="userName">
                         <input class="form-control" type="text" required="true" th:field="*{userSurname}" placeholder="userSurname">
                         <input class="form-control" type="email" required="true" th:field="*{userEmail}" placeholder="email">

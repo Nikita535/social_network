@@ -11,12 +11,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import sosal_network.Enum.Role;
+import sosal_network.entity.PasswordResetToken;
 import sosal_network.entity.User;
 import sosal_network.repository.UserRepository;
+import sosal_network.repository.passwordTokenRepository;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.util.*;
 
 @RequiredArgsConstructor
@@ -25,6 +26,9 @@ import java.util.*;
 public class UserService implements UserDetailsService {
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private passwordTokenRepository passwordTokenRepository;
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
     @Autowired
@@ -49,6 +53,11 @@ public class UserService implements UserDetailsService {
         return userRepository.findByUsername(username);
     }
 
+    @Transactional
+    public User findUserByEmail(String email){
+        return userRepository.findByUserEmail(email);
+    }
+
 
 
     @Transactional
@@ -65,10 +74,11 @@ public class UserService implements UserDetailsService {
         user.setActivationCode(UUID.randomUUID().toString());
         userRepository.save(user);
 
+
         if (!StringUtils.isEmpty(user.getUserEmail())) {
             String message = "Привет, "+user.getUsername()+"!"+
                     " Для подтверждения своей почты перейдите по ссылке http://localhost:8080/activate/"
-                    +user.getUsername();
+                    + user.getActivationCode();
             emailService.sendSimpleMessage(user.getUserEmail(), message);
         }
 
@@ -79,22 +89,29 @@ public class UserService implements UserDetailsService {
 
 
     @Transactional
-    public String validateRegister(User user, Model model){
+    public String validateRegister(User user, Model model, RedirectAttributes redirectAttributes){
 
         if (!Objects.equals(user.getPassword(), user.getUserPasswordConfirm())){
-            model.addAttribute("errorConfPassword", true);
+            redirectAttributes.addFlashAttribute("errorConfPassword", true);
             log.warn("error confirm pass");
-            return "register";
+            return "redirect:/register";
         }
+
+        if (findUserByEmail(user.getUserEmail()) != null){
+            redirectAttributes.addFlashAttribute("errorAlreadyExistsEmail", true);
+            log.warn("error email already exists");
+            return "redirect:/register";
+        }
+
         if (user.getPassword().length() < 5){
-            model.addAttribute("errorLenPassword", true);
+            redirectAttributes.addFlashAttribute("errorLenPassword", true);
             log.warn("error pass length");
-            return "register";
+            return "redirect:/register";
         }
         if (findUserByUsername(user.getUsername()) != null){
-            model.addAttribute("errorAlreadyExistsUsername", true);
+            redirectAttributes.addFlashAttribute("errorAlreadyExistsUsername", true);
             log.warn("error user already exists");
-            return "register";
+            return "redirect:/register";
         }
         try{
             saveUser(user);
@@ -102,12 +119,12 @@ public class UserService implements UserDetailsService {
             return "redirect:/login";
         } catch (Exception e){
             log.error(e.getClass().toString());
-            return "register";
+            return "redirect:/register";
         }
     }
 
-    public void activateUser(String username) {
-        User user = userRepository.findByUsername(username);
+    public void activateUser(String code) {
+        User user = userRepository.findUserByActivationCode(code);
         if (user.getActivationCode() == null){
             return;
         }
@@ -116,4 +133,46 @@ public class UserService implements UserDetailsService {
         userRepository.save(user);
     }
 
+    public void createPasswordResetTokenForUser(String userEmail) {
+        User user = findUserByEmail(userEmail);
+        String token = UUID.randomUUID().toString();
+        PasswordResetToken myToken = new PasswordResetToken(token, user, new Date());
+        passwordTokenRepository.save(myToken);
+
+        if (!StringUtils.isEmpty(user.getUserEmail())) {
+            String message = "Привет, "+user.getUsername()+"!"+
+                    " для восстановление аккаунта перейдите по ссылке http://localhost:8080/recover/"
+                    +token;
+            emailService.sendSimpleMessage(user.getUserEmail(), message);
+        }
+    }
+    @Transactional
+    public String changePasswordByToken(String token, String userPassword, String userPasswordConfirm,
+                                        RedirectAttributes redirectAttributes) {
+        if (!Objects.equals(userPassword, userPasswordConfirm)) {
+            redirectAttributes.addFlashAttribute("errorConfPassword", true);
+            redirectAttributes.addFlashAttribute("token", token);
+            log.warn("error confirm pass");
+            return "redirect:/recoveryPage";
+        }
+
+        if (userPassword.length() < 5){
+            redirectAttributes.addFlashAttribute("errorLenPassword", true);
+            redirectAttributes.addFlashAttribute("token", token);
+            log.warn("error pass length");
+            return "redirect:/recoveryPage";
+        }
+
+        try{
+            User user = passwordTokenRepository.findByToken(token).getUser();
+            user.setPassword(bCryptPasswordEncoder.encode(userPassword));
+            userRepository.save(user);
+            passwordTokenRepository.deleteByToken(token);
+            log.info("password changed");
+            return "redirect:/login";
+        } catch (Exception e){
+            log.error(e.getClass().toString());
+            return "redirect:/recovery";
+        }
+    }
 }
