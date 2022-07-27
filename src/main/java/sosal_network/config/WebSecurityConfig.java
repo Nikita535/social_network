@@ -10,17 +10,26 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 
+/**
+ * Class WebSecurityConfig - класс конфигурации WebSecurity
+ * **/
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 
+    /**
+     * Метод создания бина кодировщика паролей
+     * **/
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * Метод разрешения доступа к страницам
+     * **/
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
@@ -43,6 +52,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
 
+    /**
+     * метод разрешения подгрузки стилей
+     * **/
     @Override
     public void configure(WebSecurity web) throws Exception {
         web

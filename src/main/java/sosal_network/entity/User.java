@@ -14,6 +14,11 @@ import sosal_network.Enum.Role;
 import javax.persistence.*;
 import java.util.*;
 
+
+
+/**
+ * Class User - класс сущности пользователя
+ * **/
 @Entity(name = "user")
 @Table(name = "users")
 @Data
@@ -25,26 +30,47 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private int id;
+
+    /** имя пользователя  **/
     private String username;
+    /** фамилия пользователя  **/
     private String userSurname;
+
+    /** пароль пользователя  **/
     private String password;
+
+    /** подтвержденный пароль пользователя  **/
     @Transient
     private String userPasswordConfirm;
+
+    /** почта пользователя  **/
     private String userEmail;
 
+    /** активность пользователя  **/
     private Boolean active;
 
 
 
+    /**
+     * Соединение таблиц пользователя с ролями
+     * author - Nikita
+     * **/
     @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
     @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))
     @Enumerated(EnumType.STRING)
     private Set<Role> roles = new HashSet<>();
 
+    /**
+     * Соединение таблиц пользователя с друзьями
+     * author - Nikita
+     * **/
     @OneToMany(mappedBy = "userID", fetch = FetchType.EAGER, orphanRemoval = true)
     private Set<Friend> friendsList = new HashSet<Friend>();
 
 
+    /**
+     * Основной конструктор
+     * **/
     public User(String userName, String userSurname, String password, String passwordConfirm, String email) {
         this.username = userName;
         this.userSurname = userSurname;

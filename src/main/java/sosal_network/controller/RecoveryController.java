@@ -19,13 +19,28 @@ import java.util.Date;
 import java.util.UUID;
 
 
+/**
+ * Class RecoveryController - контроллер для восстановления пароля
+ * **/
 @Controller
 public class RecoveryController {
+
+    /**
+     * Поле репозитория токена восстановления
+     * **/
     @Autowired
     private passwordTokenRepository passwordTokenRepository;
 
+
+    /**
+     * Поле сервиса почты
+     * **/
     @Autowired
     EmailService emailService;
+
+    /**
+     * Поле сервиса пользователя
+     * **/
     @Autowired
     private UserService userService;
 
@@ -56,7 +71,6 @@ public class RecoveryController {
 
     @GetMapping("/recoveryPage")
     public String getRecoveryByPassword(Model model, @ModelAttribute("token") String token){
-//        model.addAttribute("token", token);
         return "recoveryPage";
     }
 

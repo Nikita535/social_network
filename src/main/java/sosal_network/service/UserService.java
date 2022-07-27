@@ -21,27 +21,42 @@ import sosal_network.repository.UserRepository;
 import sosal_network.repository.passwordTokenRepository;
 
 import javax.mail.MessagingException;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.util.*;
 
+
+/**
+ * Class userService - класс для основных операций над пользователем
+ * **/
 @RequiredArgsConstructor
 @Slf4j
 @Service
 public class UserService implements UserDetailsService {
+    /** Bean репозитория пользователя**/
     @Autowired
     private UserRepository userRepository;
 
+    /** Bean репозитория кода активации **/
     @Autowired
     ActivationTokenRepository activationTokenRepository;
+
+    /** Bean репозитория кода для восстановления аккаунта **/
     @Autowired
     private passwordTokenRepository passwordTokenRepository;
+
+    /** Bean класса кодирования паролей **/
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    /** Bean сервиса для почты **/
     @Autowired
     EmailService emailService;
 
 
+    /**
+     * Метод загрузки пользователя, наследованный UserDetailsService
+     * param username - имя пользователя
+     * author - Nikita
+     **/
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -55,18 +70,32 @@ public class UserService implements UserDetailsService {
         return user;
     }
 
+    /**
+     * метод поиска пользователя в БД
+     * param username - имя пользователя
+     * author - Nikita
+     * **/
     @Transactional
     public User findUserByUsername(String username) {
         return userRepository.findByUsername(username);
     }
 
+    /**
+     * Метод поиска пользователя по почте
+     * param email - почта пользователя
+     * author - Renat
+     * **/
     @Transactional
     public User findUserByEmail(String email) {
         return userRepository.findByUserEmail(email);
     }
 
 
-    /** createActivationCode **/
+    /**
+     * Метод сохранения пользователя в БД
+     * param User user - пользователь
+     * author - Nikita and Nekit
+     * **/
     @Transactional
     public boolean saveUser(User user) throws MessagingException {
         User userFromDB = userRepository.findByUsername(user.getUsername());
@@ -78,7 +107,6 @@ public class UserService implements UserDetailsService {
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         user.setRoles(Collections.singleton(Role.ROLE_USER));
         user.setActive(false);
-//        user.setActivationCode(UUID.randomUUID().toString());
         userRepository.save(user);
 
         createActivationCode(user.getUserEmail());
@@ -87,6 +115,13 @@ public class UserService implements UserDetailsService {
     }
 
 
+    /**
+     * Метод проверки правильности регистрации и сохранение пользователя в БД
+     * param user - пользователь
+     * param model - модель для добавления атрибутов на текущую страницу
+     * param redirectAttributes - модель для добавления атрибутов на переадресованную страницу
+     * author - Nikita, Nekit, Renat
+     * **/
     public String validateRegister(User user, Model model, RedirectAttributes redirectAttributes) {
 
         if (!Objects.equals(user.getPassword(), user.getUserPasswordConfirm())) {
@@ -120,7 +155,11 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    /** тут изменил **/
+    /**
+     * Метод для активации аккаунта пользователя
+     * param code - токен активации
+     * author - Nikita, Renat
+     * **/
     @Transactional
     public void activateUser(String code) {
         User user = activationTokenRepository.findByToken(code).getUser();
@@ -132,7 +171,11 @@ public class UserService implements UserDetailsService {
         userRepository.save(user);
     }
 
-    /** этот метод создал **/
+    /**
+     * Метод для создания кода активации
+     * param userEmail - почта пользователя
+     * author - Nikita, Renat
+     * **/
     public void createActivationCode(String userEmail) throws MessagingException {
         User user = findUserByEmail(userEmail);
         String token = UUID.randomUUID().toString();
@@ -146,6 +189,11 @@ public class UserService implements UserDetailsService {
         }
     }
 
+    /**
+     * Метод для создания кода восстановления аккаунта
+     * param userEmail - почта пользователя
+     * author - Renat, Nekit
+     * **/
     public void createPasswordResetTokenForUser(String userEmail) throws MessagingException {
         User user = findUserByEmail(userEmail);
         String token = UUID.randomUUID().toString();
@@ -158,7 +206,13 @@ public class UserService implements UserDetailsService {
             emailService.sendSimpleMessage(user.getUserEmail(), message);
         }
     }
-
+    /**
+     * Метод смены пароля при попытке восстановления аккаунта
+     * param token - код восстановления
+     * param userPassword - пароль пользователя
+     * param userPasswordConfirm
+     * author - Renat, Nekit
+     * **/
     @Transactional
     public String changePasswordByToken(String token, String userPassword, String userPasswordConfirm,
                                         RedirectAttributes redirectAttributes) {
