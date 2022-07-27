@@ -18,6 +18,9 @@ import sosal_network.entity.User;
 import sosal_network.repository.UserRepository;
 import sosal_network.repository.passwordTokenRepository;
 
+import javax.mail.MessagingException;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.*;
 
 @RequiredArgsConstructor
@@ -61,7 +64,7 @@ public class UserService implements UserDetailsService {
 
 
     @Transactional
-    public boolean saveUser(User user){
+    public boolean saveUser(User user) throws MessagingException {
         User userFromDB = userRepository.findByUsername(user.getUsername());
 
         if (userFromDB != null){
@@ -74,11 +77,9 @@ public class UserService implements UserDetailsService {
         user.setActivationCode(UUID.randomUUID().toString());
         userRepository.save(user);
 
-
         if (!StringUtils.isEmpty(user.getUserEmail())) {
             String message = "Привет, "+user.getUsername()+"!"+
-                    " Для подтверждения своей почты перейдите по ссылке http://localhost:8080/activate/"
-                    + user.getActivationCode();
+                    " Для подтверждения своей почты перейдите <a href= 'http://localhost:8080/activate/"+user.getUsername()+"'> по ссылке </a>";
             emailService.sendSimpleMessage(user.getUserEmail(), message);
         }
 
@@ -92,39 +93,33 @@ public class UserService implements UserDetailsService {
     public String validateRegister(User user, Model model, RedirectAttributes redirectAttributes){
 
         if (!Objects.equals(user.getPassword(), user.getUserPasswordConfirm())){
-            redirectAttributes.addFlashAttribute("errorConfPassword", true);
+            model.addAttribute("errorConfPassword", true);
             log.warn("error confirm pass");
-            return "redirect:/register";
+            return "register";
         }
-
-        if (findUserByEmail(user.getUserEmail()) != null){
-            redirectAttributes.addFlashAttribute("errorAlreadyExistsEmail", true);
-            log.warn("error email already exists");
-            return "redirect:/register";
-        }
-
         if (user.getPassword().length() < 5){
-            redirectAttributes.addFlashAttribute("errorLenPassword", true);
+            model.addAttribute("errorLenPassword", true);
             log.warn("error pass length");
-            return "redirect:/register";
+            return "register";
         }
         if (findUserByUsername(user.getUsername()) != null){
-            redirectAttributes.addFlashAttribute("errorAlreadyExistsUsername", true);
+            model.addAttribute("errorAlreadyExistsUsername", true);
             log.warn("error user already exists");
-            return "redirect:/register";
+            return "register";
         }
         try{
             saveUser(user);
             log.info("user add");
+            redirectAttributes.addFlashAttribute("registerSuccess", true);
             return "redirect:/login";
         } catch (Exception e){
             log.error(e.getClass().toString());
-            return "redirect:/register";
+            return "register";
         }
     }
 
-    public void activateUser(String code) {
-        User user = userRepository.findUserByActivationCode(code);
+    public void activateUser(String username) {
+        User user = userRepository.findByUsername(username);
         if (user.getActivationCode() == null){
             return;
         }

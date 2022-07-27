@@ -35,12 +35,13 @@ public class RegisterController {
     @PostMapping("/register")
     public String registerSave(@ModelAttribute("user") @Valid User user,
                                Model model, RedirectAttributes redirectAttributes) {
-        return userService.validateRegister(user, model, redirectAttributes);
+        userService.validateRegister(user, model,redirectAttributes);
+        return "redirect:/login";
     }
 
-    @GetMapping("/activate/{code}")
-    public String activate(Model model, @PathVariable String code){
-        userService.activateUser(code);
+    @GetMapping("/activate/{username}")
+    public String activate(Model model, @PathVariable String username){
+        userService.activateUser(username);
         return "redirect:/login";
     }
 
