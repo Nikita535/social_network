@@ -35,8 +35,7 @@ public class RegisterController {
     @PostMapping("/register")
     public String registerSave(@ModelAttribute("user") @Valid User user,
                                Model model, RedirectAttributes redirectAttributes) {
-        userService.validateRegister(user, model,redirectAttributes);
-        return "redirect:/login";
+        return userService.validateRegister(user, model,redirectAttributes);
     }
 
     @GetMapping("/activate/{username}")

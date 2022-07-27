@@ -47,6 +47,7 @@ public class RecoveryController {
         PasswordResetToken resetToken = passwordTokenRepository.findByToken(token);
         if (resetToken != null && resetToken.compareDate()) {
             redirectAttributes.addFlashAttribute("token", resetToken.getToken());
+            redirectAttributes.addFlashAttribute("username", resetToken.getUser().getUsername());
             return "redirect:/recoveryPage";
         }
         else
@@ -55,7 +56,7 @@ public class RecoveryController {
 
     @GetMapping("/recoveryPage")
     public String getRecoveryByPassword(Model model, @ModelAttribute("token") String token){
-        model.addAttribute("token", token);
+//        model.addAttribute("token", token);
         return "recoveryPage";
     }
 
