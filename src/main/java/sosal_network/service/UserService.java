@@ -128,7 +128,7 @@ public class UserService implements UserDetailsService {
         userRepository.save(user);
     }
 
-    public void createPasswordResetTokenForUser(String userEmail) {
+    public void createPasswordResetTokenForUser(String userEmail) throws MessagingException{
         User user = findUserByEmail(userEmail);
         String token = UUID.randomUUID().toString();
         PasswordResetToken myToken = new PasswordResetToken(token, user, new Date());

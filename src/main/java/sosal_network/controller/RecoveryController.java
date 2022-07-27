@@ -13,6 +13,7 @@ import sosal_network.repository.passwordTokenRepository;
 import sosal_network.service.EmailService;
 import sosal_network.service.UserService;
 
+import javax.mail.MessagingException;
 import javax.validation.Valid;
 import java.util.Date;
 import java.util.UUID;
@@ -36,7 +37,7 @@ public class RecoveryController {
 
     @PostMapping("/recovery")
     public String sendRecoveryToken(@RequestParam("email") String userEmail,
-                               Model model) {
+                               Model model) throws MessagingException {
         userService.createPasswordResetTokenForUser(userEmail);
         return "login";
     }
