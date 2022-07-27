@@ -121,6 +121,7 @@ public class UserService implements UserDetailsService {
     }
 
     /** тут изменил **/
+    @Transactional
     public void activateUser(String code) {
         User user = activationTokenRepository.findByToken(code).getUser();
         if (user == null) {
@@ -140,7 +141,7 @@ public class UserService implements UserDetailsService {
 
         if (!StringUtils.isEmpty(user.getUserEmail())) {
             String message = "Привет, " + user.getUsername() + "!" +
-                    " для активации аккаунта перейдите <a href='http://localhost:8080/recover/" + token + "'>по ссылке</a>";
+                    " для активации аккаунта перейдите <a href='http://localhost:8080/activate/" + token + "'>по ссылке</a>";
             emailService.sendSimpleMessage(user.getUserEmail(), message);
         }
     }
