@@ -11,18 +11,10 @@ import sosal_network.service.UserService;
 public class LoginController {
 
 
-    @GetMapping("/index")
-    public String getHome(){
-        return "index";
-    }
-
     @GetMapping("/login")
     public String getLogin() throws Exception {
         return "login";
     }
-
-
-
 
 
 }

@@ -8,7 +8,7 @@ import sosal_network.entity.PasswordResetToken;
  * Class passwordTokenRepository - класс для основных действий с БД
  * **/
 @Repository
-public interface passwordTokenRepository extends JpaRepository<PasswordResetToken,Integer> {
+public interface PasswordTokenRepository extends JpaRepository<PasswordResetToken,Integer> {
 
     /**
      * Метод findByToken для поиска пользователя по токену

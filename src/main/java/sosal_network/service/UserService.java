@@ -3,6 +3,7 @@ package sosal_network.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -18,9 +19,10 @@ import sosal_network.entity.PasswordResetToken;
 import sosal_network.entity.User;
 import sosal_network.repository.ActivationTokenRepository;
 import sosal_network.repository.UserRepository;
-import sosal_network.repository.passwordTokenRepository;
+import sosal_network.repository.PasswordTokenRepository;
 
 import javax.mail.MessagingException;
+import java.time.LocalDate;
 import java.util.*;
 
 
@@ -41,7 +43,7 @@ public class UserService implements UserDetailsService {
 
     /** Bean репозитория кода для восстановления аккаунта **/
     @Autowired
-    private passwordTokenRepository passwordTokenRepository;
+    private PasswordTokenRepository passwordTokenRepository;
 
     /** Bean класса кодирования паролей **/
     @Autowired
@@ -107,6 +109,7 @@ public class UserService implements UserDetailsService {
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         user.setRoles(Collections.singleton(Role.ROLE_USER));
         user.setActive(false);
+        user.setRegistrationDate(LocalDate.now());
         userRepository.save(user);
 
         createActivationCode(user.getUserEmail());
@@ -241,5 +244,14 @@ public class UserService implements UserDetailsService {
             log.error(e.getClass().toString());
             return "redirect:/recovery";
         }
+    }
+    /**
+     * Метод для получения информации о пользователе из сессии
+     * author - Nekit
+     * **/
+    @Transactional
+    public User getUserAuth()
+    {
+        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 }

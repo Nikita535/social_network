@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import sosal_network.Enum.Role;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.*;
 
 
@@ -49,7 +50,8 @@ public class User implements UserDetails {
     /** активность пользователя  **/
     private Boolean active;
 
-
+    /** дата регистрации пользователя **/
+    private LocalDate registrationDate;
 
     /**
      * Соединение таблиц пользователя с ролями
@@ -68,6 +70,7 @@ public class User implements UserDetails {
     private Set<Friend> friendsList = new HashSet<Friend>();
 
 
+
     /**
      * Основной конструктор
      * **/
@@ -77,6 +80,7 @@ public class User implements UserDetails {
         this.password = password;
         this.userPasswordConfirm = passwordConfirm;
         this.userEmail = email;
+        this.registrationDate=LocalDate.now();
     }
 
 

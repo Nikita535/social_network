@@ -1,22 +1,16 @@
 package sosal_network.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import sosal_network.entity.PasswordResetToken;
-import sosal_network.entity.User;
-import sosal_network.repository.UserRepository;
-import sosal_network.repository.passwordTokenRepository;
+import sosal_network.repository.PasswordTokenRepository;
 import sosal_network.service.EmailService;
 import sosal_network.service.UserService;
 
 import javax.mail.MessagingException;
-import javax.validation.Valid;
-import java.util.Date;
-import java.util.UUID;
 
 
 /**
@@ -29,7 +23,7 @@ public class RecoveryController {
      * Поле репозитория токена восстановления
      * **/
     @Autowired
-    private passwordTokenRepository passwordTokenRepository;
+    private PasswordTokenRepository passwordTokenRepository;
 
 
     /**
