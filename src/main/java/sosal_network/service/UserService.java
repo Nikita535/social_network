@@ -301,5 +301,47 @@ public class UserService implements UserDetailsService {
         return getUserAuth().getActive();
     }
 
+    public String editProfile(ProfileInfo editedProfile, RedirectAttributes redirectAttributes,
+                              String currentPassword, String newPassword,
+                              String passwordConfirm){
+        ProfileInfo profileSession = findByUser_Username(getUserAuth().getUsername());
+
+        if (Objects.equals(editedProfile.getName(), "") || Objects.equals(editedProfile.getCity(), "")
+                || Objects.equals(editedProfile.getDescription(), "")|| Objects.equals(editedProfile.getSurname(), "")
+                || Objects.equals(editedProfile.getWebsite(), "")) {
+            redirectAttributes.addFlashAttribute("errorLen", true);
+            log.warn("error len of profile");
+            return "redirect:/edit";
+        }
+
+        redirectAttributes.addFlashAttribute("profileChanged", true);
+        editedProfile.setUser(profileSession.getUser());
+        editedProfile.setId(profileSession.getId());
+        profileSession = editedProfile;
+        profileInfoRepository.save(profileSession);
+
+        if (!Objects.equals(currentPassword, "") && !Objects.equals(newPassword, "")
+                && !Objects.equals(passwordConfirm, "")) {
+            if (!bCryptPasswordEncoder.matches(currentPassword, profileSession.getUser().getPassword())) {
+                redirectAttributes.addFlashAttribute("errorCurrentPassword", true);
+                log.warn("error current passwords");
+                return "redirect:/edit";
+            }
+
+            if (!Objects.equals(newPassword, passwordConfirm)) {
+                redirectAttributes.addFlashAttribute("errorPassword", true);
+                log.warn("error passwords");
+                return "redirect:/edit";
+            }
+
+
+            profileSession.getUser().setPassword(bCryptPasswordEncoder.encode(newPassword));
+            redirectAttributes.addFlashAttribute("passwordChanged", true);
+            userRepository.save(profileSession.getUser());
+
+        }
+        return "redirect:/edit";
+    }
+
 
 }
