@@ -12,7 +12,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 /**
  * Class WebSecurityConfig - класс конфигурации WebSecurity
- * **/
+ **/
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -21,7 +21,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     /**
      * Метод создания бина кодировщика паролей
-     * **/
+     **/
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
@@ -29,15 +29,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     /**
      * Метод разрешения доступа к страницам
-     * **/
+     **/
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
                 .csrf()
                 .disable()
                 .authorizeRequests().antMatchers("/login",
-                        "/logout", "/register","/activate/*", "/recovery",
-                        "/recoveryPage/*", "/recover/*", "/recoveryPage", "/invalidToken").permitAll()
+                        "/logout", "/register", "/activate/*", "/recovery",
+                        "/recoveryPage/*", "/recover/*", "/recoveryPage", "/invalidToken", "/register/info/*", "/registerContinue").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
@@ -54,11 +54,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     /**
      * метод разрешения подгрузки стилей
-     * **/
+     **/
     @Override
     public void configure(WebSecurity web) throws Exception {
         web
                 .ignoring()
-                .antMatchers("/**/**/**.css","/**/**/**.js","/**/**/**.gif");
+                .antMatchers("/resources/**", "/**/**/**.css", "/**/**/**.js", "/**/**/**.gif");
     }
 }

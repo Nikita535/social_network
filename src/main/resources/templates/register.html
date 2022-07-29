@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+>
 
 <head>
     <meta charset="utf-8">
@@ -50,15 +50,15 @@
                         </div>
                         <input class="form-control" type="text" required="true" th:field="*{username}"
                                placeholder="Введите имя">
-                        <input class="form-control" type="text" required="true" th:field="*{userSurname}"
-                               placeholder="Введите фамилию">
+                        <!--                        <input class="form-control" type="text" required="true" th:field="*{userSurname}"-->
+                        <!--                               placeholder="Введите фамилию">-->
                         <input class="form-control" type="email" required="true" th:field="*{userEmail}"
                                placeholder="Введите почту">
                         <input class="form-control" type="password" th:field="*{password}" placeholder="Введите пароль"
                                required="true">
                         <input class="form-control" type="password" th:field="*{userPasswordConfirm}"
                                placeholder="Введите пароль еще раз" required="true">
-                        <button type="submit" class="btn btn-success">Зарегистрироваться <i
+                        <button type="submit" class="btn btn-success">Продолжить регистрацию <i
                                 class="fa fa-fw fa-unlock-alt"></i></button>
                     </form>
                 </div>
@@ -66,7 +66,6 @@
         </div>
     </div>
 </div>
-
 
 
 <!-- скрипт для логина  -->

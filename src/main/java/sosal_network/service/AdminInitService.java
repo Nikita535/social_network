@@ -27,10 +27,10 @@ public class AdminInitService implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         String password = bCryptPasswordEncoder.encode("ADMIN");
-        User admin = new User("ADMIN","ADMIN",password,password,"victor.hodinsciy.com@gmail.com");
+        User admin = new User("ADMIN", password, password, "victor.hodinsciy.com@gmail.com");
         admin.getRoles().add(Role.ROLE_ADMIN);
         admin.setActive(true);
-        if (userRepository.findByUsername("ADMIN")==null) {
+        if (userRepository.findByUsername("ADMIN") == null) {
             userRepository.save(admin);
         }
         System.out.println(admin.getRoles().toArray()[0].toString().getClass());

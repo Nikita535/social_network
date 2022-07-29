@@ -16,40 +16,61 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import sosal_network.Enum.Role;
 import sosal_network.entity.ActivationToken;
 import sosal_network.entity.PasswordResetToken;
+import sosal_network.entity.ProfileInfo;
 import sosal_network.entity.User;
 import sosal_network.repository.ActivationTokenRepository;
-import sosal_network.repository.UserRepository;
 import sosal_network.repository.PasswordTokenRepository;
+import sosal_network.repository.ProfileInfoRepository;
+import sosal_network.repository.UserRepository;
 
 import javax.mail.MessagingException;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Objects;
+import java.util.UUID;
 
 
 /**
  * Class userService - класс для основных операций над пользователем
- * **/
+ **/
 @RequiredArgsConstructor
 @Slf4j
 @Service
 public class UserService implements UserDetailsService {
-    /** Bean репозитория пользователя**/
+    /**
+     * Bean репозитория пользователя
+     **/
     @Autowired
     private UserRepository userRepository;
 
-    /** Bean репозитория кода активации **/
+    /**
+     * Bean репозитория кода активации
+     **/
     @Autowired
     ActivationTokenRepository activationTokenRepository;
 
-    /** Bean репозитория кода для восстановления аккаунта **/
+    /**
+     * Bean репозитория кода для восстановления аккаунта
+     **/
     @Autowired
     private PasswordTokenRepository passwordTokenRepository;
 
-    /** Bean класса кодирования паролей **/
+    /**
+     * Bean репозитория для информации об аккаунте
+     **/
+    @Autowired
+    private ProfileInfoRepository profileInfoRepository;
+
+    /**
+     * Bean класса кодирования паролей
+     **/
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    /** Bean сервиса для почты **/
+    /**
+     * Bean сервиса для почты
+     **/
     @Autowired
     EmailService emailService;
 
@@ -76,7 +97,7 @@ public class UserService implements UserDetailsService {
      * метод поиска пользователя в БД
      * param username - имя пользователя
      * author - Nikita
-     * **/
+     **/
     @Transactional
     public User findUserByUsername(String username) {
         return userRepository.findByUsername(username);
@@ -86,18 +107,22 @@ public class UserService implements UserDetailsService {
      * Метод поиска пользователя по почте
      * param email - почта пользователя
      * author - Renat
-     * **/
+     **/
     @Transactional
     public User findUserByEmail(String email) {
         return userRepository.findByUserEmail(email);
     }
 
+    @Transactional
+    public ProfileInfo findByUser_Username(String username) {
+        return profileInfoRepository.findByUser_Username(username);
+    }
 
     /**
      * Метод сохранения пользователя в БД
      * param User user - пользователь
      * author - Nikita and Nekit
-     * **/
+     **/
     @Transactional
     public boolean saveUser(User user) throws MessagingException {
         User userFromDB = userRepository.findByUsername(user.getUsername());
@@ -124,7 +149,7 @@ public class UserService implements UserDetailsService {
      * param model - модель для добавления атрибутов на текущую страницу
      * param redirectAttributes - модель для добавления атрибутов на переадресованную страницу
      * author - Nikita, Nekit, Renat
-     * **/
+     **/
     public String validateRegister(User user, Model model, RedirectAttributes redirectAttributes) {
 
         if (!Objects.equals(user.getPassword(), user.getUserPasswordConfirm())) {
@@ -149,9 +174,9 @@ public class UserService implements UserDetailsService {
         }
         try {
             saveUser(user);
-            log.info("user add");
-            redirectAttributes.addFlashAttribute("registerSuccess", true);
-            return "redirect:/login";
+//            log.info("user add");
+//            redirectAttributes.addFlashAttribute("registerSuccess", true);
+            return "redirect:/register/info/" + user.getUsername();
         } catch (Exception e) {
             log.error(e.getClass().toString());
             return "register";
@@ -162,7 +187,7 @@ public class UserService implements UserDetailsService {
      * Метод для активации аккаунта пользователя
      * param code - токен активации
      * author - Nikita, Renat
-     * **/
+     **/
     @Transactional
     public void activateUser(String code) {
         User user = activationTokenRepository.findByToken(code).getUser();
@@ -178,7 +203,7 @@ public class UserService implements UserDetailsService {
      * Метод для создания кода активации
      * param userEmail - почта пользователя
      * author - Nikita, Renat
-     * **/
+     **/
     public void createActivationCode(String userEmail) throws MessagingException {
         User user = findUserByEmail(userEmail);
         String token = UUID.randomUUID().toString();
@@ -196,7 +221,7 @@ public class UserService implements UserDetailsService {
      * Метод для создания кода восстановления аккаунта
      * param userEmail - почта пользователя
      * author - Renat, Nekit
-     * **/
+     **/
     public void createPasswordResetTokenForUser(String userEmail) throws MessagingException {
         User user = findUserByEmail(userEmail);
         String token = UUID.randomUUID().toString();
@@ -209,13 +234,14 @@ public class UserService implements UserDetailsService {
             emailService.sendSimpleMessage(user.getUserEmail(), message);
         }
     }
+
     /**
      * Метод смены пароля при попытке восстановления аккаунта
      * param token - код восстановления
      * param userPassword - пароль пользователя
-     * param userPasswordConfirm
+     * param userPasswordConfirm - подтверждение пароля
      * author - Renat, Nekit
-     * **/
+     **/
     @Transactional
     public String changePasswordByToken(String token, String userPassword, String userPasswordConfirm,
                                         RedirectAttributes redirectAttributes) {
@@ -245,13 +271,28 @@ public class UserService implements UserDetailsService {
             return "redirect:/recovery";
         }
     }
+
+    /**
+     * Метод для добавления информации о пользователе
+     * param profileInfo - информация о пользователе
+     * param redirectAttributes - модель для добавления атрибутов на переадресованную страницу
+     * param username - имя пользователя
+     * author - Nekit
+     **/
+    @Transactional
+    public String addProfileInfo(ProfileInfo profileInfo, RedirectAttributes redirectAttributes, String username) {
+        profileInfo.setUser(findUserByUsername(username));
+        profileInfoRepository.save(profileInfo);
+        redirectAttributes.addFlashAttribute("registerSuccess", true);
+        return "redirect:/login";
+    }
+
     /**
      * Метод для получения информации о пользователе из сессии
      * author - Nekit
-     * **/
+     **/
     @Transactional
-    public User getUserAuth()
-    {
+    public User getUserAuth() {
         return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 }

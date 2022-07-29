@@ -15,34 +15,42 @@ import java.util.Date;
 @Setter
 public class PasswordResetToken {
 
-    /** поле для времени **/
+    /**
+     * поле для времени
+     **/
     private static final int EXPIRATION = 24 * 60 * 60 * 1000;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    /** поле токена **/
+    /**
+     * поле токена
+     **/
     private String token;
 
-    /** соединение токена с пользователем  **/
+    /**
+     * соединение токена с пользователем
+     **/
     @OneToOne(targetEntity = User.class, fetch = FetchType.EAGER)
     @JoinColumn(nullable = false, name = "user_id")
     private User user;
 
-    /** поле для даты **/
+    /**
+     * поле для даты
+     **/
     private Date expiryDate;
 
     /**
      * пустой конструктор
-     * **/
+     **/
     public PasswordResetToken() {
     }
 
     /**
      * Главный конструктор
      * author - Renat
-     * **/
+     **/
     public PasswordResetToken(String token, User user, Date expiryDate) {
         this.token = token;
         this.user = user;
@@ -52,8 +60,8 @@ public class PasswordResetToken {
     /**
      * Метод сравнения дат
      * author - Renat
-     * **/
-    public boolean compareDate(){
+     **/
+    public boolean compareDate() {
         return (int) ((new Date().getTime() - expiryDate.getTime()) / EXPIRATION) < 2;
     }
 }

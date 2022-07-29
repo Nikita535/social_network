@@ -5,7 +5,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import sosal_network.entity.User;
 import sosal_network.service.UserService;
 
 import java.util.Optional;
@@ -42,15 +41,15 @@ public class UserController {
             return "/error";
         }
         if (username.isEmpty()) {
-            String usernameAuth = userService.getUserAuth().getUsername();
             model.addAttribute("user", userService.getUserAuth());
+            model.addAttribute("profileInfo", userService.findByUser_Username(userService.getUserAuth().getUsername()));
             return "index";
         }
         if (userService.findUserByUsername(username.get()) == null) {
             return "error-404";
         }
-        User user = userService.getUserAuth();
         model.addAttribute("user", userService.findUserByUsername(username.get()));
+        model.addAttribute("profileInfo", userService.findByUser_Username(username.get()));
         return "index";
 
     }
