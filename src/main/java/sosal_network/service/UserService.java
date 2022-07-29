@@ -295,4 +295,11 @@ public class UserService implements UserDetailsService {
     public User getUserAuth() {
         return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
+
+    @Transactional
+    public Boolean getUserActive(){
+        return getUserAuth().getActive();
+    }
+
+
 }

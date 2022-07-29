@@ -7,9 +7,10 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.bundle.min.js"></script>
     <link href="/profile/profile.css" rel="stylesheet">
+    <link href="/error/error-404.css" rel="stylesheet">
 </head>
 <body>
-<div class="container">
+<div class="container"  th:if="${#authentication.getPrincipal().getActive()}">
     <div class="profile-page tx-13">
         <div class="row">
             <div class="col-12 grid-margin">
@@ -25,7 +26,7 @@
                                 <span class="profile-name"  th:text="${user.getUsername()} + ' ( '+ ${profileInfo.getName()} + ' ' + ${profileInfo.getSurname()}+' )' "></span>
                             </div>
                             <div class="d-none d-md-block">
-                                <button class="btn btn-primary btn-icon-text btn-edit-profile" th:if="${#authentication.getPrincipal().getUsername()}==${user.getUsername()}">
+                                <button  class="btn btn-primary btn-icon-text btn-edit-profile" th:if="${#authentication.getPrincipal().getUsername()}==${user.getUsername()}">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit btn-icon-prepend">
                                         <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                                         <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
@@ -498,6 +499,20 @@
         </div>
     </div>
 </div>
+
+<section class="error-404-section section-padding"  th:if="!${#authentication.getPrincipal().getActive()}">
+    <div class="error">
+        <img src="/img/error404.png" alt>
+    </div>
+    <div class="error-message">
+        <h3>Ой! Аккаунт не активирован!</h3>
+        <p>Активируйте аккаунт, перейдя по ссылке из письма.</p>
+        <a href="javascript:history.go(-1)" class="theme-btn">Вернуться назад</a>
+    </div>
+</section>
+
+
+
 
 <script type="text/javascript">
 
