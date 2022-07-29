@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8">
     <!--  This file has been downloaded from bootdey.com @bootdey on twitter -->
@@ -7,6 +7,8 @@
     <title>Profile with overview and edit - Bootdey.com</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://netdna.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+    <script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+    <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
     <script src="https://netdna.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     <link href="/profileEdit/profileEdit.css" rel="stylesheet">
 </head>
@@ -41,29 +43,41 @@
                         <hr class="half-margins">
 
                         <!-- About -->
-                        <h3 class="text-black">
-                            Melisa Doe
+                        <h3 class="text-black" th:text="${profileInfo.getName()}+ ' '+ ${profileInfo.getSurname()}">
+
                             <small class="text-gray size-14"> / CEO</small>
                         </h3>
-                        <p class="size-12">Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt laoreet dolore magna aliquam tincidunt erat volutpat laoreet dolore magna aliquam tincidunt erat volutpat.</p>
+                        <p class="size-12" th:text="${profileInfo.getDescription()}"></p>
                         <!-- /About -->
 
                         <hr class="half-margins">
                         <!-- Social -->
                         <h6>Follow Me</h6>
-                        <a href="#" class="btn ico-only btn-facebook btn-xs" title="Facebook"><i class="fa fa-facebook"></i></a>
-                        <a href="#" class="btn ico-only btn-twitter btn-xs" title="Twitter"><i class="fa fa-twitter"></i></a>
-                        <a href="#" class="btn ico-only btn-google-plus btn-xs" title="Google plus"><i class="fa fa-google-plus"></i></a>
-                        <a href="#" class="btn ico-only btn-linkedin btn-xs" title="Linked In"><i class="fa fa-linkedin"></i></a>
-                        <a href="#" class="btn ico-only btn-pinterest btn-xs" title="Pinterest"><i class="fa fa-pinterest"></i></a>
-                        <a href="#" class="btn ico-only btn-flickr btn-xs" title="Flickr"><i class="fa fa-flickr"></i></a>
-                        <a href="#" class="btn ico-only btn-tumblr btn-xs" title="Tumblr"><i class="fa fa-tumblr"></i></a>
+                        <a href="#" class="btn ico-only btn-facebook btn-xs" title="Facebook"><i
+                                class="fa fa-facebook"></i></a>
+                        <a href="#" class="btn ico-only btn-twitter btn-xs" title="Twitter"><i
+                                class="fa fa-twitter"></i></a>
+                        <a href="#" class="btn ico-only btn-google-plus btn-xs" title="Google plus"><i
+                                class="fa fa-google-plus"></i></a>
+                        <a href="#" class="btn ico-only btn-linkedin btn-xs" title="Linked In"><i
+                                class="fa fa-linkedin"></i></a>
+                        <a href="#" class="btn ico-only btn-pinterest btn-xs" title="Pinterest"><i
+                                class="fa fa-pinterest"></i></a>
+                        <a href="#" class="btn ico-only btn-flickr btn-xs" title="Flickr"><i
+                                class="fa fa-flickr"></i></a>
+                        <a href="#" class="btn ico-only btn-tumblr btn-xs" title="Tumblr"><i
+                                class="fa fa-tumblr"></i></a>
                         <a href="#" class="btn ico-only btn-skype btn-xs" title="Skype"><i class="fa fa-skype"></i></a>
-                        <a href="#" class="btn ico-only btn-stackoverflow btn-xs" title="Stack Overflow"><i class="fa fa-stack-overflow"></i></a>
-                        <a href="#" class="btn ico-only btn-instagram btn-xs" title="Instagram"><i class="fa fa-instagram"></i></a>
-                        <a href="#" class="btn ico-only btn-dribbble btn-xs" title="Dribble"><i class="fa fa-dribbble"></i></a>
-                        <a href="#" class="btn ico-only btn-youtube btn-xs" title="Youtube"><i class="fa fa-youtube"></i></a>
-                        <a href="#" class="btn ico-only btn-vimeo btn-xs" title="Vimeo"><i class="fa fa-vimeo-square"></i></a>
+                        <a href="#" class="btn ico-only btn-stackoverflow btn-xs" title="Stack Overflow"><i
+                                class="fa fa-stack-overflow"></i></a>
+                        <a href="#" class="btn ico-only btn-instagram btn-xs" title="Instagram"><i
+                                class="fa fa-instagram"></i></a>
+                        <a href="#" class="btn ico-only btn-dribbble btn-xs" title="Dribble"><i
+                                class="fa fa-dribbble"></i></a>
+                        <a href="#" class="btn ico-only btn-youtube btn-xs" title="Youtube"><i
+                                class="fa fa-youtube"></i></a>
+                        <a href="#" class="btn ico-only btn-vimeo btn-xs" title="Vimeo"><i
+                                class="fa fa-vimeo-square"></i></a>
                         <a href="#" class="btn ico-only btn-rss btn-xs" title="Rss"><i class="fa fa-rss"></i></a>
                         <!-- /Social -->
 
@@ -92,9 +106,15 @@
                                 <textarea rows="2" class="form-control" placeholder="What's on your mind?"></textarea>
                                 <div class="margin-top-10">
                                     <button type="submit" class="btn btn-sm btn-primary pull-right">Post</button>
-                                    <a href="#" class="btn btn-link profile-btn-link" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Add a Location"><i class="fa fa-map-marker"></i></a>
-                                    <a href="#" class="btn btn-link profile-btn-link" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Add Photo"><i class="fa fa-camera"></i></a>
-                                    <a href="#" class="btn btn-link profile-btn-link" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Add File"><i class="fa fa-file"></i></a>
+                                    <a href="#" class="btn btn-link profile-btn-link" data-toggle="tooltip"
+                                       data-placement="bottom" title="" data-original-title="Add a Location"><i
+                                            class="fa fa-map-marker"></i></a>
+                                    <a href="#" class="btn btn-link profile-btn-link" data-toggle="tooltip"
+                                       data-placement="bottom" title="" data-original-title="Add Photo"><i
+                                            class="fa fa-camera"></i></a>
+                                    <a href="#" class="btn btn-link profile-btn-link" data-toggle="tooltip"
+                                       data-placement="bottom" title="" data-original-title="Add File"><i
+                                            class="fa fa-file"></i></a>
                                 </div>
                             </form>
 
@@ -103,7 +123,8 @@
                             <ul class="comment list-unstyled padding-10">
                                 <li class="comment">
                                     <!-- avatar -->
-                                    <img class="avatar" src="https://bootdey.com/img/Content/avatar/avatar1.png" width="50" height="50" alt="avatar">
+                                    <img class="avatar" src="https://bootdey.com/img/Content/avatar/avatar1.png"
+                                         width="50" height="50" alt="avatar">
                                     <!-- comment body -->
                                     <div class="comment-body">
                                         <a href="#" class="comment-author">
@@ -111,8 +132,10 @@
                                             <span>Melisa Doe</span>
                                         </a>
                                         <p>
-                                            Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh
-                                            euismod tincidunt laoreet dolore magna aliquam tincidunt erat volutpat laoreet
+                                            Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy
+                                            nibh
+                                            euismod tincidunt laoreet dolore magna aliquam tincidunt erat volutpat
+                                            laoreet
                                             dolore magna aliquam tincidunt erat volutpat.
                                         </p>
                                     </div><!-- /comment body -->
@@ -140,7 +163,8 @@
                                 <li class="comment comment-reply">
 
                                     <!-- avatar -->
-                                    <img class="avatar" src="https://bootdey.com/img/Content/avatar/avatar2.png" width="35" height="35" alt="avatar">
+                                    <img class="avatar" src="https://bootdey.com/img/Content/avatar/avatar2.png"
+                                         width="35" height="35" alt="avatar">
 
                                     <!-- comment body -->
                                     <div class="comment-body">
@@ -149,7 +173,8 @@
                                             <span>Ioana Doe</span>
                                         </a>
                                         <p>
-                                            Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy! <i class="fa fa-smile-o green"></i>
+                                            Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy!
+                                            <i class="fa fa-smile-o green"></i>
                                         </p>
                                     </div><!-- /comment body -->
 
@@ -171,7 +196,8 @@
                                 <li class="comment comment-reply">
 
                                     <!-- avatar -->
-                                    <img class="avatar" src="https://bootdey.com/img/Content/avatar/avatar3.png" width="35" height="35" alt="avatar">
+                                    <img class="avatar" src="https://bootdey.com/img/Content/avatar/avatar3.png"
+                                         width="35" height="35" alt="avatar">
 
                                     <!-- comment body -->
                                     <div class="comment-body">
@@ -180,7 +206,8 @@
                                             <span>Simona Doe</span>
                                         </a>
                                         <p>
-                                            Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy! <i class="fa fa-smile-o green"></i>
+                                            Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy!
+                                            <i class="fa fa-smile-o green"></i>
                                         </p>
                                     </div><!-- /comment body -->
 
@@ -206,7 +233,8 @@
                                 <li class="comment">
 
                                     <!-- avatar -->
-                                    <img class="avatar" src="https://bootdey.com/img/Content/avatar/avatar4.png" width="50" height="50" alt="avatar">
+                                    <img class="avatar" src="https://bootdey.com/img/Content/avatar/avatar4.png"
+                                         width="50" height="50" alt="avatar">
 
                                     <!-- comment body -->
                                     <div class="comment-body">
@@ -215,8 +243,10 @@
                                             <span>Melisa Doe</span>
                                         </a>
                                         <p>
-                                            Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh
-                                            euismod tincidunt laoreet dolore magna aliquam tincidunt erat volutpat laoreet
+                                            Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy
+                                            nibh
+                                            euismod tincidunt laoreet dolore magna aliquam tincidunt erat volutpat
+                                            laoreet
                                             dolore magna aliquam tincidunt erat volutpat.
                                         </p>
                                     </div><!-- /comment body -->
@@ -241,7 +271,8 @@
                                 <li class="comment comment-reply">
 
                                     <!-- avatar -->
-                                    <img class="avatar" src="https://bootdey.com/img/Content/avatar/avatar5.png" width="35" height="35" alt="avatar">
+                                    <img class="avatar" src="https://bootdey.com/img/Content/avatar/avatar5.png"
+                                         width="35" height="35" alt="avatar">
 
                                     <!-- comment body -->
                                     <div class="comment-body">
@@ -250,7 +281,8 @@
                                             <span>Ioana Doe</span>
                                         </a>
                                         <p>
-                                            Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy! <i class="fa fa-smile-o green"></i>
+                                            Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy!
+                                            <i class="fa fa-smile-o green"></i>
                                         </p>
                                     </div><!-- /comment body -->
 
@@ -272,7 +304,8 @@
                                 <li class="comment comment-reply">
 
                                     <!-- avatar -->
-                                    <img class="avatar" src="https://bootdey.com/img/Content/avatar/avatar6.png" width="35" height="35" alt="avatar">
+                                    <img class="avatar" src="https://bootdey.com/img/Content/avatar/avatar6.png"
+                                         width="35" height="35" alt="avatar">
 
                                     <!-- comment body -->
                                     <div class="comment-body">
@@ -281,7 +314,8 @@
                                             <span>Simona Doe</span>
                                         </a>
                                         <p>
-                                            Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy! <i class="fa fa-smile-o green"></i>
+                                            Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy!
+                                            <i class="fa fa-smile-o green"></i>
                                         </p>
                                     </div><!-- /comment body -->
 
@@ -301,7 +335,8 @@
                                 </li>
                                 <li>
                                     <div class="input-group">
-                                        <input id="btn-input" type="text" class="form-control" placeholder="Type your message...">
+                                        <input id="btn-input" type="text" class="form-control"
+                                               placeholder="Type your message...">
                                         <span class="input-group-btn">
 										<button class="btn btn-primary" id="btn-chat">
 											<i class="fa fa-reply"></i> Reply
@@ -323,25 +358,29 @@
                                     <div class="form-group">
                                         <label class="col-md-3 control-label" for="profileFirstName">First Name</label>
                                         <div class="col-md-8">
-                                            <input type="text" class="form-control" id="profileFirstName">
+                                            <input type="text" class="form-control" id="profileFirstName"
+                                                   th:value="${profileInfo.getName()}">
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="col-md-3 control-label" for="profileLastName">Last Name</label>
                                         <div class="col-md-8">
-                                            <input type="text" class="form-control" id="profileLastName">
+                                            <input type="text" class="form-control" id="profileLastName"
+                                                   th:value="${profileInfo.getSurname()}">
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label class="col-md-3 control-label" for="profileAddress">Address</label>
+                                        <label class="col-md-3 control-label" for="profileAddress">City</label>
                                         <div class="col-md-8">
-                                            <input type="text" class="form-control" id="profileAddress">
+                                            <input type="text" class="form-control" id="profileAddress"
+                                                   th:value="${profileInfo.getCity()}">
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label class="col-md-3 control-label" for="profileCompany">Company</label>
+                                        <label class="col-md-3 control-label" for="profileCompany">Website</label>
                                         <div class="col-md-8">
-                                            <input type="text" class="form-control" id="profileCompany">
+                                            <input type="text" class="form-control" id="profileCompany"
+                                                   th:value="${profileInfo.getWebsite()}">
                                         </div>
                                     </div>
                                 </fieldset>
@@ -371,11 +410,13 @@
                                             <div class="col-md-8">
                                                 <label for="file" class="input input-file">
                                                     <div class="button">
-                                                        <input type="file" id="file" onchange="this.parentNode.nextSibling.value = this.value">Browse
+                                                        <input type="file" id="file"
+                                                               onchange="this.parentNode.nextSibling.value = this.value">Browse
                                                     </div>
                                                     <input type="text" readonly="">
                                                 </label>
-                                                <a href="#" class="btn btn-danger btn-xs nomargin"><i class="fa fa-times"></i> Remove Current Image</a>
+                                                <a href="#" class="btn btn-danger btn-xs nomargin"><i
+                                                        class="fa fa-times"></i> Remove Current Image</a>
                                             </div>
                                         </div>
                                     </div>
@@ -388,13 +429,15 @@
                                 <h4>Change Password</h4>
                                 <fieldset class="mb-xl">
                                     <div class="form-group">
-                                        <label class="col-md-3 control-label" for="profileNewPassword">New Password</label>
+                                        <label class="col-md-3 control-label" for="profileNewPassword">New
+                                            Password</label>
                                         <div class="col-md-8">
                                             <input type="text" class="form-control" id="profileNewPassword">
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label class="col-md-3 control-label" for="profileNewPasswordRepeat">Repeat New Password</label>
+                                        <label class="col-md-3 control-label" for="profileNewPasswordRepeat">Repeat New
+                                            Password</label>
                                         <div class="col-md-8">
                                             <input type="text" class="form-control" id="profileNewPasswordRepeat">
                                         </div>
@@ -471,8 +514,10 @@
                             <div class="col-xs-10 col-sm-11">
                                 <h6><a href="page-sidebar.html">Lorem ipsum dolor sit amet</a></h6>
                                 <p>
-                                    Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod
-                                    tincidunt laoreet dolore magna aliquam tincidunt erat volutpat laoreet dolore magna aliquam
+                                    Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh
+                                    euismod
+                                    tincidunt laoreet dolore magna aliquam tincidunt erat volutpat laoreet dolore magna
+                                    aliquam
                                     tincidunt erat volutpat.
                                 </p>
                             </div>
@@ -493,8 +538,10 @@
                             <div class="col-xs-10 col-sm-11">
                                 <h6><a href="page-sidebar.html">Sed diam nonummy nibh euismod</a></h6>
                                 <p>
-                                    Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod
-                                    tincidunt laoreet dolore magna aliquam tincidunt erat volutpat laoreet dolore magna aliquam
+                                    Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh
+                                    euismod
+                                    tincidunt laoreet dolore magna aliquam tincidunt erat volutpat laoreet dolore magna
+                                    aliquam
                                     tincidunt erat volutpat.
                                 </p>
                             </div>
@@ -525,7 +572,6 @@
         </div>
     </div>
 </div>
-
 
 <script type="text/javascript">
 

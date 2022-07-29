@@ -5,6 +5,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import sosal_network.entity.User;
 import sosal_network.service.UserService;
 
 import java.util.Optional;
@@ -35,7 +36,7 @@ public class UserController {
      * param model - модель для добавления атрибутов на текущую страницу
      * author - Nekit
      **/
-    @GetMapping({"/user/{username}"})
+    @GetMapping("/user/{username}")
     public String getHome(@PathVariable Optional<String> username, Model model) {
         if (userService.getUserAuth() == null && (username.isEmpty())) {
             return "/error";
@@ -52,5 +53,18 @@ public class UserController {
         model.addAttribute("profileInfo", userService.findByUser_Username(username.get()));
         return "index";
 
+    }
+
+    /**
+     * Get контроллер для страницы редактирования профиля пользователя
+     * param model - модель для добавления атрибутов на текущую страницу
+     * author - Nekit
+     **/
+    @GetMapping("/edit")
+    public String getEditProfile(Model model) {
+        User userFromSession = userService.getUserAuth();
+        model.addAttribute("user", userFromSession);
+        model.addAttribute("profileInfo", userService.findByUser_Username(userFromSession.getUsername()));
+        return "profileEdit";
     }
 }
