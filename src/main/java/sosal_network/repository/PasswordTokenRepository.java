@@ -5,7 +5,7 @@ import org.springframework.stereotype.Repository;
 import sosal_network.entity.PasswordResetToken;
 
 /**
- * Class PasswordTokenRepository - класс для основных действий с БД
+ * Class PasswordTokenRepository - класс для связи токенов с БД
  **/
 @Repository
 public interface PasswordTokenRepository extends JpaRepository<PasswordResetToken, Integer> {

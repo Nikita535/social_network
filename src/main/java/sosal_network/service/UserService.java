@@ -103,6 +103,11 @@ public class UserService implements UserDetailsService {
         return userRepository.findByUsername(username);
     }
 
+    @Transactional
+    public void resaveUser(User user) {
+        userRepository.save(user);
+    }
+
     /**
      * Метод поиска пользователя по почте
      * param email - почта пользователя
@@ -297,18 +302,18 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
-    public Boolean getUserActive(){
+    public Boolean getUserActive() {
         return getUserAuth().getActive();
     }
 
     public String editProfile(ProfileInfo editedProfile, RedirectAttributes redirectAttributes,
                               String currentPassword, String newPassword,
-                              String passwordConfirm){
+                              String passwordConfirm) {
         ProfileInfo profileSession = findByUser_Username(getUserAuth().getUsername());
 
         if (Objects.equals(editedProfile.getName(), "") || Objects.equals(editedProfile.getCity(), "")
-                || Objects.equals(editedProfile.getDescription(), "")|| Objects.equals(editedProfile.getSurname(), "")
-                || Objects.equals(editedProfile.getWebsite(), "")) {
+                || Objects.equals(editedProfile.getSurname(), "")
+        ) {
             redirectAttributes.addFlashAttribute("errorLen", true);
             log.warn("error len of profile");
             return "redirect:/edit";
