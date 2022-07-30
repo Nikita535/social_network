@@ -5,6 +5,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Class ProfileInfo - класс информации о пользователе
@@ -47,6 +49,9 @@ public class ProfileInfo {
      **/
     private String website;
 
+
+
+
     public ProfileInfo(String name, String surname, String city, String description, String website) {
         this.name = name;
         this.surname = surname;
@@ -54,4 +59,6 @@ public class ProfileInfo {
         this.description = description;
         this.website = website;
     }
+
+
 }

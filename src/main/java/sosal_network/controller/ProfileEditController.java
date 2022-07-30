@@ -5,12 +5,14 @@ import org.springframework.boot.Banner;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import sosal_network.entity.ProfileInfo;
 import sosal_network.entity.User;
 import sosal_network.repository.ProfileInfoRepository;
 import sosal_network.service.UserService;
 
+import java.io.IOException;
 import java.util.Optional;
 
 @Controller
@@ -41,8 +43,10 @@ public class ProfileEditController {
                           RedirectAttributes redirectAttributes,
                           @RequestParam("currentPassword") String currentPassword,
                           @RequestParam("newPassword") String newPassword,
-                          @RequestParam("passwordConfirm") String passwordConfirm) {
+                          @RequestParam("passwordConfirm") String passwordConfirm,
+                          @RequestParam("file")MultipartFile file) throws IOException {
 
-        return userService.editProfile(editedProfile, redirectAttributes, currentPassword, newPassword, passwordConfirm);
+        return userService.editProfile(editedProfile, redirectAttributes, currentPassword, newPassword, passwordConfirm,file);
     }
+
 }

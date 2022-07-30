@@ -22,7 +22,8 @@
                         </figure>
                         <div class="cover-body d-flex justify-content-between align-items-center">
                             <div>
-                                <img class="profile-pic" src="https://bootdey.com/img/Content/avatar/avatar6.png"
+                                <img class="profile-pic" th:src="${user.images.size()!=0 ? '/image/' +  user.getUsername() :
+                                'https://bootdey.com/img/Content/avatar/avatar6.png'}"
                                      alt="profile">
                                 <span class="profile-name"
                                       th:text="${user.getUsername()} + ' ( '+ ${profileInfo.getName()} + ' ' + ${profileInfo.getSurname()}+' )' "></span>
