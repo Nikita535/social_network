@@ -11,10 +11,7 @@ import sosal_network.Enum.Role;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 
 /**
@@ -30,7 +27,7 @@ public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private int id;
+    private Long id;
 
     /**
      * имя пользователя
@@ -82,6 +79,10 @@ public class User implements UserDetails {
     private Set<Friend> friendsList = new HashSet<Friend>();
 
 
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, orphanRemoval = true)
+    private List<Image> images = new ArrayList<>();
+
+
     /**
      * Основной конструктор
      **/
@@ -93,6 +94,11 @@ public class User implements UserDetails {
         this.registrationDate = LocalDate.now();
     }
 
+
+
+    public void addImageToUser(Image image){
+        images.add(image);
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -23,7 +23,8 @@
                 <section class="panel">
                     <div class="panel-body noradius padding-10">
                         <figure class="margin-bottom-10"><!-- image -->
-                            <img class="img-responsive" src="https://bootdey.com/img/Content/avatar/avatar1.png" alt="">
+                            <img class="img-responsive"  th:src="${user.images.size()!=0 ? '/image/' + user.getUsername() :
+                                'https://bootdey.com/img/Content/avatar/avatar6.png'}" alt="">
                         </figure><!-- /image -->
 
                         <!-- progress bar -->
@@ -106,7 +107,7 @@
                         <!-- Edit -->
                         <div id="edit" class="tab-pane active">
 
-                            <form class="form-horizontal padding-10" th:action="@{/edit}"
+                            <form class="form-horizontal padding-10" enctype="multipart/form-data" th:action="@{/edit} "
                                   th:object="${editedProfileInfo}" th:method="POST">
                                 <h4>Personal Information</h4>
                                 <fieldset>
@@ -117,7 +118,7 @@
                                     </div>
                                     <div th:if="${profileChanged}">
                                         <div class="alert alert-success">
-                                            Профиль изменен
+                                            Профиль сохранен
                                         </div>
                                     </div>
                                     <div class="form-group">
@@ -153,7 +154,7 @@
                                 <hr>
 
                                 <h4>About</h4>
-                                <fieldset>
+                                <fieldset >
                                     <div class="form-group">
                                         <label class="col-xs-3 control-label" for="profileCompany">Description</label>
                                         <div class="col-md-8">
@@ -167,13 +168,9 @@
                                             <div class="col-md-8">
                                                 <label for="file" class="input input-file">
                                                     <div class="button">
-                                                        <input type="file" id="file"
-                                                               onchange="this.parentNode.nextSibling.value = this.value">Browse
+                                                        <input type="file" id="file" name="file">
                                                     </div>
-                                                    <input type="text" readonly="">
                                                 </label>
-                                                <a href="#" class="btn btn-danger btn-xs nomargin"><i
-                                                        class="fa fa-times"></i> Remove Current Image</a>
                                             </div>
                                         </div>
                                     </div>

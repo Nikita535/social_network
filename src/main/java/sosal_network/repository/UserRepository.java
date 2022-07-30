@@ -8,7 +8,7 @@ import sosal_network.entity.User;
  * Class UserRepository - класс для основных действий с БД
  **/
 @Repository
-public interface UserRepository extends JpaRepository<User, Integer> {
+public interface UserRepository extends JpaRepository<User, Long> {
     /**
      * Метод findByUsername для поиска пользователя по имени
      * param username - имя пользователя

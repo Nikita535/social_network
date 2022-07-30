@@ -12,18 +12,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import sosal_network.Enum.Role;
-import sosal_network.entity.ActivationToken;
-import sosal_network.entity.PasswordResetToken;
-import sosal_network.entity.ProfileInfo;
-import sosal_network.entity.User;
-import sosal_network.repository.ActivationTokenRepository;
-import sosal_network.repository.PasswordTokenRepository;
-import sosal_network.repository.ProfileInfoRepository;
-import sosal_network.repository.UserRepository;
+import sosal_network.entity.*;
+import sosal_network.repository.*;
 
 import javax.mail.MessagingException;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.Date;
@@ -73,6 +69,9 @@ public class UserService implements UserDetailsService {
      **/
     @Autowired
     EmailService emailService;
+
+    @Autowired
+    ImageRepository imageRepository;
 
 
     /**
@@ -308,7 +307,8 @@ public class UserService implements UserDetailsService {
 
     public String editProfile(ProfileInfo editedProfile, RedirectAttributes redirectAttributes,
                               String currentPassword, String newPassword,
-                              String passwordConfirm) {
+                              String passwordConfirm,
+                              MultipartFile file) throws IOException {
         ProfileInfo profileSession = findByUser_Username(getUserAuth().getUsername());
 
         if (Objects.equals(editedProfile.getName(), "") || Objects.equals(editedProfile.getCity(), "")
@@ -321,9 +321,28 @@ public class UserService implements UserDetailsService {
 
         redirectAttributes.addFlashAttribute("profileChanged", true);
         editedProfile.setUser(profileSession.getUser());
+
+
         editedProfile.setId(profileSession.getId());
         profileSession = editedProfile;
+
+        if(file.getSize()!=0) {
+            if (!getUserAuth().getImages().isEmpty()) {
+                Image image = imageRepository.findImageByUser(profileSession.getUser());
+                Image img = toImageEntity(file, profileSession);
+                img.setId(image.getId());
+                img.setUser(image.getUser());
+                image = img;
+                profileSession.getUser().addImageToUser(image);
+                imageRepository.save(image);
+            } else {
+                getUserAuth().addImageToUser(toImageEntity(file,profileSession));
+                imageRepository.save(toImageEntity(file, profileSession));
+            }
+        }
+
         profileInfoRepository.save(profileSession);
+
 
         if (!Objects.equals(currentPassword, "") && !Objects.equals(newPassword, "")
                 && !Objects.equals(passwordConfirm, "")) {
@@ -347,6 +366,13 @@ public class UserService implements UserDetailsService {
         }
         return "redirect:/edit";
     }
+
+
+    private Image toImageEntity(MultipartFile file,ProfileInfo profileSession) throws IOException {
+        return new Image(file.getName(),file.getOriginalFilename(),file.getSize(),file.getContentType(),
+                file.getBytes(),profileSession.getUser());
+    }
+
 
 
 }
