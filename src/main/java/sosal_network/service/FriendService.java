@@ -36,42 +36,59 @@ public class FriendService {
 
 
     @Transactional
-    public String addFriend(String username) {
+    public String addFriend(String username, Boolean fromList, String where) {
         if (isFriend(username)) {
             log.error("user is already in friend list");
             return "redirect:/user/" + username;
         }
+
         User userFromSession = userService.getUserAuth();
         User friendUser = userService.findUserByUsername(username);
+        System.out.println("\nADDDDD\n" + userFromSession.toString() + "\n\n" + friendUser.toString() + "\n\n\n\n");
         if (friendUser == null) {
             log.error("no such user");
             return "redirect:/user/" + username;
         }
         Friend(userFromSession, friendUser);
         Friend(friendUser, userFromSession);
-        return "redirect:/user/" + username;
+        if (fromList) {
+            return "redirect:/" + where + "/friendList/1";
+        }
+        else{
+            return "redirect:/user/" + username;
+
+        }
     }
 
     @Transactional
-    public String deleteFriend(String username) {
+    public String deleteFriend(String username, Boolean fromList, String where) {
         if (!isFriend(username)) {
             log.error("users are not friends");
             return "redirect:/user/" + username;
         }
         User userFromSession = userService.getUserAuth();
         User friendUser = userService.findUserByUsername(username);
+        System.out.println("\nDELETE\n" + userFromSession.toString() + "\n\n" + friendUser.toString() + "\n\n\n\n");
         Unfriend(userFromSession, friendUser);
         Unfriend(friendUser, userFromSession);
-        return "redirect:/user/" + username;
+
+        if (fromList) {
+            return "redirect:/" + where + "/friendList/1";
+        }
+        else{
+            return "redirect:/user/" + username;
+
+        }
     }
 
+    @Transactional
     public void Friend(User user, User friendUser) {
         Friend friend = new Friend(friendUser, user);
         user.getFriendsList().add(friend);
         saveFriend(friend);
         userService.resaveUser(user);
     }
-
+    @Transactional
     public void Unfriend(User user, User friendUser) {
         Friend friendToUnfriend = findFriendByFriendUserAndUserID(friendUser, user);
         user.getFriendsList().remove(friendToUnfriend);
@@ -143,7 +160,7 @@ public class FriendService {
 
         return new Object[]{profiles, sizeOfFriends, allFriendProfiles};
     }
-
+    @Transactional
     public List<ProfileInfo> allProfileInfos(String similarTo) {
         return em.createQuery("SELECT u FROM ProfileInfo u WHERE CONCAT(u.surname, ' ', u.name) LIKE CONCAT('%',:similarTo,'%')", ProfileInfo.class)
                 .setParameter("similarTo", similarTo).getResultList();

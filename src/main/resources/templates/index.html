@@ -39,7 +39,7 @@
                                     </svg>
                                     Редактировать информацию
                                 </a>
-                                <a th:href="@{'/user/'+${user.username}+'/friend'}"
+                                <a th:href="@{'/user/'+${user.username}+'/friend?fromList=false&amp;where=1'}"
                                         class="btn btn-primary btn-icon-text btn-edit-profile"
                                         th:if="${#authentication.getPrincipal().username}!=${user.username} and ${friendService.isFriend(username.get())}==false">
                                     Добавить в друзья
@@ -48,7 +48,7 @@
                                      th:if="${friendService.isFriend(username.get())}==true">
                                     В друзьях
                                 </div>
-                                <a th:href="@{'/user/'+${user.username}+'/unfriend'}"
+                                <a th:href="@{'/user/'+${user.username}+'/unfriend?fromList=false&amp;where=1'}"
                                         class="btn btn-danger"
                                         th:if="${friendService.isFriend(username.get())}==true">
                                     Удалить из друзей

@@ -5,11 +5,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import sosal_network.entity.Friend;
 import sosal_network.entity.ProfileInfo;
 import sosal_network.service.FriendService;
 import sosal_network.service.UserService;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -68,18 +70,22 @@ public class UserController {
     }
 
     @GetMapping("/user/{username}/friend")
-    public String addFriend(@PathVariable Optional<String> username, Model model) {
+    public String addFriend(@PathVariable Optional<String> username, Model model,
+                            @RequestParam("fromList") String fromList,
+                            @RequestParam("where") String where) {
         if (userService.getUserAuth() == null && (username.isEmpty())) {
             return "/error";
         }
-        return friendService.addFriend(username.get());
+        return friendService.addFriend(username.get(), Objects.equals(fromList, "true"), where);
     }
 
     @GetMapping("/user/{username}/unfriend")
-    public String deleteFriend(@PathVariable Optional<String> username, Model model) {
+    public String deleteFriend(@PathVariable Optional<String> username, Model model,
+                               @RequestParam("fromList") String fromList,
+                               @RequestParam("where") String where) {
         if (userService.getUserAuth() == null && (username.isEmpty())) {
             return "/error";
         }
-        return friendService.deleteFriend(username.get());
+        return friendService.deleteFriend(username.get(), Objects.equals(fromList, "true"), where);
     }
 }
