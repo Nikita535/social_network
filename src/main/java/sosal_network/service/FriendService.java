@@ -168,7 +168,8 @@ public class FriendService {
             profiles = new LinkedList<>();
             sizeOfStrangers = profilesNew.size();
 
-            for (int i = 0; i < page * lenght && i < profilesNew.size() && profiles.size() < size; i++)
+
+            for (int i = page == 1 ? 0 : (page * lenght - profilesOfFriends.size() - 1); i < page * lenght && i < profilesNew.size() && profiles.size() < size; i++)
                 profiles.add(profilesNew.get(i));
 
 
@@ -184,7 +185,7 @@ public class FriendService {
 
             sizeOfStrangers = profilesNew.size();
 
-            for (int i = 0; i < page * lenght && i < profilesNew.size() && profiles.size() < size; i++)
+            for (int i = page == 1 ? 0 : (page * lenght - profilesOfFriends.size()); i < page * lenght && i < profilesNew.size() && profiles.size() < size; i++)
                 profiles.add(profilesNew.get(i));
 
         }

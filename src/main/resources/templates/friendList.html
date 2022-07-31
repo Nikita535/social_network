@@ -232,7 +232,7 @@
                                     <button type="submit" class="btn btn-outline-primary">Искать</button>
                                 </form>
                                 <br>
-                                <span th:if="${errorNoShowStrangers}" style="display: flex; justify-content: center">Друзья</span>
+                                <span th:if="${errorNoShowFriends}" style="display: flex; justify-content: center">Друзья</span>
 
                                 <div th:if="${errorNoSuchFriends}">
                                     <div class="alert" style="display: flex; justify-content: center; color: darkred">
@@ -256,7 +256,7 @@
                                     </div>
                                 </div>
                                 <br >
-                                <span th:if="${errorNoShowFriends}" style="display: flex; justify-content: center">Возможные друзья</span>
+                                <span th:if="${errorNoShowStrangers}" style="display: flex; justify-content: center">Возможные друзья</span>
 
                                 <div th:if="${errorNoSuchStrangers}">
                                     <div class="alert" style="display: flex; justify-content: center; color: darkred">
