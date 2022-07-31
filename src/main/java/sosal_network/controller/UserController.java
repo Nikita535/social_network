@@ -58,9 +58,7 @@ public class UserController {
         if (userService.findUserByUsername(username.get()) == null) {
             return "error-404";
         }
-        Set<Friend> friends = authentificatedUser.getFriendsList();
         friendService.isFriend(username.get());
-        ProfileInfo profileInfo = userService.findByUser_Username(username.get());
         model.addAttribute("user", userService.findUserByUsername(username.get()));
         model.addAttribute("profileInfo", userService.findByUser_Username(username.get()));
 

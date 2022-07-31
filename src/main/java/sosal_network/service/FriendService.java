@@ -50,24 +50,20 @@ public class FriendService {
     }
 
     public void Friend(User user, User friendUser) {
-        Friend friend = new Friend(friendUser, user);
-        user.getFriendsList().add(friend);
-        saveFriend(friend);
+        user.getFriends().add(friendUser);
         userService.resaveUser(user);
     }
 
     public void Unfriend(User user, User friendUser) {
-        Friend friendToUnfriend = findFriendByFriendUserAndUserID(friendUser, user);
-        user.getFriendsList().remove(friendToUnfriend);
-        deleteFriendByFriendUserAndUserID(friendToUnfriend);
+        user.getFriends().remove(friendUser);
         userService.resaveUser(user);
     }
 
     @Transactional
     public boolean isFriend(String username) {
         User userFromSession = userService.getUserAuth();
-        for (Friend friend : userFromSession.getFriendsList()) {
-            if (friend.getFriendUser().getUsername().equals(username)) {
+        for (User user : userFromSession.getFriends()) {
+            if (user.getUsername().equals(username)) {
                 return true;
             }
         }

@@ -75,8 +75,8 @@ public class User implements UserDetails {
      * Соединение таблиц пользователя с друзьями
      * author - Nikita
      **/
-    @OneToMany(mappedBy = "userID", fetch = FetchType.EAGER, orphanRemoval = true)
-    private Set<Friend> friendsList = new HashSet<Friend>();
+    @ManyToMany(fetch = FetchType.EAGER, cascade=CascadeType.ALL)
+    private Set<User> friends = new HashSet<>();
 
 
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, orphanRemoval = true)
