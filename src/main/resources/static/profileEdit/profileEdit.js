@@ -5,8 +5,9 @@ let website=document.getElementById("profileCompany").value
 let desc=document.getElementById("profileDescription").value
 let crossbar=document.querySelector(".progress-bar")
 let crossbarValue=document.querySelector(".pull-right")
+let file=document.getElementById("file")
 
-let arr=[name,surname,city,website,desc]
+let arr=[name,surname,city,website,desc,file]
 
 let count=0
 for (let i = 0; i < arr.length; i++) {
@@ -16,6 +17,6 @@ for (let i = 0; i < arr.length; i++) {
 }
 
 
-crossbar.style.width=count/arr.length *100 + "%"
-crossbarValue.textContent=count/arr.length *100 + "%"
+crossbar.style.width=Math.floor(count/arr.length *100) + "%"
+crossbarValue.textContent=Math.floor(count/arr.length *100) + "%"
 
