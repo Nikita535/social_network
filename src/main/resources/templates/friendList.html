@@ -7,6 +7,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.bundle.min.js"></script>
     <link href="/profile/profile.css" rel="stylesheet">
+    <link href="/friendList/friendList.css" rel="stylesheet">
     <link href="/error/error-404.css" rel="stylesheet">
 </head>
 <body>
@@ -40,8 +41,8 @@
                                     Редактировать информацию
                                 </a>
                                 <a th:href="@{'/user/'+${user.username}+'/friend'}"
-                                        class="btn btn-primary btn-icon-text btn-edit-profile"
-                                        th:if="${#authentication.getPrincipal().username}!=${user.username} and ${friendService.isFriend(username.get())}==false">
+                                   class="btn btn-primary btn-icon-text btn-edit-profile"
+                                   th:if="${#authentication.getPrincipal().username}!=${user.username} and ${friendService.isFriend(username.get())}==false">
                                     Добавить в друзья
                                 </a>
                                 <div class="btn btn-dark"
@@ -49,8 +50,8 @@
                                     В друзьях
                                 </div>
                                 <a th:href="@{'/user/'+${user.username}+'/unfriend'}"
-                                        class="btn btn-danger"
-                                        th:if="${friendService.isFriend(username.get())}==true">
+                                   class="btn btn-danger"
+                                   th:if="${friendService.isFriend(username.get())}==true">
                                     Удалить из друзей
                                 </a>
                                 <a href="/logout" class="btn btn-danger"
@@ -60,7 +61,7 @@
                     </div>
                     <div class="header-links">
                         <ul class="links d-flex align-items-center mt-3 mt-md-0">
-                            <li class="header-link-item d-flex align-items-center active">
+                            <li class="header-link-item d-flex align-items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                      fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                      stroke-linejoin="round" class="feather feather-columns mr-1 icon-md">
@@ -77,7 +78,7 @@
                                 </svg>
                                 <a class="pt-1px d-none d-md-block" href="#">About</a>
                             </li>
-                            <li class="header-link-item ml-3 pl-3 border-left d-flex align-items-center">
+                            <li class="header-link-item ml-3 pl-3 border-left d-flex align-items-center active">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                      fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                      stroke-linejoin="round" class="feather feather-users mr-1 icon-md">
@@ -86,9 +87,9 @@
                                     <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
                                     <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                                 </svg>
-
                                 <a class="pt-1px d-none d-md-block" th:href="@{'/' + ${user.username} + '/friendList/1'}" methods="GET">Friends <span class="text-muted tx-12"
-                                                                                           th:text="${user.getFriendsList().size()}"></span></a>
+                                                                                                                                                      th:text="${user.getFriendsList().size()}"></span></a>
+
                             </li>
                             <li class="header-link-item ml-3 pl-3 border-left d-flex align-items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -98,7 +99,7 @@
                                     <circle cx="8.5" cy="8.5" r="1.5"></circle>
                                     <polyline points="21 15 16 10 5 21"></polyline>
                                 </svg>
-                                <a class="pt-1px d-none d-md-block" href="/friendList">Photos</a>
+                                <a class="pt-1px d-none d-md-block" href="#">Photos</a>
                             </li>
                             <li class="header-link-item ml-3 pl-3 border-left d-flex align-items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -221,229 +222,79 @@
             </div>
             <!-- left wrapper end -->
             <!-- middle wrapper start -->
-            <div class="col-md-8 col-xl-6 middle-wrapper">
-                <div class="row">
-                    <div class="col-md-12 grid-margin">
-                        <div class="card rounded">
-                            <div class="card-header">
-                                <div class="d-flex align-items-center justify-content-between">
-                                    <div class="d-flex align-items-center">
-                                        <img class="img-xs rounded-circle"
-                                             src="https://bootdey.com/img/Content/avatar/avatar6.png" alt="">
-                                        <div class="ml-2">
-                                            <p>Mike Popescu</p>
-                                            <p class="tx-11 text-muted">1 min ago</p>
-                                        </div>
+                <div class="col-md-8 col-xl-6 middle-wrapper">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="people-nearby">
+
+                                <form class="input-group" th:action="@{'/' + ${user.username} + '/search'}" method="post">
+                                    <input type="search" name="searchLine" th:value="${searchLine}" class="form-control rounded" placeholder="Search" aria-label="Search" aria-describedby="search-addon" />
+                                    <button type="submit" class="btn btn-outline-primary">Искать</button>
+                                </form>
+                                <br>
+                                <span th:if="${errorNoShowStrangers}" style="display: flex; justify-content: center">Друзья</span>
+
+                                <div th:if="${errorNoSuchFriends}">
+                                    <div class="alert" style="display: flex; justify-content: center; color: darkred">
+                                        Таких друзей нет :(
                                     </div>
-                                    <div class="dropdown">
-                                        <button class="btn p-0" type="button" id="dropdownMenuButton2"
-                                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                                 stroke-linecap="round" stroke-linejoin="round"
-                                                 class="feather feather-more-horizontal icon-lg pb-3px">
-                                                <circle cx="12" cy="12" r="1"></circle>
-                                                <circle cx="19" cy="12" r="1"></circle>
-                                                <circle cx="5" cy="12" r="1"></circle>
-                                            </svg>
-                                        </button>
-                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
-                                            <a class="dropdown-item d-flex align-items-center" href="#">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                                     class="feather feather-meh icon-sm mr-2">
-                                                    <circle cx="12" cy="12" r="10"></circle>
-                                                    <line x1="8" y1="15" x2="16" y2="15"></line>
-                                                    <line x1="9" y1="9" x2="9.01" y2="9"></line>
-                                                    <line x1="15" y1="9" x2="15.01" y2="9"></line>
-                                                </svg>
-                                                <span class="">Unfollow</span></a>
-                                            <a class="dropdown-item d-flex align-items-center" href="#">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                                     class="feather feather-corner-right-up icon-sm mr-2">
-                                                    <polyline points="10 9 15 4 20 9"></polyline>
-                                                    <path d="M4 20h7a4 4 0 0 0 4-4V4"></path>
-                                                </svg>
-                                                <span class="">Go to post</span></a>
-                                            <a class="dropdown-item d-flex align-items-center" href="#">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                                     class="feather feather-share-2 icon-sm mr-2">
-                                                    <circle cx="18" cy="5" r="3"></circle>
-                                                    <circle cx="6" cy="12" r="3"></circle>
-                                                    <circle cx="18" cy="19" r="3"></circle>
-                                                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
-                                                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
-                                                </svg>
-                                                <span class="">Share</span></a>
-                                            <a class="dropdown-item d-flex align-items-center" href="#">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                                     class="feather feather-copy icon-sm mr-2">
-                                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                                                </svg>
-                                                <span class="">Copy link</span></a>
+                                </div>
+
+                                <div class="nearby-user" th:each="profile : ${friendProfiles}">
+                                    <div class="row">
+                                        <div class="col-md-2 col-sm-2">
+                                            <img src="https://bootdey.com/img/Content/avatar/avatar7.png" alt="user" class="profile-photo-lg">
+                                        </div>
+                                        <div class="col-md-7 col-sm-7">
+                                            <h5><a th:href="@{'/user/' + ${profile.getUser().getUsername()}}" class="profile-link" th:text="${profile.getSurname()} + ' ' + ${profile.getName()}"></a></h5>
+                                            <p>Software Engineer</p>
+                                            <p class="text-muted">500m away</p>
+                                        </div>
+                                        <div class="col-md-3 col-sm-3">
+                                            <a th:href="@{'/user/'+${profile.getUser().getUsername()}+'/unfriend'}" class="btn btn-primary pull-right">Удалить из друзей</a>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="card-body">
-                                <p class="mb-3 tx-14">Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                                    Accusamus minima delectus nemo unde quae recusandae assumenda.</p>
-                                <img class="img-fluid" src="https://bootdey.com/img/Content/avatar/avatar6.png" alt="">
-                            </div>
-                            <div class="card-footer">
-                                <div class="d-flex post-actions">
-                                    <a href="javascript:" class="d-flex align-items-center text-muted mr-4">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                             stroke-linecap="round" stroke-linejoin="round"
-                                             class="feather feather-heart icon-md">
-                                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                                        </svg>
-                                        <p class="d-none d-md-block ml-2">Like</p>
-                                    </a>
-                                    <a href="javascript:" class="d-flex align-items-center text-muted mr-4">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                             stroke-linecap="round" stroke-linejoin="round"
-                                             class="feather feather-message-square icon-md">
-                                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                                        </svg>
-                                        <p class="d-none d-md-block ml-2">Comment</p>
-                                    </a>
-                                    <a href="javascript:" class="d-flex align-items-center text-muted">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                             stroke-linecap="round" stroke-linejoin="round"
-                                             class="feather feather-share icon-md">
-                                            <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
-                                            <polyline points="16 6 12 2 8 6"></polyline>
-                                            <line x1="12" y1="2" x2="12" y2="15"></line>
-                                        </svg>
-                                        <p class="d-none d-md-block ml-2">Share</p>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-12">
-                        <div class="card rounded">
-                            <div class="card-header">
-                                <div class="d-flex align-items-center justify-content-between">
-                                    <div class="d-flex align-items-center">
-                                        <img class="img-xs rounded-circle"
-                                             src="https://bootdey.com/img/Content/avatar/avatar6.png" alt="">
-                                        <div class="ml-2">
-                                            <p>Mike Popescu</p>
-                                            <p class="tx-11 text-muted">5 min ago</p>
-                                        </div>
+                                <br >
+                                <span th:if="${errorNoShowFriends}" style="display: flex; justify-content: center">Возможные друзья</span>
+
+                                <div th:if="${errorNoSuchStrangers}">
+                                    <div class="alert" style="display: flex; justify-content: center; color: darkred">
+                                        Таких незнакомцев нет :(
                                     </div>
-                                    <div class="dropdown">
-                                        <button class="btn p-0" type="button" id="dropdownMenuButton3"
-                                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                                 stroke-linecap="round" stroke-linejoin="round"
-                                                 class="feather feather-more-horizontal icon-lg pb-3px">
-                                                <circle cx="12" cy="12" r="1"></circle>
-                                                <circle cx="19" cy="12" r="1"></circle>
-                                                <circle cx="5" cy="12" r="1"></circle>
-                                            </svg>
-                                        </button>
-                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton3">
-                                            <a class="dropdown-item d-flex align-items-center" href="#">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                                     class="feather feather-meh icon-sm mr-2">
-                                                    <circle cx="12" cy="12" r="10"></circle>
-                                                    <line x1="8" y1="15" x2="16" y2="15"></line>
-                                                    <line x1="9" y1="9" x2="9.01" y2="9"></line>
-                                                    <line x1="15" y1="9" x2="15.01" y2="9"></line>
-                                                </svg>
-                                                <span class="">Unfollow</span></a>
-                                            <a class="dropdown-item d-flex align-items-center" href="#">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                                     class="feather feather-corner-right-up icon-sm mr-2">
-                                                    <polyline points="10 9 15 4 20 9"></polyline>
-                                                    <path d="M4 20h7a4 4 0 0 0 4-4V4"></path>
-                                                </svg>
-                                                <span class="">Go to post</span></a>
-                                            <a class="dropdown-item d-flex align-items-center" href="#">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                                     class="feather feather-share-2 icon-sm mr-2">
-                                                    <circle cx="18" cy="5" r="3"></circle>
-                                                    <circle cx="6" cy="12" r="3"></circle>
-                                                    <circle cx="18" cy="19" r="3"></circle>
-                                                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
-                                                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
-                                                </svg>
-                                                <span class="">Share</span></a>
-                                            <a class="dropdown-item d-flex align-items-center" href="#">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                                     class="feather feather-copy icon-sm mr-2">
-                                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                                                </svg>
-                                                <span class="">Copy link</span></a>
+                                </div>
+                                <div class="nearby-user" th:each="strangers : ${profilesOfStrangers}">
+                                    <div class="row">
+                                        <div class="col-md-2 col-sm-2">
+                                            <img src="https://bootdey.com/img/Content/avatar/avatar7.png" alt="user" class="profile-photo-lg">
+                                        </div>
+                                        <div class="col-md-7 col-sm-7">
+                                            <h5><a th:href="@{'/user/' + ${strangers.getUser().getUsername()}}" class="profile-link" th:text="${strangers.getSurname()} + ' ' + ${strangers.getName()}"></a></h5>
+                                            <p>Software Engineer</p>
+                                            <p class="text-muted">500m away</p>
+                                        </div>
+                                        <div class="col-md-3 col-sm-3">
+                                            <a th:href="@{'/user/'+${strangers.getUser().getUsername()}+'/friend'}" class="btn btn-primary pull-right">Добавить в друзья</a>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="card-body">
-                                <p class="mb-3 tx-14">Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
-                                <img class="img-fluid" src="../../../assets/images/sample2.jpg" alt="">
-                            </div>
-                            <div class="card-footer">
-                                <div class="d-flex post-actions">
-                                    <a href="javascript:" class="d-flex align-items-center text-muted mr-4">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                             stroke-linecap="round" stroke-linejoin="round"
-                                             class="feather feather-heart icon-md">
-                                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                                        </svg>
-                                        <p class="d-none d-md-block ml-2">Like</p>
-                                    </a>
-                                    <a href="javascript:" class="d-flex align-items-center text-muted mr-4">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                             stroke-linecap="round" stroke-linejoin="round"
-                                             class="feather feather-message-square icon-md">
-                                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                                        </svg>
-                                        <p class="d-none d-md-block ml-2">Comment</p>
-                                    </a>
-                                    <a href="javascript:" class="d-flex align-items-center text-muted">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                             stroke-linecap="round" stroke-linejoin="round"
-                                             class="feather feather-share icon-md">
-                                            <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
-                                            <polyline points="16 6 12 2 8 6"></polyline>
-                                            <line x1="12" y1="2" x2="12" y2="15"></line>
-                                        </svg>
-                                        <p class="d-none d-md-block ml-2">Share</p>
-                                    </a>
+
+                                <div class="nearby-user">
+                                    <div class="row">
+                                        <nav aria-label="Page navigation example" th:each="page : ${pages}">
+                                            <ul class="pagination">
+                                                <li class="page-item"><a class="page-link"
+                                                                         th:href="@{'/' + ${user.username} + '/friendList/' + ${page}}"
+                                                                         th:text="${page}"></a></li>
+                                            </ul>
+                                        </nav>
+                                    </div>
                                 </div>
+
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
             <!-- middle wrapper end -->
             <!-- right wrapper start -->
             <div class="d-none d-xl-block col-xl-3 right-wrapper">
