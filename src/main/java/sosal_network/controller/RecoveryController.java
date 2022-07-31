@@ -15,56 +15,55 @@ import javax.mail.MessagingException;
 
 /**
  * Class RecoveryController - контроллер для восстановления пароля
- * **/
+ **/
 @Controller
 public class RecoveryController {
 
     /**
      * Поле репозитория токена восстановления
-     * **/
+     **/
     @Autowired
     private PasswordTokenRepository passwordTokenRepository;
 
 
     /**
      * Поле сервиса почты
-     * **/
+     **/
     @Autowired
     EmailService emailService;
 
     /**
      * Поле сервиса пользователя
-     * **/
+     **/
     @Autowired
     private UserService userService;
 
 
     @GetMapping("/recovery")
-    public String getRecoveryForm(Model model){
+    public String getRecoveryForm(Model model) {
         return "recovery";
     }
 
     @PostMapping("/recovery")
     public String sendRecoveryToken(@RequestParam("email") String userEmail,
-                               Model model) throws MessagingException {
+                                    Model model) throws MessagingException {
         userService.createPasswordResetTokenForUser(userEmail);
         return "login";
     }
 
     @GetMapping("/recover/{token}")
-    public String getRecoveryToken(Model model, @PathVariable String token, RedirectAttributes redirectAttributes){
+    public String getRecoveryToken(Model model, @PathVariable String token, RedirectAttributes redirectAttributes) {
         PasswordResetToken resetToken = passwordTokenRepository.findByToken(token);
         if (resetToken != null && resetToken.compareDate()) {
             redirectAttributes.addFlashAttribute("token", resetToken.getToken());
             redirectAttributes.addFlashAttribute("username", resetToken.getUser().getUsername());
             return "redirect:/recoveryPage";
-        }
-        else
+        } else
             return "invalidToken";
     }
 
     @GetMapping("/recoveryPage")
-    public String getRecoveryByPassword(Model model, @ModelAttribute("token") String token){
+    public String getRecoveryByPassword(Model model, @ModelAttribute("token") String token) {
         return "recoveryPage";
     }
 
@@ -72,7 +71,7 @@ public class RecoveryController {
     public String getRecoveryByPassword(Model model, @PathVariable String token,
                                         @RequestParam("password") String userPassword,
                                         @RequestParam("passwordConfirm") String passwordConfirm,
-                                        RedirectAttributes redirectAttributes){
+                                        RedirectAttributes redirectAttributes) {
         return userService.changePasswordByToken(token, userPassword, passwordConfirm, redirectAttributes);
     }
 
