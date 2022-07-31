@@ -44,11 +44,11 @@
                         <hr class="half-margins">
 
                         <!-- About -->
-                        <h3 class="text-black"  th:text="${profileInfo.getName()}+ ' '+ ${profileInfo.getSurname()}">
+                        <h3 class="text-black"  th:text="${profileInfo.name}+ ' '+ ${profileInfo.surname}">
 
                             <small class="text-gray size-14"> / CEO</small>
                         </h3>
-                        <p class="size-12" th:text="${profileInfo.getDescription()}"></p>
+                        <p class="size-12" th:text="${profileInfo.description}"></p>
                         <!-- /About -->
 
                         <hr class="half-margins">
@@ -125,28 +125,28 @@
                                         <label class="col-md-3 control-label" >First Name</label>
                                         <div class="col-md-8">
                                             <input type="text" class="form-control profileFirstName" id="profileFirstName"
-                                                   name="name" th:value="${profileInfo.getName()}">
+                                                   name="name" th:value="${profileInfo.name}">
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="col-md-3 control-label" for="profileLastName">Last Name</label>
                                         <div class="col-md-8">
                                             <input type="text" class="form-control" id="profileLastName"
-                                                  name="surname" th:value="${profileInfo.getSurname()}">
+                                                  name="surname" th:value="${profileInfo.surname}">
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="col-md-3 control-label" for="profileAddress">City</label>
                                         <div class="col-md-8">
                                             <input type="text" class="form-control" id="profileAddress"
-                                                   name="city" th:value="${profileInfo.getCity()}">
+                                                   name="city" th:value="${profileInfo.city}">
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="col-md-3 control-label" for="profileCompany" id="website">Website</label>
                                         <div class="col-md-8">
                                             <input type="text" class="form-control" id="profileCompany"
-                                                   name="website" th:value="${profileInfo.getWebsite()}">
+                                                   name="website" th:value="${profileInfo.website}">
                                         </div>
                                     </div>
                                 </fieldset>
@@ -159,7 +159,7 @@
                                         <label class="col-xs-3 control-label" for="profileCompany" >Description</label>
                                         <div class="col-md-8">
                                             <input type="text" class="form-control" id="profileDescription"
-                                                   name="description" th:value="${profileInfo.getDescription()}">
+                                                   name="description" th:value="${profileInfo.description}">
                                         </div>
                                     </div>
                                     <div class="form-group">

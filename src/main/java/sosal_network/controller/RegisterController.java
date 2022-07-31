@@ -99,11 +99,16 @@ public class RegisterController {
      * author - Nikita
      **/
     @GetMapping("/activate/{code}")
-    public String activate(Model model, @PathVariable String code) {
+    public String activate(RedirectAttributes redirectAttributes, @PathVariable String code) {
         ActivationToken activationToken = activationTokenRepository.findByToken(code);
         if (activationToken != null && activationToken.compareDate()) {
             userService.activateUser(code);
-            return "redirect:/login";
+            if (userService.getUserAuth() != null) {
+                return "redirect:/";
+            } else {
+                redirectAttributes.addFlashAttribute("activateUser",true);
+                return "redirect:/login";
+            }
         } else
             return "invalidToken";
     }
