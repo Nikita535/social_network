@@ -6,11 +6,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sosal_network.Enum.InviteStatus;
 import sosal_network.entity.Friend;
+import sosal_network.entity.ProfileInfo;
 import sosal_network.entity.User;
 import sosal_network.repository.FriendRepository;
+import sosal_network.repository.ProfileInfoRepository;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
+import java.util.regex.Pattern;
 
 /**
  * Class friendService - класс для основных операций над друзьями пользователя
@@ -18,39 +25,52 @@ import java.util.List;
 @Service
 @Slf4j
 public class FriendService {
+
+    @PersistenceContext
+    private EntityManager em;
     @Autowired
     private UserService userService;
     @Autowired
     private FriendRepository friendRepository;
 
-    @Transactional
-    public String sendInvite(String username) {
-        User userFromSession = userService.getUserAuth();
-        User friendUser = userService.findUserByUsername(username);
-        if (friendUser == null) {
-            log.error("no such user");
-            return "redirect:/user/" + username;
-        }
-        if (existsByFirstUserAndSecondUser(userFromSession, friendUser) || existsByFirstUserAndSecondUser(friendUser, userFromSession)) {
-            log.error("user is already in friend list");
-            return "redirect:/user/" + username;
-        }
-        Friend friend = new Friend(userFromSession, friendUser, InviteStatus.PENDING);
-        save(friend);
+    @Autowired
+    private ProfileInfoRepository profileInfoRepository;
+
+
+    public String redirectToFriendListOrToProfile(String username, String where){
+        if (!Objects.equals(where, ""))
+            return "redirect:/" + where + "/friendList/1";
         return "redirect:/user/" + username;
     }
 
     @Transactional
-    public String resultInvite(String username, int result) {
+    public String sendInvite(String username, String where) {
         User userFromSession = userService.getUserAuth();
         User friendUser = userService.findUserByUsername(username);
         if (friendUser == null) {
             log.error("no such user");
-            return "redirect:/user/" + username;
+            return redirectToFriendListOrToProfile(username, where);
+        }
+        if (existsByFirstUserAndSecondUser(userFromSession, friendUser) || existsByFirstUserAndSecondUser(friendUser, userFromSession)) {
+            log.error("user is already in friend list");
+            return redirectToFriendListOrToProfile(username, where);
+        }
+        Friend friend = new Friend(userFromSession, friendUser, InviteStatus.PENDING);
+        save(friend);
+        return redirectToFriendListOrToProfile(username, where);
+    }
+
+    @Transactional
+    public String resultInvite(String username, int result, String where) {
+        User userFromSession = userService.getUserAuth();
+        User friendUser = userService.findUserByUsername(username);
+        if (friendUser == null) {
+            log.error("no such user");
+            return redirectToFriendListOrToProfile(username, where);
         }
         if (!existsByFirstUserAndSecondUser(userFromSession, friendUser) && !existsByFirstUserAndSecondUser(friendUser, userFromSession)) {
             log.error("users are not friends");
-            return "redirect:/user/" + username;
+            return redirectToFriendListOrToProfile(username, where);
         }
         Friend friend = findLinkedFriends(userFromSession, friendUser);
 
@@ -67,28 +87,28 @@ public class FriendService {
             default:
                 break;
         }
-        return "redirect:/user/" + username;
+        return redirectToFriendListOrToProfile(username, where);
     }
 
     @Transactional
-    public String deleteFriend(String username) {
+    public String deleteFriend(String username, String where) {
 
         User userFromSession = userService.getUserAuth();
         User friendUser = userService.findUserByUsername(username);
         if (friendUser == null) {
             log.error("no such user");
-            return "redirect:/user/" + username;
+            return redirectToFriendListOrToProfile(username, where);
         }
         if (!existsByFirstUserAndSecondUser(userFromSession, friendUser) && !existsByFirstUserAndSecondUser(friendUser, userFromSession)) {
             log.error("users are not friends");
-            return "redirect:/user/" + username;
+            return redirectToFriendListOrToProfile(username, where);
         }
         if (existsByFirstUserAndSecondUser(userFromSession, friendUser)) {
             deleteFriendByFirstUserAndSecondUser(userFromSession, friendUser);
         } else {
             deleteFriendByFirstUserAndSecondUser(friendUser, userFromSession);
         }
-        return "redirect:/user/" + username;
+        return redirectToFriendListOrToProfile(username, where);
     }
 
     @Transactional
@@ -203,4 +223,93 @@ public class FriendService {
         friendRepository.save(friend);
     }
 
+
+    public Object[] findFriendProfilesByUsername(String username, String searchLine, String pageString,
+                                                 Integer lenght){
+        int page = Integer.parseInt(pageString);
+        Integer sizeOfFriends;
+
+        List<ProfileInfo> profiles = new LinkedList<>();
+        List<User> friends = new LinkedList<>(getAcceptedFriends(username) );
+        List<ProfileInfo> allFriendProfiles = new LinkedList<>();
+        if (Objects.equals(searchLine, "")){
+            for (int i = (page - 1) * lenght; i < page * lenght && i < friends.size(); i++)
+                profiles.add(userService.findByUser_Username(friends.get(i).getUsername()));
+            sizeOfFriends = friends.size();
+
+            for (int i = 0; i < friends.size(); i++)
+                allFriendProfiles.add(userService.findByUser_Username(friends.get(i).getUsername()));
+        }else {
+            Pattern pattern = Pattern.compile(searchLine);
+
+            List<ProfileInfo> newProfiles = new LinkedList<>();
+            for (User friend: friends)
+                profiles.add(userService.findByUser_Username(friend.getUsername()));
+
+            for (ProfileInfo profile: profiles){
+                if (pattern.matcher( profile.getSurname() + " " + profile.getName()).find())
+                    newProfiles.add(profile);
+            }
+            sizeOfFriends = newProfiles.size();
+            allFriendProfiles = newProfiles;
+
+            profiles = new LinkedList<>();
+            for (int i = (page - 1) * lenght; i < page * lenght && i < newProfiles.size(); i++)
+                profiles.add(newProfiles.get(i));
+        }
+
+
+        return new Object[]{profiles, sizeOfFriends, allFriendProfiles};
+    }
+
+
+    @Transactional
+    public List<ProfileInfo> allProfileInfos(String similarTo) {
+        return em.createQuery("SELECT u FROM ProfileInfo u WHERE CONCAT(u.surname, ' ', u.name) LIKE CONCAT('%',:similarTo,'%')", ProfileInfo.class)
+                .setParameter("similarTo", similarTo).getResultList();
+    }
+
+    public Object[] findStrangersProfilesByUsername(String username, String searchLine,
+                                                    String pageString, List<ProfileInfo> profilesOfFriends,
+                                                    Integer size,
+                                                    Integer lenght){
+        int page = Integer.parseInt(pageString);
+        Integer sizeOfStrangers;
+        List<ProfileInfo> profiles = new LinkedList<>();
+
+        if (Objects.equals(searchLine, "")){
+            List<ProfileInfo> profilesNew = new LinkedList<>();
+            profiles = allProfileInfos(searchLine);
+            profilesOfFriends.add(profileInfoRepository.findByUser_Username(username));
+
+            for (ProfileInfo profile: profiles)
+                if (!profilesOfFriends.contains(profile))
+                    profilesNew.add(profile);
+            profiles = new LinkedList<>();
+            sizeOfStrangers = profilesNew.size();
+
+
+            for (int i = page == 1 ? 0 : (page * lenght - profilesOfFriends.size() - 1); i < page * lenght && i < profilesNew.size() && profiles.size() < size; i++)
+                profiles.add(profilesNew.get(i));
+
+
+        }else {
+            List<ProfileInfo> profilesNew = new LinkedList<>();
+            profiles = allProfileInfos(searchLine);
+            profilesOfFriends.add(profileInfoRepository.findByUser_Username(username));
+
+            for (ProfileInfo profile: profiles)
+                if (!profilesOfFriends.contains(profile))
+                    profilesNew.add(profile);
+            profiles = new LinkedList<>();
+
+            sizeOfStrangers = profilesNew.size();
+
+            for (int i = page == 1 ? 0 : (page * lenght - profilesOfFriends.size()); i < page * lenght && i < profilesNew.size() && profiles.size() < size; i++)
+                profiles.add(profilesNew.get(i));
+
+        }
+
+        return new Object[]{profiles, sizeOfStrangers};
+    }
 }

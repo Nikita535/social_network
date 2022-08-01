@@ -42,26 +42,40 @@
                                 </a>
                                 <a th:href="@{'/user/'+${user.username}+'/friend'}"
                                    class="btn btn-primary btn-icon-text btn-edit-profile"
-                                   th:if="${#authentication.getPrincipal().username}!=${user.username} and ${friendService.isFriend(username.get())}==false">
+                                   th:if="${#authentication.getPrincipal().username}!=${user.username} and !${isFriend}">
                                     Добавить в друзья
                                 </a>
                                 <div class="btn btn-dark"
-                                     th:if="${friendService.isFriend(username.get())}==true">
+                                     th:if="${isFriend} and ${friendAccepted}">
                                     В друзьях
+                                </div>
+                                <div class="btn btn-dark"
+                                     th:if="${isFriend} and !${friendAccepted} and ${isInviteSend}">
+                                    Заявка отправлена
                                 </div>
                                 <a th:href="@{'/user/'+${user.username}+'/unfriend'}"
                                    class="btn btn-danger"
-                                   th:if="${friendService.isFriend(username.get())}==true">
+                                   th:if="${isFriend} and ${friendAccepted}">
                                     Удалить из друзей
+                                </a>
+                                <a th:href="@{'/user/'+${user.username}+'/friend/1'}"
+                                   class="btn btn-success"
+                                   th:if="${isFriend} and !${friendAccepted} and ${isInviteRecieved}">
+                                    Принять заявку
+                                </a>
+                                <a th:href="@{'/user/'+${user.username}+'/friend/2'}"
+                                   class="btn btn-danger"
+                                   th:if="${isFriend} and !${friendAccepted} and ${isInviteRecieved}">
+                                    Отклонить заявку
                                 </a>
                                 <a href="/logout" class="btn btn-danger"
                                    th:if="${#authentication.getPrincipal().username}==${user.username}">Выйти</a>
                             </div>
                         </div>
                     </div>
-                    <div class="header-links">
+                    <div class="header-links" >
                         <ul class="links d-flex align-items-center mt-3 mt-md-0">
-                            <li class="header-link-item d-flex align-items-center">
+                            <li class="header-link-item d-flex align-items-center active">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                      fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                      stroke-linejoin="round" class="feather feather-columns mr-1 icon-md">
@@ -78,7 +92,7 @@
                                 </svg>
                                 <a class="pt-1px d-none d-md-block" href="#">About</a>
                             </li>
-                            <li class="header-link-item ml-3 pl-3 border-left d-flex align-items-center active">
+                            <li class="header-link-item ml-3 pl-3 border-left d-flex align-items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                      fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                      stroke-linejoin="round" class="feather feather-users mr-1 icon-md">
@@ -88,7 +102,8 @@
                                     <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                                 </svg>
                                 <a class="pt-1px d-none d-md-block" th:href="@{'/' + ${user.username} + '/friendList/1'}" methods="GET">Friends <span class="text-muted tx-12"
-                                                                                                                                                      th:text="${user.getFriendsList().size()}"></span></a>
+                                                                                                                                                      th:text="${friends.size()}"></span></a>
+
 
                             </li>
                             <li class="header-link-item ml-3 pl-3 border-left d-flex align-items-center">
@@ -115,8 +130,8 @@
                 </div>
             </div>
         </div>
+        <!-- left wrapper start -->
         <div class="row profile-body">
-            <!-- left wrapper start -->
             <div class="d-none d-md-block col-md-4 col-xl-3 left-wrapper">
                 <div class="card rounded">
                     <div class="card-body">
@@ -250,7 +265,7 @@
                                             <p>Software Engineer</p>
                                             <p class="text-muted">500m away</p>
                                         </div>
-                                        <div class="col-md-3 col-sm-3">
+                                        <div th:if="${isAdminOfTheFriendList}" class="col-md-3 col-sm-3">
                                             <a th:href="@{'/user/'+${profile.getUser().getUsername()}+'/unfriend?fromList=true&amp;where=' + ${user.username}}" class="btn btn-primary pull-right">Удалить из друзей</a>
                                         </div>
                                     </div>
@@ -273,15 +288,36 @@
                                             <p>Software Engineer</p>
                                             <p class="text-muted">500m away</p>
                                         </div>
-                                        <div class="col-md-3 col-sm-3">
-                                            <a th:href="@{'/user/'+${strangers.getUser().getUsername()}+'/friend?fromList=true&amp;where=' + ${user.username}}" class="btn btn-primary pull-right">Добавить в друзья</a>
+                                        <div th:if="${isAdminOfTheFriendList}" class="col-md-3 col-sm-3">
+                                            <a th:if="!${friendService.isFriends(strangers.getUser().getUsername())}"
+                                               th:href="@{'/user/'+${strangers.getUser().getUsername()}+'/friend?fromList=true&amp;where=' + ${user.username}}" class="btn btn-primary pull-right">
+                                                Добавить в друзья
+                                            </a>
+                                            <a th:if="${friendService.isFriends(strangers.getUser().getUsername())} and
+                                             !${friendService.checkFriendStatus(strangers.getUser().getUsername())} and
+                                             ${friendService.isInviteRecieved(strangers.getUser().getUsername())}"
+                                               th:href="@{'/user/'+${strangers.getUser().getUsername()}+'/friend/1?fromList=true&amp;where=' + ${user.username}}" class="btn btn-success pull-right">
+                                                Принять заявку
+                                            </a>
+                                            <a th:if="${friendService.isFriends(strangers.getUser().getUsername())} and
+                                             !${friendService.checkFriendStatus(strangers.getUser().getUsername())} and
+                                             ${friendService.isInviteRecieved(strangers.getUser().getUsername())}"
+                                               th:href="@{'/user/'+${strangers.getUser().getUsername()}+'/friend/2?fromList=true&amp;where=' + ${user.username}}" class="btn btn-danger pull-right">
+                                                Отклонить заявку
+                                            </a>
+                                            <div class="btn btn-dark"
+                                                 th:if="${friendService.isFriends(strangers.getUser().getUsername())} and
+                                             !${friendService.checkFriendStatus(strangers.getUser().getUsername())} and
+                                             ${friendService.isInviteSend(strangers.getUser().getUsername())}">
+                                                Заявка отправлена
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="nearby-user">
                                     <div class="row">
-                                        <nav aria-label="Page navigation example" th:each="page : ${pages}">
+                                        <nav aria-label="Page navigation example" th:each="page : ${#numbers.sequence( 1, pages, 1)}">
                                             <ul class="pagination">
                                                 <li class="page-item"><a class="page-link"
                                                                          th:href="@{'/' + ${user.username} + '/friendList/' + ${page}}"

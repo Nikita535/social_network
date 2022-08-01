@@ -30,7 +30,7 @@ public class FriendListController {
                                 @ModelAttribute("searchLine") String searchLine){
         User userFriend = userService.findUserByUsername(username.get());
 
-        Integer sizeOfPage = 10;
+        int sizeOfPage = 10;
 
 
         Object[] informationProfilesOfFriends = friendService.findFriendProfilesByUsername(username.get(),
@@ -44,9 +44,6 @@ public class FriendListController {
         List<ProfileInfo> profilesOfStrangers = (List<ProfileInfo>)informationProfilesOfStrangers[0];
         Integer sizeOfStrangers = (Integer) informationProfilesOfStrangers[1];
 
-        List<Integer> pages = new LinkedList<>();
-        for (int i = 1; i < Math.ceil(((float)sizeOfFriends + (float)sizeOfStrangers) / sizeOfPage + 1); i++)
-            pages.add(i);
 
         if (profilesOfFriends.size() == 0 && sizeOfFriends == 0 && !Objects.equals(searchLine, ""))
             model.addAttribute("errorNoSuchFriends", true);
@@ -61,13 +58,21 @@ public class FriendListController {
             model.addAttribute("errorNoShowStrangers", true);
 
 
-        model.addAttribute("pages", pages);
+
+        model.addAttribute("isAdminOfTheFriendList", Objects.equals(userService.findUserByUsername(username.get()).getUsername(), userService.getUserAuth().getUsername()));
+        model.addAttribute("pages", Math.ceil(((float)sizeOfFriends + (float)sizeOfStrangers) / sizeOfPage));
         model.addAttribute("searchLine", searchLine);
         model.addAttribute("profilesOfStrangers", profilesOfStrangers);
         model.addAttribute("friendProfiles", profilesOfFriends);
         model.addAttribute("friendService", friendService);
-        model.addAttribute("user", userFriend);
-        model.addAttribute("profileInfo", userService.findByUser_Username(userFriend.getUsername()));
+
+        model.addAttribute("user", userService.findUserByUsername(username.get()));
+        model.addAttribute("profileInfo", userService.findByUser_Username(username.get()));
+        model.addAttribute("friends",friendService.getAcceptedFriends(username.get()));
+        model.addAttribute("isFriend",friendService.isFriends(username.get()));
+        model.addAttribute("friendAccepted",friendService.checkFriendStatus(username.get()));
+        model.addAttribute("isInviteRecieved",friendService.isInviteRecieved(username.get()));
+        model.addAttribute("isInviteSend",friendService.isInviteSend(username.get()));
         return "friendList";
     }
 
