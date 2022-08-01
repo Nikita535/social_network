@@ -19,7 +19,6 @@ import java.util.*;
  **/
 @Entity(name = "user")
 @Table(name = "users")
-@Data
 @Getter
 @Setter
 @NoArgsConstructor
@@ -71,12 +70,12 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Set<Role> roles = new HashSet<>();
 
-    /**
-     * Соединение таблиц пользователя с друзьями
-     * author - Nikita
-     **/
-    @ManyToMany(fetch = FetchType.EAGER, cascade=CascadeType.ALL)
-    private Set<User> friends = new HashSet<>();
+//    /**
+//     * Соединение таблиц пользователя с друзьями
+//     * author - Nikita
+//     **/
+//    @ManyToMany(fetch = FetchType.EAGER, cascade=CascadeType.ALL)
+//    private Set<User> friends = new HashSet<>();
 
 
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, orphanRemoval = true)

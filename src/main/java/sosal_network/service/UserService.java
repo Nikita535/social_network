@@ -139,7 +139,7 @@ public class UserService implements UserDetailsService {
 
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         user.setRoles(Collections.singleton(Role.ROLE_USER));
-        user.setActive(false);
+        user.setActive(true);
         user.setRegistrationDate(LocalDate.now());
         userRepository.save(user);
 
