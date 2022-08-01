@@ -5,8 +5,20 @@ import org.springframework.stereotype.Repository;
 import sosal_network.entity.Friend;
 import sosal_network.entity.User;
 
+import java.util.List;
+
 @Repository
-public interface FriendRepository extends JpaRepository<Friend,Integer> {
-    Friend findFriendByFriendUserAndUserID(User friendUser,User userID);
-    void deleteFriendByFriendUserAndUserID(User friendUser, User userID);
+public interface FriendRepository extends JpaRepository<Friend, Integer> {
+    boolean existsByFirstUserAndSecondUser(User firstUser, User secondUser);
+
+    Friend findFriendByFirstUserAndSecondUser(User firstUser, User secondUser);
+
+    void deleteFriendByFirstUserAndSecondUser(User firstUser, User secondUser);
+
+    List<Friend> findFriendsByFirstUser(User firstUser);
+
+
+    List<Friend> findFriendsBySecondUser(User secondUser);
+
+
 }
