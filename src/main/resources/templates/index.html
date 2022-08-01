@@ -41,24 +41,38 @@
                                 </a>
                                 <a th:href="@{'/user/'+${user.username}+'/friend'}"
                                         class="btn btn-primary btn-icon-text btn-edit-profile"
-                                        th:if="${#authentication.getPrincipal().username}!=${user.username} and ${friendService.isFriend(username.get())}==false">
+                                        th:if="${#authentication.getPrincipal().username}!=${user.username} and !${isFriend}">
                                     Добавить в друзья
                                 </a>
                                 <div class="btn btn-dark"
-                                     th:if="${friendService.isFriend(username.get())}==true">
+                                     th:if="${isFriend} and ${friendAccepted}">
                                     В друзьях
+                                </div>
+                                <div class="btn btn-dark"
+                                     th:if="${isFriend} and !${friendAccepted} and ${isInviteSend}">
+                                    Заявка отправлена
                                 </div>
                                 <a th:href="@{'/user/'+${user.username}+'/unfriend'}"
                                         class="btn btn-danger"
-                                        th:if="${friendService.isFriend(username.get())}==true">
+                                        th:if="${isFriend} and ${friendAccepted}">
                                     Удалить из друзей
+                                </a>
+                                <a th:href="@{'/user/'+${user.username}+'/friend/1'}"
+                                   class="btn btn-success"
+                                   th:if="${isFriend} and !${friendAccepted} and ${isInviteRecieved}">
+                                    Принять заявку
+                                </a>
+                                <a th:href="@{'/user/'+${user.username}+'/friend/2'}"
+                                   class="btn btn-danger"
+                                   th:if="${isFriend} and !${friendAccepted} and ${isInviteRecieved}">
+                                    Отклонить заявку
                                 </a>
                                 <a href="/logout" class="btn btn-danger"
                                    th:if="${#authentication.getPrincipal().username}==${user.username}">Выйти</a>
                             </div>
                         </div>
                     </div>
-                    <div class="header-links">
+                    <div class="header-links" >
                         <ul class="links d-flex align-items-center mt-3 mt-md-0">
                             <li class="header-link-item d-flex align-items-center active">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -86,9 +100,10 @@
                                     <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
                                     <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                                 </svg>
-
                                 <a class="pt-1px d-none d-md-block" th:href="@{'/' + ${user.username} + '/friendList/1'}" methods="GET">Friends <span class="text-muted tx-12"
-                                                                                           th:text="${user.getFriendsList().size()}"></span></a>
+                                                                                                                                                      th:text="${friends.size()}"></span></a>
+
+
                             </li>
                             <li class="header-link-item ml-3 pl-3 border-left d-flex align-items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -98,7 +113,7 @@
                                     <circle cx="8.5" cy="8.5" r="1.5"></circle>
                                     <polyline points="21 15 16 10 5 21"></polyline>
                                 </svg>
-                                <a class="pt-1px d-none d-md-block" href="/friendList">Photos</a>
+                                <a class="pt-1px d-none d-md-block" href="#">Photos</a>
                             </li>
                             <li class="header-link-item ml-3 pl-3 border-left d-flex align-items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"

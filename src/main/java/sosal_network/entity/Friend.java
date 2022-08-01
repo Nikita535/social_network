@@ -3,9 +3,9 @@ package sosal_network.entity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import sosal_network.Enum.InviteStatus;
 
 import javax.persistence.*;
-import java.util.Objects;
 
 /**
  * Class Friend - класс сущности друзей пользователя
@@ -21,37 +21,53 @@ import java.util.Objects;
  **/
 public class Friend {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    /**
-     * Друг пользователя
-     **/
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "friend_id")
-    private User friendUser;
+    //    /**
+//     * Друг пользователя
+//     **/
+//    @ManyToOne(fetch = FetchType.EAGER)
+//    @JoinColumn(name = "friend_id")
+//    private User friendUser;
+//
+//    /**
+//     * Пользователь,у которого в друзьях friendUser
+//     **/
+//    @ManyToOne(fetch = FetchType.EAGER)
+//    @JoinColumn(name = "user_id")
+//    private User userID;
+//
+//    public Friend(User friendUser, User userID) {
+//        this.friendUser = friendUser;
+//        this.userID = userID;
+//    }
+//
+//    @Override
+//    public boolean equals(Object o) {
+//        if (this == o) return true;
+//        if (o == null || getClass() != o.getClass()) return false;
+//        Friend friend = (Friend) o;
+//        return Objects.equals(friendUser, friend.friendUser) && Objects.equals(userID, friend.userID);
+//    }
+//
+//    @Override
+//    public int hashCode() {
+//        return Objects.hash(friendUser, userID);
+//    }
+    @OneToOne(cascade = CascadeType.MERGE,fetch = FetchType.EAGER)
+    @JoinColumn(name = "first_user_id", referencedColumnName = "id")
+    private User firstUser;
 
-    /**
-     * Пользователь,у которого в друзьях friendUser
-     **/
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id")
-    private User userID;
+    @OneToOne(cascade = CascadeType.MERGE,fetch = FetchType.EAGER)
+    @JoinColumn(name = "second_user_id", referencedColumnName = "id")
+    private User secondUser;
 
-    public Friend(User friendUser, User userID) {
-        this.friendUser = friendUser;
-        this.userID = userID;
-    }
+    @Enumerated(EnumType.STRING)
+    private InviteStatus inviteStatus;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Friend friend = (Friend) o;
-        return Objects.equals(friendUser, friend.friendUser) && Objects.equals(userID, friend.userID);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(friendUser, userID);
+    public Friend(User firstUser, User secondUser, InviteStatus inviteStatus) {
+        this.firstUser = firstUser;
+        this.secondUser = secondUser;
+        this.inviteStatus = inviteStatus;
     }
 }

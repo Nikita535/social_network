@@ -42,24 +42,38 @@
                                 </a>
                                 <a th:href="@{'/user/'+${user.username}+'/friend'}"
                                    class="btn btn-primary btn-icon-text btn-edit-profile"
-                                   th:if="${#authentication.getPrincipal().username}!=${user.username} and ${friendService.isFriend(username.get())}==false">
+                                   th:if="${#authentication.getPrincipal().username}!=${user.username} and !${isFriend}">
                                     Добавить в друзья
                                 </a>
                                 <div class="btn btn-dark"
-                                     th:if="${friendService.isFriend(username.get())}==true">
+                                     th:if="${isFriend} and ${friendAccepted}">
                                     В друзьях
+                                </div>
+                                <div class="btn btn-dark"
+                                     th:if="${isFriend} and !${friendAccepted} and ${isInviteSend}">
+                                    Заявка отправлена
                                 </div>
                                 <a th:href="@{'/user/'+${user.username}+'/unfriend'}"
                                    class="btn btn-danger"
-                                   th:if="${friendService.isFriend(username.get())}==true">
+                                   th:if="${isFriend} and ${friendAccepted}">
                                     Удалить из друзей
+                                </a>
+                                <a th:href="@{'/user/'+${user.username}+'/friend/1'}"
+                                   class="btn btn-success"
+                                   th:if="${isFriend} and !${friendAccepted} and ${isInviteRecieved}">
+                                    Принять заявку
+                                </a>
+                                <a th:href="@{'/user/'+${user.username}+'/friend/2'}"
+                                   class="btn btn-danger"
+                                   th:if="${isFriend} and !${friendAccepted} and ${isInviteRecieved}">
+                                    Отклонить заявку
                                 </a>
                                 <a href="/logout" class="btn btn-danger"
                                    th:if="${#authentication.getPrincipal().username}==${user.username}">Выйти</a>
                             </div>
                         </div>
                     </div>
-                    <div class="header-links">
+                    <div class="header-links" >
                         <ul class="links d-flex align-items-center mt-3 mt-md-0">
                             <li class="header-link-item d-flex align-items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -67,7 +81,7 @@
                                      stroke-linejoin="round" class="feather feather-columns mr-1 icon-md">
                                     <path d="M12 3h7a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-7m0-18H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h7m0-18v18"></path>
                                 </svg>
-                                <a class="pt-1px d-none d-md-block" href="#">Timeline</a>
+                                <a class="pt-1px d-none d-md-block" th:href="@{'/user/' + ${user.username}}">Timeline</a>
                             </li>
                             <li class="header-link-item ml-3 pl-3 border-left d-flex align-items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -88,7 +102,8 @@
                                     <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                                 </svg>
                                 <a class="pt-1px d-none d-md-block" th:href="@{'/' + ${user.username} + '/friendList/1'}" methods="GET">Friends <span class="text-muted tx-12"
-                                                                                                                                                      th:text="${user.getFriendsList().size()}"></span></a>
+                                                                                                                                                      th:text="${friends.size()}"></span></a>
+
 
                             </li>
                             <li class="header-link-item ml-3 pl-3 border-left d-flex align-items-center">
@@ -115,8 +130,8 @@
                 </div>
             </div>
         </div>
+        <!-- left wrapper start -->
         <div class="row profile-body">
-            <!-- left wrapper start -->
             <div class="d-none d-md-block col-md-4 col-xl-3 left-wrapper">
                 <div class="card rounded">
                     <div class="card-body">
@@ -243,15 +258,16 @@
                                 <div class="nearby-user" th:each="profile : ${friendProfiles}">
                                     <div class="row">
                                         <div class="col-md-2 col-sm-2">
-                                            <img src="https://bootdey.com/img/Content/avatar/avatar7.png" alt="user" class="profile-photo-lg">
+                                            <img th:src="${profile.getUser().images.size()!=0 ? '/image/' +  profile.getUser().getUsername() :
+                                'https://bootdey.com/img/Content/avatar/avatar6.png'}"
+                                                 alt="user" class="profile-photo-lg">
                                         </div>
                                         <div class="col-md-7 col-sm-7">
                                             <h5><a th:href="@{'/user/' + ${profile.getUser().getUsername()}}" class="profile-link" th:text="${profile.getSurname()} + ' ' + ${profile.getName()}"></a></h5>
-                                            <p>Software Engineer</p>
-                                            <p class="text-muted">500m away</p>
+                                            <p class="text-muted" th:text="${profile.getCity()}"></p>
                                         </div>
-                                        <div class="col-md-3 col-sm-3">
-                                            <a th:href="@{'/user/'+${profile.getUser().getUsername()}+'/unfriend'}" class="btn btn-primary pull-right">Удалить из друзей</a>
+                                        <div th:if="${isAdminOfTheFriendList}" class="col-md-3 col-sm-3">
+                                            <a th:href="@{'/user/'+${profile.getUser().getUsername()}+'/unfriend?fromList=true&amp;where=' + ${user.username}}" class="btn btn-primary pull-right">Удалить из друзей</a>
                                         </div>
                                     </div>
                                 </div>
@@ -263,25 +279,36 @@
                                         Таких незнакомцев нет :(
                                     </div>
                                 </div>
-                                <div class="nearby-user" th:each="strangers : ${profilesOfStrangers}">
+                                <div class="nearby-user" th:if="!${friendService.isInviteRecieved(strangers.getUser().getUsername())}" th:each="strangers : ${profilesOfStrangers}">
                                     <div class="row">
                                         <div class="col-md-2 col-sm-2">
-                                            <img src="https://bootdey.com/img/Content/avatar/avatar7.png" alt="user" class="profile-photo-lg">
+                                            <img th:src="${strangers.getUser().images.size()!=0 ? '/image/' +  strangers.getUser().getUsername() :
+                                'https://bootdey.com/img/Content/avatar/avatar6.png'}"
+                                                 alt="user" class="profile-photo-lg">
+
                                         </div>
                                         <div class="col-md-7 col-sm-7">
                                             <h5><a th:href="@{'/user/' + ${strangers.getUser().getUsername()}}" class="profile-link" th:text="${strangers.getSurname()} + ' ' + ${strangers.getName()}"></a></h5>
-                                            <p>Software Engineer</p>
-                                            <p class="text-muted">500m away</p>
+                                            <p class="text-muted" th:text="${strangers.getCity()}"></p>
                                         </div>
-                                        <div class="col-md-3 col-sm-3">
-                                            <a th:href="@{'/user/'+${strangers.getUser().getUsername()}+'/friend'}" class="btn btn-primary pull-right">Добавить в друзья</a>
+                                        <div th:if="${isAdminOfTheFriendList}" class="col-md-3 col-sm-3">
+                                            <a th:if="!${friendService.isFriends(strangers.getUser().getUsername())}"
+                                               th:href="@{'/user/'+${strangers.getUser().getUsername()}+'/friend?fromList=true&amp;where=' + ${user.username}}" class="btn btn-primary pull-right">
+                                                Добавить в друзья
+                                            </a>
+                                            <div class="btn btn-dark"
+                                                 th:if="${friendService.isFriends(strangers.getUser().getUsername())} and
+                                             !${friendService.checkFriendStatus(strangers.getUser().getUsername())} and
+                                             ${friendService.isInviteSend(strangers.getUser().getUsername())}">
+                                                Заявка отправлена
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="nearby-user">
                                     <div class="row">
-                                        <nav aria-label="Page navigation example" th:each="page : ${pages}">
+                                        <nav aria-label="Page navigation example" th:each="page : ${#numbers.sequence( 1, pages, 1)}">
                                             <ul class="pagination">
                                                 <li class="page-item"><a class="page-link"
                                                                          th:href="@{'/' + ${user.username} + '/friendList/' + ${page}}"
@@ -364,142 +391,50 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-12 grid-margin">
+                    <div th:if="${isAdminOfTheFriendList}" class="col-md-12 grid-margin">
                         <div class="card rounded">
                             <div class="card-body">
                                 <h6 class="card-title">suggestions for you</h6>
-                                <div class="d-flex justify-content-between mb-2 pb-2 border-bottom">
-                                    <div class="d-flex align-items-center hover-pointer">
-                                        <img class="img-xs rounded-circle"
-                                             src="https://bootdey.com/img/Content/avatar/avatar2.png" alt="">
-                                        <div class="ml-2">
-                                            <p>Mike Popescu</p>
-                                            <p class="tx-11 text-muted">12 Mutual Friends</p>
+                                <div th:if="${friendService.isInviteRecieved(strangers.getUser().getUsername())}" th:each="strangers : ${profilesOfStrangers}" class="d-flex justify-content-between mb-2 pb-2 border-bottom">
+                                        <div class="d-flex align-items-center hover-pointer">
+                                            <img th:src="${strangers.getUser().images.size()!=0 ? '/image/' +  strangers.getUser().getUsername() :
+                                'https://bootdey.com/img/Content/avatar/avatar6.png'}"
+                                                 alt="" class="img-xs rounded-circle">
+                                            <div class="ml-2">
+                                                <p><a th:href="@{'/user/' + ${strangers.getUser().getUsername()}}" class="profile-link" th:text="${strangers.getSurname()} + ' ' + ${strangers.getName()}"></a></p>
+                                            </div>
                                         </div>
+                                        <a th:if="${friendService.isFriends(strangers.getUser().getUsername())} and
+                                                 !${friendService.checkFriendStatus(strangers.getUser().getUsername())} and
+                                                 ${friendService.isInviteRecieved(strangers.getUser().getUsername())}"
+                                                th:href="@{'/user/'+${strangers.getUser().getUsername()}+'/friend/1?fromList=true&amp;where=' + ${user.username}}"class="btn btn-icon">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                 stroke-linecap="round" stroke-linejoin="round"
+                                                 class="feather feather-user-plus" data-toggle="tooltip" title=""
+                                                 data-original-title="Connect">
+                                                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                                <circle cx="8.5" cy="7" r="4"></circle>
+                                                <line x1="20" y1="8" x2="20" y2="14"></line>
+                                                <line x1="23" y1="11" x2="17" y2="11"></line>
+                                            </svg>
+                                        </a>
+                                        <a th:if="${friendService.isFriends(strangers.getUser().getUsername())} and
+                                                 !${friendService.checkFriendStatus(strangers.getUser().getUsername())} and
+                                                 ${friendService.isInviteRecieved(strangers.getUser().getUsername())}"
+                                                th:href="@{'/user/'+${strangers.getUser().getUsername()}+'/friend/2?fromList=true&amp;where=' + ${user.username}}"class="btn btn-icon">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                 stroke-linecap="round" stroke-linejoin="round"
+                                                 class="feather feather-user-plus" data-toggle="tooltip" title=""
+                                                 data-original-title="Connect">
+                                                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                                <circle cx="8.5" cy="7" r="4"></circle>
+                                                <line x1="23" y1="11" x2="17" y2="11"></line>
+                                            </svg>
+                                        </a>
                                     </div>
-                                    <button class="btn btn-icon">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                             stroke-linecap="round" stroke-linejoin="round"
-                                             class="feather feather-user-plus" data-toggle="tooltip" title=""
-                                             data-original-title="Connect">
-                                            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                                            <circle cx="8.5" cy="7" r="4"></circle>
-                                            <line x1="20" y1="8" x2="20" y2="14"></line>
-                                            <line x1="23" y1="11" x2="17" y2="11"></line>
-                                        </svg>
-                                    </button>
-                                </div>
-                                <div class="d-flex justify-content-between mb-2 pb-2 border-bottom">
-                                    <div class="d-flex align-items-center hover-pointer">
-                                        <img class="img-xs rounded-circle"
-                                             src="https://bootdey.com/img/Content/avatar/avatar3.png" alt="">
-                                        <div class="ml-2">
-                                            <p>Mike Popescu</p>
-                                            <p class="tx-11 text-muted">12 Mutual Friends</p>
-                                        </div>
-                                    </div>
-                                    <button class="btn btn-icon">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                             stroke-linecap="round" stroke-linejoin="round"
-                                             class="feather feather-user-plus" data-toggle="tooltip" title=""
-                                             data-original-title="Connect">
-                                            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                                            <circle cx="8.5" cy="7" r="4"></circle>
-                                            <line x1="20" y1="8" x2="20" y2="14"></line>
-                                            <line x1="23" y1="11" x2="17" y2="11"></line>
-                                        </svg>
-                                    </button>
-                                </div>
-                                <div class="d-flex justify-content-between mb-2 pb-2 border-bottom">
-                                    <div class="d-flex align-items-center hover-pointer">
-                                        <img class="img-xs rounded-circle"
-                                             src="https://bootdey.com/img/Content/avatar/avatar4.png" alt="">
-                                        <div class="ml-2">
-                                            <p>Mike Popescu</p>
-                                            <p class="tx-11 text-muted">12 Mutual Friends</p>
-                                        </div>
-                                    </div>
-                                    <button class="btn btn-icon">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                             stroke-linecap="round" stroke-linejoin="round"
-                                             class="feather feather-user-plus" data-toggle="tooltip" title=""
-                                             data-original-title="Connect">
-                                            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                                            <circle cx="8.5" cy="7" r="4"></circle>
-                                            <line x1="20" y1="8" x2="20" y2="14"></line>
-                                            <line x1="23" y1="11" x2="17" y2="11"></line>
-                                        </svg>
-                                    </button>
-                                </div>
-                                <div class="d-flex justify-content-between mb-2 pb-2 border-bottom">
-                                    <div class="d-flex align-items-center hover-pointer">
-                                        <img class="img-xs rounded-circle"
-                                             src="https://bootdey.com/img/Content/avatar/avatar5.png" alt="">
-                                        <div class="ml-2">
-                                            <p>Mike Popescu</p>
-                                            <p class="tx-11 text-muted">12 Mutual Friends</p>
-                                        </div>
-                                    </div>
-                                    <button class="btn btn-icon">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                             stroke-linecap="round" stroke-linejoin="round"
-                                             class="feather feather-user-plus" data-toggle="tooltip" title=""
-                                             data-original-title="Connect">
-                                            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                                            <circle cx="8.5" cy="7" r="4"></circle>
-                                            <line x1="20" y1="8" x2="20" y2="14"></line>
-                                            <line x1="23" y1="11" x2="17" y2="11"></line>
-                                        </svg>
-                                    </button>
-                                </div>
-                                <div class="d-flex justify-content-between mb-2 pb-2 border-bottom">
-                                    <div class="d-flex align-items-center hover-pointer">
-                                        <img class="img-xs rounded-circle"
-                                             src="https://bootdey.com/img/Content/avatar/avatar6.png" alt="">
-                                        <div class="ml-2">
-                                            <p>Mike Popescu</p>
-                                            <p class="tx-11 text-muted">12 Mutual Friends</p>
-                                        </div>
-                                    </div>
-                                    <button class="btn btn-icon">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                             stroke-linecap="round" stroke-linejoin="round"
-                                             class="feather feather-user-plus" data-toggle="tooltip" title=""
-                                             data-original-title="Connect">
-                                            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                                            <circle cx="8.5" cy="7" r="4"></circle>
-                                            <line x1="20" y1="8" x2="20" y2="14"></line>
-                                            <line x1="23" y1="11" x2="17" y2="11"></line>
-                                        </svg>
-                                    </button>
-                                </div>
-                                <div class="d-flex justify-content-between">
-                                    <div class="d-flex align-items-center hover-pointer">
-                                        <img class="img-xs rounded-circle"
-                                             src="https://bootdey.com/img/Content/avatar/avatar7.png" alt="">
-                                        <div class="ml-2">
-                                            <p>Mike Popescu</p>
-                                            <p class="tx-11 text-muted">12 Mutual Friends</p>
-                                        </div>
-                                    </div>
-                                    <button class="btn btn-icon">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                             stroke-linecap="round" stroke-linejoin="round"
-                                             class="feather feather-user-plus" data-toggle="tooltip" title=""
-                                             data-original-title="Connect">
-                                            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                                            <circle cx="8.5" cy="7" r="4"></circle>
-                                            <line x1="20" y1="8" x2="20" y2="14"></line>
-                                            <line x1="23" y1="11" x2="17" y2="11"></line>
-                                        </svg>
-                                    </button>
-                                </div>
+
 
                             </div>
                         </div>
