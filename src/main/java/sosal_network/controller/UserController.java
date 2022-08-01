@@ -1,19 +1,16 @@
 package sosal_network.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import sosal_network.entity.Friend;
-import sosal_network.entity.ProfileInfo;
+import sosal_network.entity.User;
 import sosal_network.service.FriendService;
 import sosal_network.service.UserService;
 
-import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * Class UserController - контроллер для страницы пользователя
@@ -34,8 +31,8 @@ public class UserController {
      * author - Nekit
      **/
     @GetMapping("/")
-    public String getUser() {
-        return "redirect:/user/" + userService.getUserAuth().getUsername();
+    public String getUser(@AuthenticationPrincipal User authentificatedUser) {
+        return "redirect:/user/" + authentificatedUser.getUsername();
     }
 
     /**
@@ -45,47 +42,52 @@ public class UserController {
      * author - Nekit
      **/
     @GetMapping("/user/{username}")
-    public String getHome(@PathVariable Optional<String> username, Model model) {
-        if (userService.getUserAuth() == null && (username.isEmpty())) {
+    public String getHome(@PathVariable Optional<String> username, Model model, @AuthenticationPrincipal User authentificatedUser) {
+        if (authentificatedUser == null && (username.isEmpty())) {
             return "/error";
         }
-        model.addAttribute("friendService", friendService);
+//        model.addAttribute("friendService", friendService);
         if (username.isEmpty()) {
-            model.addAttribute("user", userService.getUserAuth());
-            model.addAttribute("profileInfo", userService.findByUser_Username(userService.getUserAuth().getUsername()));
+            model.addAttribute("user", authentificatedUser);
+            model.addAttribute("profileInfo", userService.findByUser_Username(authentificatedUser.getUsername()));
+            model.addAttribute("friends",friendService.getFriends(authentificatedUser.getUsername()));
             return "index";
         }
         if (userService.findUserByUsername(username.get()) == null) {
             return "error-404";
         }
-        Set<Friend> friends = userService.getUserAuth().getFriendsList();
-        friendService.isFriend(username.get());
-        ProfileInfo profileInfo = userService.findByUser_Username(username.get());
         model.addAttribute("user", userService.findUserByUsername(username.get()));
         model.addAttribute("profileInfo", userService.findByUser_Username(username.get()));
-
-
+        model.addAttribute("friends",friendService.getAcceptedFriends(username.get()));
+        model.addAttribute("isFriend",friendService.isFriends(username.get()));
+        model.addAttribute("friendAccepted",friendService.checkFriendStatus(username.get()));
+        model.addAttribute("isInviteRecieved",friendService.isInviteRecieved(username.get()));
+        model.addAttribute("isInviteSend",friendService.isInviteSend(username.get()));
         return "index";
 
     }
 
     @GetMapping("/user/{username}/friend")
-    public String addFriend(@PathVariable Optional<String> username, Model model,
-                            @RequestParam("fromList") String fromList,
-                            @RequestParam("where") String where) {
-        if (userService.getUserAuth() == null && (username.isEmpty())) {
+    public String sendInvite(@PathVariable Optional<String> username, Model model, @AuthenticationPrincipal User authentificatedUser) {
+        if (authentificatedUser == null && (username.isEmpty())) {
             return "/error";
         }
-        return friendService.addFriend(username.get(), Objects.equals(fromList, "true"), where);
+        return friendService.sendInvite(username.get());
     }
 
-    @GetMapping("/user/{username}/unfriend")
-    public String deleteFriend(@PathVariable Optional<String> username, Model model,
-                               @RequestParam("fromList") String fromList,
-                               @RequestParam("where") String where) {
-        if (userService.getUserAuth() == null && (username.isEmpty())) {
+    @GetMapping("/user/{username}/friend/{result}")
+    public String acceptInvite(@PathVariable Optional<String> username, Model model, @AuthenticationPrincipal User authentificatedUser,@PathVariable int result)
+    {
+        if (authentificatedUser == null && (username.isEmpty())||(result>2)) {
             return "/error";
         }
-        return friendService.deleteFriend(username.get(), Objects.equals(fromList, "true"), where);
+        return friendService.resultInvite(username.get(), result);
+    }
+    @GetMapping("/user/{username}/unfriend")
+    public String deleteFriend(@PathVariable Optional<String> username, Model model, @AuthenticationPrincipal User authentificatedUser) {
+        if (authentificatedUser == null && (username.isEmpty())) {
+            return "/error";
+        }
+        return friendService.deleteFriend(username.get());
     }
 }

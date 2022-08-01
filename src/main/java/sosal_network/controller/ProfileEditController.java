@@ -2,6 +2,7 @@ package sosal_network.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.Banner;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -27,17 +28,21 @@ public class ProfileEditController {
     /**
      * Get контроллер для страницы редактирования профиля пользователя
      * param model - модель для добавления атрибутов на текущую страницу
-     * author - Nekit
+     * author - Renat
      **/
     @GetMapping("/edit")
-    public String getEditProfile(Model model) {
-        User userFromSession = userService.getUserAuth();
+    public String getEditProfile(Model model, @AuthenticationPrincipal User userFromSession) {
         model.addAttribute("editedProfileInfo", new ProfileInfo());
         model.addAttribute("user", userFromSession);
         model.addAttribute("profileInfo", userService.findByUser_Username(userFromSession.getUsername()));
         return "profileEdit";
     }
 
+    /**
+     * Get контроллер для страницы редактирования профиля пользователя
+     * param model - модель для добавления атрибутов на текущую страницу
+     * author - Renat
+     **/
     @PostMapping("/edit")
     public String getHome(Model model, @ModelAttribute("editedProfile")ProfileInfo editedProfile,
                           RedirectAttributes redirectAttributes,

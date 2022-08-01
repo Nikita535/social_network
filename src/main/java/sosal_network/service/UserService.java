@@ -3,6 +3,8 @@ package sosal_network.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -137,7 +139,7 @@ public class UserService implements UserDetailsService {
 
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         user.setRoles(Collections.singleton(Role.ROLE_USER));
-        user.setActive(false);
+        user.setActive(true);
         user.setRegistrationDate(LocalDate.now());
         userRepository.save(user);
 
@@ -297,6 +299,7 @@ public class UserService implements UserDetailsService {
      **/
     @Transactional
     public User getUserAuth() {
+
         return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
@@ -326,20 +329,7 @@ public class UserService implements UserDetailsService {
         editedProfile.setId(profileSession.getId());
         profileSession = editedProfile;
 
-        if(file.getSize()!=0) {
-            if (!getUserAuth().getImages().isEmpty()) {
-                Image image = imageRepository.findImageByUser(profileSession.getUser());
-                Image img = toImageEntity(file, profileSession);
-                img.setId(image.getId());
-                img.setUser(image.getUser());
-                image = img;
-                profileSession.getUser().addImageToUser(image);
-                imageRepository.save(image);
-            } else {
-                getUserAuth().addImageToUser(toImageEntity(file,profileSession));
-                imageRepository.save(toImageEntity(file, profileSession));
-            }
-        }
+        saveImage(file, profileSession);
 
         profileInfoRepository.save(profileSession);
 
@@ -368,11 +358,27 @@ public class UserService implements UserDetailsService {
     }
 
 
-    private Image toImageEntity(MultipartFile file,ProfileInfo profileSession) throws IOException {
-        return new Image(file.getName(),file.getOriginalFilename(),file.getSize(),file.getContentType(),
-                file.getBytes(),profileSession.getUser());
+    private Image toImageEntity(MultipartFile file, ProfileInfo profileSession) throws IOException {
+        return new Image(file.getName(), file.getOriginalFilename(), file.getSize(), file.getContentType(),
+                file.getBytes(), profileSession.getUser());
     }
 
 
+    private void saveImage(MultipartFile file, ProfileInfo profileSession) throws IOException {
+        if (file.getSize() != 0) {
+            if (!getUserAuth().getImages().isEmpty()) {
+                Image image = imageRepository.findImageByUser(profileSession.getUser());
+                Image img = toImageEntity(file, profileSession);
+                img.setId(image.getId());
+                img.setUser(image.getUser());
+                image = img;
+                profileSession.getUser().addImageToUser(image);
+                imageRepository.save(image);
+            } else {
+                getUserAuth().addImageToUser(toImageEntity(file, profileSession));
+                imageRepository.save(toImageEntity(file, profileSession));
+            }
+        }
+    }
 
 }
