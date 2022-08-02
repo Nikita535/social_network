@@ -40,7 +40,7 @@ public class FriendService {
 
 
     public String redirectToFriendListOrToProfile(String username, String where){
-        if (!Objects.equals(where, ""))
+        if (where != null)
             return "redirect:/" + where + "/friendList/1";
         return "redirect:/user/" + username;
     }

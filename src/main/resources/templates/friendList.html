@@ -267,7 +267,7 @@
                                             <p class="text-muted" th:text="${profile.getCity()}"></p>
                                         </div>
                                         <div th:if="${isAdminOfTheFriendList}" class="col-md-3 col-sm-3">
-                                            <a th:href="@{'/user/'+${profile.getUser().getUsername()}+'/unfriend?fromList=true&amp;where=' + ${user.username}}" class="btn btn-primary pull-right">Удалить из друзей</a>
+                                            <a th:href="@{'/user/'+${profile.getUser().getUsername()}+'/unfriend?where=' + ${user.username}}" class="btn btn-primary pull-right">Удалить из друзей</a>
                                         </div>
                                     </div>
                                 </div>
@@ -293,7 +293,7 @@
                                         </div>
                                         <div th:if="${isAdminOfTheFriendList}" class="col-md-3 col-sm-3">
                                             <a th:if="!${friendService.isFriends(strangers.getUser().getUsername())}"
-                                               th:href="@{'/user/'+${strangers.getUser().getUsername()}+'/friend?fromList=true&amp;where=' + ${user.username}}" class="btn btn-primary pull-right">
+                                               th:href="@{'/user/'+${strangers.getUser().getUsername()}+'/friend?where=' + ${user.username}}" class="btn btn-primary pull-right">
                                                 Добавить в друзья
                                             </a>
                                             <div class="btn btn-dark"
@@ -407,7 +407,7 @@
                                         <a th:if="${friendService.isFriends(strangers.getUser().getUsername())} and
                                                  !${friendService.checkFriendStatus(strangers.getUser().getUsername())} and
                                                  ${friendService.isInviteRecieved(strangers.getUser().getUsername())}"
-                                                th:href="@{'/user/'+${strangers.getUser().getUsername()}+'/friend/1?fromList=true&amp;where=' + ${user.username}}"class="btn btn-icon">
+                                                th:href="@{'/user/'+${strangers.getUser().getUsername()}+'/friend/1?where=' + ${user.username}}"class="btn btn-icon">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                                  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                                  stroke-linecap="round" stroke-linejoin="round"
@@ -422,7 +422,7 @@
                                         <a th:if="${friendService.isFriends(strangers.getUser().getUsername())} and
                                                  !${friendService.checkFriendStatus(strangers.getUser().getUsername())} and
                                                  ${friendService.isInviteRecieved(strangers.getUser().getUsername())}"
-                                                th:href="@{'/user/'+${strangers.getUser().getUsername()}+'/friend/2?fromList=true&amp;where=' + ${user.username}}"class="btn btn-icon">
+                                                th:href="@{'/user/'+${strangers.getUser().getUsername()}+'/friend/2?where=' + ${user.username}}"class="btn btn-icon">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                                  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                                  stroke-linecap="round" stroke-linejoin="round"
