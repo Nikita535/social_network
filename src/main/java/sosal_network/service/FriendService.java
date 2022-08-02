@@ -2,8 +2,10 @@ package sosal_network.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.Banner;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.Model;
 import sosal_network.Enum.InviteStatus;
 import sosal_network.entity.Friend;
 import sosal_network.entity.ProfileInfo;
@@ -224,21 +226,28 @@ public class FriendService {
     }
 
 
-    public Object[] findFriendProfilesByUsername(String username, String searchLine, String pageString,
-                                                 Integer lenght){
+    public Model generateModelOfFriendList(Model model, String username, String searchLine, String pageString, Integer length){
+        model = findFriendProfilesByUsernameFirst(model, username, searchLine, pageString, length);
+        return model;
+    }
+
+
+    public Model findFriendProfilesByUsernameFirst(Model model, String username, String searchLine, String pageString,
+                                                 Integer length){
         int page = Integer.parseInt(pageString);
-        Integer sizeOfFriends;
+        int sizeOfFriends;
 
         List<ProfileInfo> profiles = new LinkedList<>();
         List<User> friends = new LinkedList<>(getAcceptedFriends(username) );
         List<ProfileInfo> allFriendProfiles = new LinkedList<>();
         if (Objects.equals(searchLine, "")){
-            for (int i = (page - 1) * lenght; i < page * lenght && i < friends.size(); i++)
+            for (int i = (page - 1) * length; i < page * length && i < friends.size(); i++)
                 profiles.add(userService.findByUser_Username(friends.get(i).getUsername()));
+            model.addAttribute("friendProfiles", profiles);
             sizeOfFriends = friends.size();
 
-            for (int i = 0; i < friends.size(); i++)
-                allFriendProfiles.add(userService.findByUser_Username(friends.get(i).getUsername()));
+            for (User friend : friends)
+                allFriendProfiles.add(userService.findByUser_Username(friend.getUsername()));
         }else {
             Pattern pattern = Pattern.compile(searchLine);
 
@@ -254,12 +263,22 @@ public class FriendService {
             allFriendProfiles = newProfiles;
 
             profiles = new LinkedList<>();
-            for (int i = (page - 1) * lenght; i < page * lenght && i < newProfiles.size(); i++)
+            for (int i = (page - 1) * length; i < page * length && i < newProfiles.size(); i++)
                 profiles.add(newProfiles.get(i));
+            model.addAttribute("friendProfiles", profiles);
         }
 
+        if (profiles.size() == 0 && sizeOfFriends == 0 && !Objects.equals(searchLine, ""))
+            model.addAttribute("errorNoSuchFriends", true);
 
-        return new Object[]{profiles, sizeOfFriends, allFriendProfiles};
+        if (profiles.size() != 0)
+                model.addAttribute("errorNoShowFriends", true);
+
+
+        findStrangersProfilesByUsernameSecond(model, username, searchLine, page,allFriendProfiles,
+                length - profiles.size(), length, sizeOfFriends);
+
+        return model;
     }
 
 
@@ -269,47 +288,48 @@ public class FriendService {
                 .setParameter("similarTo", similarTo).getResultList();
     }
 
-    public Object[] findStrangersProfilesByUsername(String username, String searchLine,
-                                                    String pageString, List<ProfileInfo> profilesOfFriends,
-                                                    Integer size,
-                                                    Integer lenght){
-        int page = Integer.parseInt(pageString);
-        Integer sizeOfStrangers;
-        List<ProfileInfo> profiles = new LinkedList<>();
+    public Model findStrangersProfilesByUsernameSecond(Model model, String username, String searchLine,Integer page,
+                                                       List<ProfileInfo> profilesOfFriends,Integer size,
+                                                       Integer length, Integer sizeOfFriends){
+        int sizeOfStrangers;
+        List<ProfileInfo> profiles;
+
+        List<ProfileInfo> profilesNew = new LinkedList<>();
+        profiles = allProfileInfos(searchLine);
+        profilesOfFriends.add(profileInfoRepository.findByUser_Username(username));
+
+        for (ProfileInfo profile: profiles)
+            if (!profilesOfFriends.contains(profile))
+                profilesNew.add(profile);
+        profiles = new LinkedList<>();
+        sizeOfStrangers = profilesNew.size();
 
         if (Objects.equals(searchLine, "")){
-            List<ProfileInfo> profilesNew = new LinkedList<>();
-            profiles = allProfileInfos(searchLine);
-            profilesOfFriends.add(profileInfoRepository.findByUser_Username(username));
 
-            for (ProfileInfo profile: profiles)
-                if (!profilesOfFriends.contains(profile))
-                    profilesNew.add(profile);
-            profiles = new LinkedList<>();
-            sizeOfStrangers = profilesNew.size();
-
-
-            for (int i = page == 1 ? 0 : (page * lenght - profilesOfFriends.size() - 1); i < page * lenght && i < profilesNew.size() && profiles.size() < size; i++)
+            for (int i = page == 1 ? 0 : (page * length - profilesOfFriends.size() - 1); i < page * length && i < profilesNew.size() && profiles.size() < size; i++)
                 profiles.add(profilesNew.get(i));
 
+            model.addAttribute("profilesOfStrangers", profiles);
 
         }else {
-            List<ProfileInfo> profilesNew = new LinkedList<>();
-            profiles = allProfileInfos(searchLine);
-            profilesOfFriends.add(profileInfoRepository.findByUser_Username(username));
-
-            for (ProfileInfo profile: profiles)
-                if (!profilesOfFriends.contains(profile))
-                    profilesNew.add(profile);
-            profiles = new LinkedList<>();
-
-            sizeOfStrangers = profilesNew.size();
-
-            for (int i = page == 1 ? 0 : (page * lenght - profilesOfFriends.size()); i < page * lenght && i < profilesNew.size() && profiles.size() < size; i++)
+            for (int i = page == 1 ? 0 : (page * length - profilesOfFriends.size()); i < page * length && i < profilesNew.size() && profiles.size() < size; i++)
                 profiles.add(profilesNew.get(i));
 
+            model.addAttribute("profilesOfStrangers", profiles);
         }
 
-        return new Object[]{profiles, sizeOfStrangers};
+        if (profiles.size() == 0 && sizeOfStrangers == 0 && !Objects.equals(searchLine, ""))
+            model.addAttribute("errorNoSuchStrangers", true);
+
+        if (profiles.size() != 0)
+            model.addAttribute("errorNoShowStrangers", true);
+
+        model.addAttribute("pages", Math.ceil(((float)sizeOfFriends + (float)sizeOfStrangers) / length));
+        return model;
+    }
+
+
+    public String clearSearchLine(String searchLine){
+        return searchLine.replaceAll("[^A-Za-zА-Яа-я0-9 ]", "");
     }
 }
