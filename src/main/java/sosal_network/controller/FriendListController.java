@@ -33,6 +33,7 @@ public class FriendListController {
         model = friendService.generateModelOfFriendList(model, username.get(), searchLine, page.get(), sizeOfPage);
 
 
+
         model.addAttribute("isAdminOfTheFriendList", Objects.equals(userService.findUserByUsername(username.get()).getUsername(), userService.getUserAuth().getUsername()));
         model.addAttribute("searchLine", searchLine);
         model.addAttribute("friendService", friendService);
