@@ -29,8 +29,13 @@ public class FriendListController {
                                 @PathVariable Optional<String> page,
                                 @ModelAttribute("searchLine") String searchLine){
 
+
+        if (username.isEmpty()) {
+            return "/error";
+        }
         int sizeOfPage = 10;
         model = friendService.generateModelOfFriendList(model, username.get(), searchLine, page.get(), sizeOfPage);
+
 
 
         model.addAttribute("isAdminOfTheFriendList", Objects.equals(userService.findUserByUsername(username.get()).getUsername(), userService.getUserAuth().getUsername()));

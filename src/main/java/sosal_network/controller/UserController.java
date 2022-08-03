@@ -72,7 +72,7 @@ public class UserController {
 
     @GetMapping("/user/{username}/friend")
     public String sendInvite(@PathVariable Optional<String> username, Model model, @AuthenticationPrincipal User authentificatedUser,
-                             @RequestParam("where") String where) {
+                             @RequestParam(value = "where", required = false) String where) {
         if (authentificatedUser == null && (username.isEmpty()) || Objects.equals(userService.findUserByUsername(username.get()).getUsername(), userService.getUserAuth().getUsername())) {
             return "/error";
         }
@@ -81,7 +81,7 @@ public class UserController {
 
     @GetMapping("/user/{username}/friend/{result}")
     public String acceptInvite(@PathVariable Optional<String> username, Model model, @AuthenticationPrincipal User authentificatedUser,@PathVariable int result,
-                               @RequestParam("where") String where)
+                               @RequestParam(value = "where", required = false) String where)
     {
         if (authentificatedUser == null && (username.isEmpty())||(result>2) || Objects.equals(userService.findUserByUsername(username.get()).getUsername(), userService.getUserAuth().getUsername())) {
             return "/error";
@@ -90,7 +90,7 @@ public class UserController {
     }
     @GetMapping("/user/{username}/unfriend")
     public String deleteFriend(@PathVariable Optional<String> username, Model model, @AuthenticationPrincipal User authentificatedUser,
-                               @RequestParam("where") String where) {
+                               @RequestParam(value="where", required = false) String where) {
         if (authentificatedUser == null && (username.isEmpty()) || Objects.equals(userService.findUserByUsername(username.get()).getUsername(), userService.getUserAuth().getUsername())) {
             return "/error";
         }
