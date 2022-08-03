@@ -8,8 +8,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import sosal_network.entity.Post;
 import sosal_network.entity.User;
 import sosal_network.service.FriendService;
+import sosal_network.service.PostService;
 import sosal_network.service.UserService;
 
 import java.util.Objects;
@@ -23,6 +25,9 @@ public class UserController {
     /**
      * Поле сервиса пользователя
      **/
+
+    @Autowired
+    PostService postService;
     @Autowired
     private UserService userService;
 
@@ -49,11 +54,17 @@ public class UserController {
         if (authentificatedUser == null && (username.isEmpty())) {
             return "/error";
         }
-//        model.addAttribute("friendService", friendService);
+        model.addAttribute("postService", postService);
         if (username.isEmpty()) {
             model.addAttribute("user", authentificatedUser);
             model.addAttribute("profileInfo", userService.findByUser_Username(authentificatedUser.getUsername()));
             model.addAttribute("friends",friendService.getFriends(authentificatedUser.getUsername()));
+            model.addAttribute("isFriend",friendService.isFriends(authentificatedUser.getUsername()));
+            model.addAttribute("friendAccepted",friendService.checkFriendStatus(authentificatedUser.getUsername()));
+            model.addAttribute("isInviteRecieved",friendService.isInviteRecieved(authentificatedUser.getUsername()));
+            model.addAttribute("isInviteSend",friendService.isInviteSend(authentificatedUser.getUsername()));
+            model.addAttribute("post",new Post());
+            model.addAttribute("posts",postService.showPost(authentificatedUser));
             return "index";
         }
         if (userService.findUserByUsername(username.get()) == null) {
@@ -66,6 +77,8 @@ public class UserController {
         model.addAttribute("friendAccepted",friendService.checkFriendStatus(username.get()));
         model.addAttribute("isInviteRecieved",friendService.isInviteRecieved(username.get()));
         model.addAttribute("isInviteSend",friendService.isInviteSend(username.get()));
+        model.addAttribute("post",new Post());
+        model.addAttribute("posts",postService.showPost(userService.findUserByUsername(username.get())));
         return "index";
 
     }

@@ -23,10 +23,7 @@ import sosal_network.repository.*;
 import javax.mail.MessagingException;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 
 /**
@@ -360,9 +357,11 @@ public class UserService implements UserDetailsService {
 
     private Image toImageEntity(MultipartFile file, ProfileInfo profileSession) throws IOException {
         return new Image(file.getName(), file.getOriginalFilename(), file.getSize(), file.getContentType(),
-                file.getBytes(), profileSession.getUser());
+                file.getBytes(), profileSession.getUser(),true);
     }
 
+
+   
 
     private void saveImage(MultipartFile file, ProfileInfo profileSession) throws IOException {
         if (file.getSize() != 0) {
@@ -380,5 +379,7 @@ public class UserService implements UserDetailsService {
             }
         }
     }
+
+
 
 }

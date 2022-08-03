@@ -82,6 +82,9 @@ public class User implements UserDetails {
     private List<Image> images = new ArrayList<>();
 
 
+
+
+
     /**
      * Основной конструктор
      **/
