@@ -5,6 +5,7 @@ var isInviteSend = window.isInviteSend;
 var isInviteRecieved = window.isInviteRecieved;
 var usernameOfSession = window.usernameOfSession;
 var usernameOfPage = window.usernameOfPage;
+var currentLocation = document.location.protocol + "//" + document.location.host;
 
 
 
@@ -19,7 +20,7 @@ function addButton($mainObj){
 }
 
 function addFriend(){
-    createAjaxQuery('http://localhost:8080/user/' + usernameOfPage + '/friend', successAddFriendHandler())
+    createAjaxQuery('/user/' + usernameOfPage + '/friend', successAddFriendHandler())
 }
 
 function successAddFriendHandler(){
@@ -47,7 +48,8 @@ function deleteButton($mainObj){
     const $friendButton = document.createElement('div');
     $friendButton.classList.add("btn", "btn-dark")
     $friendButton.innerHTML += "В друзьях";
-    $friendButton.id = "deleteFriend1"
+    $friendButton.id = "deleteFriend1";
+    $friendButton.style.marginRight = "5px";
     $mainObj.appendChild($friendButton);
 
     const $friendButton2 = document.createElement('button');
@@ -59,7 +61,7 @@ function deleteButton($mainObj){
 }
 
 function deleteFriend(){
-    createAjaxQuery('http://localhost:8080/user/' + usernameOfPage + '/unfriend', successDeleteFriendHandler())
+    createAjaxQuery('/user/' + usernameOfPage + '/unfriend', successDeleteFriendHandler())
 }
 
 function successDeleteFriendHandler(){
@@ -77,6 +79,7 @@ function acceptAndReceiveButton($mainObj){
     $friendButton1.classList.add("btn", "btn-success");
     $friendButton1.innerHTML += "Принять заявку";
     $friendButton1.id = "acceptFriend";
+    $friendButton1.style.marginRight = "5px";
     $friendButton1.onclick=function(){acceptFriend()};
     $mainObj.appendChild($friendButton1);
 
@@ -89,11 +92,11 @@ function acceptAndReceiveButton($mainObj){
 }
 
 function  acceptFriend(){
-    createAjaxQuery('http://localhost:8080/user/' + usernameOfPage + '/friend/1', acceptFriendHandler())
+    createAjaxQuery('/user/' + usernameOfPage + '/friend/1', acceptFriendHandler())
 }
 
 function  receiveFriend(){
-    createAjaxQuery('http://localhost:8080/user/' + usernameOfPage + '/friend/2', receiveFriendHandler())
+    createAjaxQuery('/user/' + usernameOfPage + '/friend/2', receiveFriendHandler())
 }
 
 function acceptFriendHandler(){
@@ -120,7 +123,7 @@ function createAjaxQuery(url, toFunction)
 {
     jQuery.ajax({
         type       : 'GET',
-        url        : url,
+        url        : currentLocation + url,
         contentType: 'application/json',
         success    : toFunction
     });
