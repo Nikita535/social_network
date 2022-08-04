@@ -31,7 +31,7 @@
                                       th:text="${user.username} + ' ( '+ ${profileInfo.name} + ' ' + ${profileInfo.surname}+' )' "></span>
                             </div>
                             <div id="friendStatus" class="d-none d-md-block d-flex justify-space-between">
-                                <a href="/edit" class="btn btn-primary btn-icon-text btn-edit-profile"
+                                <a href="/edit" class="btn btn-primary btn-icon-text btn-edit-profile m-2"
                                    th:if="${#authentication.getPrincipal().username}==${user.username}">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                          fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -64,7 +64,7 @@
                                      stroke-linejoin="round" class="feather feather-columns mr-1 icon-md">
                                     <path d="M12 3h7a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-7m0-18H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h7m0-18v18"></path>
                                 </svg>
-                                <a class="pt-1px d-none d-md-block" href="#">Timeline</a>
+                                <a class="pt-1px d-none d-md-block" href="#">Записи</a>
                             </li>
                             <li class="header-link-item ml-3 pl-3 border-left d-flex align-items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -73,7 +73,7 @@
                                     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                                     <circle cx="12" cy="7" r="4"></circle>
                                 </svg>
-                                <a class="pt-1px d-none d-md-block" href="#">About</a>
+                                <a class="pt-1px d-none d-md-block" href="#">О вас</a>
                             </li>
                             <li class="header-link-item ml-3 pl-3 border-left d-flex align-items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -84,7 +84,7 @@
                                     <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
                                     <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                                 </svg>
-                                <a class="pt-1px d-none d-md-block" th:href="@{'/' + ${user.username} + '/friendList/1'}" methods="GET">Friends <span class="text-muted tx-12"
+                                <a class="pt-1px d-none d-md-block" th:href="@{'/user/' + ${user.username} + '/friendList/1'}" methods="GET">Друзья <span class="text-muted tx-12"
                                                                                                                                                       th:text="${friends.size()}"></span></a>
 
 
@@ -167,9 +167,14 @@
                         <p th:text="${profileInfo.description!='' and profileInfo.description!=null} ? *{profileInfo.description} : 'Нет описания'">
                             Нет описания</p>
                         <div class="mt-3">
+                            <label class="tx-11 font-weight-bold mb-0 text-uppercase">Дата рождения:</label>
+                            <p class="text-muted"
+                               th:text="${profileInfo.dateOfBirth!=null} ? ${profileInfo.dateFormat()}+ ' , '+ ${profileInfo.getAge()} : 'Дата рождения не указана'"></p>
+                        </div>
+                        <div class="mt-3">
                             <label class="tx-11 font-weight-bold mb-0 text-uppercase">Зарегистрирован с:</label>
                             <p class="text-muted"
-                               th:text="${user.getRegistrationDate().getMonth()}+' '+${user.getRegistrationDate().getDayOfMonth()}+','+${user.getRegistrationDate().getYear()}"></p>
+                               th:text="${user.dateFormat()}"></p>
                         </div>
                         <div class="mt-3">
                             <label class="tx-11 font-weight-bold mb-0 text-uppercase">Город:</label>
@@ -180,7 +185,7 @@
                             <p class="text-muted" th:text="${user.userEmail}"></p>
                         </div>
                         <div class="mt-3">
-                            <label class="tx-11 font-weight-bold mb-0 text-uppercase">Website:</label>
+                            <label class="tx-11 font-weight-bold mb-0 text-uppercase">Веб-сайт:</label>
                             <p class="text-muted"
                                th:text="*{profileInfo.website!='' and profileInfo.website!=null} ? *{profileInfo.website} : 'У пользователя нет веб-сайта'"></p>
                         </div>

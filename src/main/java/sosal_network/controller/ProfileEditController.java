@@ -45,13 +45,14 @@ public class ProfileEditController {
      **/
     @PostMapping("/edit")
     public String getHome(Model model, @ModelAttribute("editedProfile")ProfileInfo editedProfile,
+                          @RequestParam("profileDateOfBirth") String dateOfBirth,
                           RedirectAttributes redirectAttributes,
                           @RequestParam("currentPassword") String currentPassword,
                           @RequestParam("newPassword") String newPassword,
                           @RequestParam("passwordConfirm") String passwordConfirm,
                           @RequestParam("file")MultipartFile file) throws IOException {
 
-        return userService.editProfile(editedProfile, redirectAttributes, currentPassword, newPassword, passwordConfirm,file);
+        return userService.editProfile(editedProfile,dateOfBirth, redirectAttributes, currentPassword, newPassword, passwordConfirm,file);
     }
 
 }
