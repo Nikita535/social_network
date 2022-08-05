@@ -6,30 +6,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-<<<<<<<<< Temporary merge branch 1
 import org.springframework.web.bind.annotation.*;
-=========
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.client.RestTemplate;
->>>>>>>>> Temporary merge branch 2
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import sosal_network.entity.ActivationToken;
 import sosal_network.entity.ProfileInfo;
 import sosal_network.entity.User;
 import sosal_network.repository.ActivationTokenRepository;
 import sosal_network.service.UserService;
-import sosal_network.utility.ReCaptchaResponse;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

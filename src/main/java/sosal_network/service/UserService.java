@@ -6,8 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -27,14 +25,20 @@ import sosal_network.entity.ActivationToken;
 import sosal_network.entity.PasswordResetToken;
 import sosal_network.entity.ProfileInfo;
 import sosal_network.entity.User;
-import sosal_network.repository.*;
+import sosal_network.repository.ActivationTokenRepository;
+import sosal_network.repository.PasswordTokenRepository;
+import sosal_network.repository.ProfileInfoRepository;
+import sosal_network.repository.UserRepository;
 import sosal_network.utility.ReCaptchaResponse;
 
 import javax.mail.MessagingException;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Objects;
+import java.util.UUID;
 
 
 /**
