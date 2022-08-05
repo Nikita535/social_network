@@ -30,6 +30,7 @@ import sosal_network.utility.ReCaptchaResponse;
 import javax.mail.MessagingException;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 
@@ -290,11 +291,19 @@ public class UserService implements UserDetailsService {
      * author - Nekit
      **/
     @Transactional
-    public String addProfileInfo(ProfileInfo profileInfo, RedirectAttributes redirectAttributes, String username) {
-        profileInfo.setUser(findUserByUsername(username));
-        profileInfoRepository.save(profileInfo);
-        redirectAttributes.addFlashAttribute("registerSuccess", true);
-        return "redirect:/login";
+    public String addProfileInfo(ProfileInfo profileInfo, RedirectAttributes redirectAttributes, String username, String dateOfBirth) {
+        try {
+            if (!Objects.equals(dateOfBirth, null)) {
+                profileInfo.setDateOfBirth(LocalDate.parse(dateOfBirth, DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+            }
+            profileInfo.setUser(findUserByUsername(username));
+            profileInfoRepository.save(profileInfo);
+            redirectAttributes.addFlashAttribute("registerSuccess", true);
+            return "redirect:/login";
+        } catch (Exception e) {
+            userRepository.deleteUserByUsername(username);
+            return "redirect:/register";
+        }
     }
 
     /**
@@ -312,7 +321,7 @@ public class UserService implements UserDetailsService {
         return getUserAuth().getActive();
     }
 
-    public String editProfile(ProfileInfo editedProfile, RedirectAttributes redirectAttributes,
+    public String editProfile(ProfileInfo editedProfile, String dateOfBirth, RedirectAttributes redirectAttributes,
                               String currentPassword, String newPassword,
                               String passwordConfirm,
                               MultipartFile file) throws IOException {
@@ -325,7 +334,10 @@ public class UserService implements UserDetailsService {
             log.warn("error len of profile");
             return "redirect:/edit";
         }
-
+        if (!Objects.equals(dateOfBirth, "")) {
+            LocalDate changedDate = LocalDate.parse(dateOfBirth, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+            editedProfile.setDateOfBirth(changedDate);
+        }
         redirectAttributes.addFlashAttribute("profileChanged", true);
         editedProfile.setUser(profileSession.getUser());
 
@@ -364,11 +376,9 @@ public class UserService implements UserDetailsService {
 
     private Image toImageEntity(MultipartFile file, ProfileInfo profileSession) throws IOException {
         return new Image(file.getName(), file.getOriginalFilename(), file.getSize(), file.getContentType(),
-                file.getBytes(), profileSession.getUser(),true);
+                file.getBytes(), profileSession.getUser(), true);
     }
 
-
-   
 
     private void saveImage(MultipartFile file, ProfileInfo profileSession) throws IOException {
         if (file.getSize() != 0) {

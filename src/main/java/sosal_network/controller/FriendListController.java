@@ -2,6 +2,7 @@ package sosal_network.controller;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -24,10 +25,10 @@ public class FriendListController {
     @Autowired
     private UserService userService;
 
-    @GetMapping("/{username}/friendList/{page}")
+    @GetMapping("/user/{username}/friendList/{page}")
     public String getFriendList(Model model, @PathVariable Optional<String> username,
                                 @PathVariable Optional<String> page,
-                                @ModelAttribute("searchLine") String searchLine){
+                                @ModelAttribute("searchLine") String searchLine, @AuthenticationPrincipal User user){
 
 
         if (username.isEmpty()) {
@@ -38,7 +39,7 @@ public class FriendListController {
 
 
 
-        model.addAttribute("isAdminOfTheFriendList", Objects.equals(userService.findUserByUsername(username.get()).getUsername(), userService.getUserAuth().getUsername()));
+        model.addAttribute("isAdminOfTheFriendList", Objects.equals(userService.findUserByUsername(username.get()).getUsername(), user.getUsername()));
         model.addAttribute("searchLine", searchLine);
         model.addAttribute("friendService", friendService);
         model.addAttribute("user", userService.findUserByUsername(username.get()));
@@ -51,11 +52,11 @@ public class FriendListController {
         return "friendList";
     }
 
-    @PostMapping("/{username}/search")
+    @PostMapping("/user/{username}/search")
     public String findFriendList(Model model, @PathVariable Optional<String> username,
                                  @RequestParam("searchLine") String searchLine,
                                  RedirectAttributes redirectAttributes){
         redirectAttributes.addFlashAttribute("searchLine", friendService.clearSearchLine(searchLine));
-        return "redirect:/" + username.get() + "/friendList/1";
+        return "redirect:/user/" + username.get() + "/friendList/1";
     }
 }

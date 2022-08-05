@@ -14,10 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import sosal_network.entity.ActivationToken;
@@ -128,8 +125,8 @@ public class RegisterController {
      * author - Nekit
      **/
     @PostMapping("/register/info/{username}")
-    public String saveProfileInfo(@ModelAttribute("profileInfo") ProfileInfo profileInfo, RedirectAttributes redirectAttributes, @PathVariable String username) {
-        return userService.addProfileInfo(profileInfo, redirectAttributes, username);
+    public String saveProfileInfo(@ModelAttribute("profileInfo") ProfileInfo profileInfo, RedirectAttributes redirectAttributes, @PathVariable String username, @RequestParam("date") String dateOfBirth) {
+        return userService.addProfileInfo(profileInfo, redirectAttributes, username,dateOfBirth);
     }
 
     /**

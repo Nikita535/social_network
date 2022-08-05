@@ -22,38 +22,58 @@ public class PostService {
     @Autowired
     PostRepository postRepository;
 
-    public void savePost(Post post, User user){
+    public void savePost(Post post, User user) {
         post.setDateOfCreate(LocalDateTime.now());
         post.setUser(user);
         postRepository.save(post);
     }
 
-    public List<Post> showPost(User user){
-       return postRepository.findPostsByUser(user).stream().sorted(Comparator.comparing(Post::getDateOfCreate).reversed()).collect(Collectors.toList());
+    public List<Post> showPost(User user) {
+        return postRepository.findPostsByUser(user).stream().sorted(Comparator.comparing(Post::getDateOfCreate).reversed()).collect(Collectors.toList());
     }
 
-    public String showTimeAgo(Post post){
-        long Seconds = ChronoUnit.SECONDS.between(post.getDateOfCreate(),LocalDateTime.now());
-        long Minutes = ChronoUnit.MINUTES.between(post.getDateOfCreate(),LocalDateTime.now());
-        long Hours = ChronoUnit.HOURS.between(post.getDateOfCreate(),LocalDateTime.now());
-        long Days = ChronoUnit.DAYS.between(post.getDateOfCreate(),LocalDateTime.now());
-        long Months = ChronoUnit.MONTHS.between(post.getDateOfCreate(),LocalDateTime.now());
+    public String showTimeAgo(Post post) {
+        long seconds = ChronoUnit.SECONDS.between(post.getDateOfCreate(), LocalDateTime.now());
+        long minutes = ChronoUnit.MINUTES.between(post.getDateOfCreate(), LocalDateTime.now());
+        long hours = ChronoUnit.HOURS.between(post.getDateOfCreate(), LocalDateTime.now());
+        long days = ChronoUnit.DAYS.between(post.getDateOfCreate(), LocalDateTime.now());
+        long months = ChronoUnit.MONTHS.between(post.getDateOfCreate(), LocalDateTime.now());
 
-        if (Seconds<60){
-            return Seconds%10!=0 && Seconds%10 < 5 ? Seconds+" секунды назад" : Seconds+" секунд назад" ;
+        if (seconds < 60) {
+            if (seconds % 10 == 1 && seconds / 10 != 1) {
+                return seconds + " секунду назад";
+            } else {
+                return seconds % 10 != 0 && seconds % 10 < 5 && seconds / 10 != 1 ? seconds + " секунды назад" : seconds + " секунд назад";
+            }
         }
 
-        if(Minutes>=1 && Minutes<60){
-            return Minutes%10!=0 && Minutes%10< 5 ? Minutes+" минуты назад" : Minutes+" минут назад" ;
+        if (minutes >= 1 && minutes < 60) {
+            if (minutes % 10 == 1 && minutes / 10 != 1) {
+                return minutes + " минуту назад";
+            } else {
+                return minutes % 10 != 0 && minutes % 10 < 5 && minutes / 10 != 1 ? minutes + " минуты назад" : minutes + " минут назад";
+            }
         }
-        if(Hours>=1 && Hours<24){
-            return  Hours%10!=0 && Hours%10 < 5 ? Hours+" часа назад" : Hours+" часов назад" ;
+        if (hours >= 1 && hours < 24) {
+            if (hours % 10 == 1 && hours / 10 != 1) {
+                return hours + " час назад";
+            } else {
+                return hours % 10 != 0 && hours % 10 < 5 && hours / 10 != 1 ? hours + " часа назад" : hours + " часов назад";
+            }
         }
-        if(Days >=1 && Days<30){
-            return  Days%10!=0 && Days%10 < 5 ? Days+" дня назад" : Days+" дней назад" ;
+        if (days >= 1 && days < 30) {
+            if (days % 10 == 1 && days / 10 != 1) {
+                return days + " день назад";
+            } else {
+                return days % 10 != 0 && days % 10 < 5 && days / 10 != 1 ? days + " дня назад" : days + " день назад";
+            }
         }
-        if(Months>=1 && Months<12){
-            return  Months%10!=0 && Months%10 < 5 ? Months+" месяца назад" : Months+" месяцев назад" ;
+        if (months >= 1 && months < 12) {
+            if (months % 10 == 1 && months / 10 != 1) {
+                return months + " месяц назад";
+            } else {
+                return months % 10 != 0 && months % 10 < 5 && months / 10 != 1 ? months + " месяца назад" : months + " месяцев назад";
+            }
         }
         return " давно";
     }
