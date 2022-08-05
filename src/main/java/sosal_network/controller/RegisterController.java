@@ -48,6 +48,7 @@ public class RegisterController {
         return "register";
     }
 
+
     /**
      * Post контроллер для валидации данных и сохранения пользователя
      * author - Nikita, Renat
