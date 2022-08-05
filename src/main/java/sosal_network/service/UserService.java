@@ -3,6 +3,9 @@ package sosal_network.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,12 +16,16 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import sosal_network.Enum.Role;
 import sosal_network.entity.*;
 import sosal_network.repository.*;
+import sosal_network.utility.ReCaptchaResponse;
 
 import javax.mail.MessagingException;
 import java.io.IOException;
@@ -380,6 +387,28 @@ public class UserService implements UserDetailsService {
         }
     }
 
+    public static boolean verifyReCAPTCHA(String gRecaptchaResponse, String recaptchaSecret, String recaptchaURL, RestTemplate restTemplate) {
+        HttpHeaders headers=new org.springframework.http.HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
+        LinkedMultiValueMap<String, String> map=new LinkedMultiValueMap<>();
+        map.add("secret",recaptchaSecret);
+        map.add("response",gRecaptchaResponse);
+
+
+        HttpEntity<MultiValueMap<String,String>> request=new HttpEntity<>(map,headers);
+
+        ReCaptchaResponse response= restTemplate.postForObject(recaptchaURL,request,
+                ReCaptchaResponse.class);
+
+        assert response != null;
+        if(response.getErrorCodes()!=null){
+            for(String error: response.getErrorCodes()){
+                log.error("responseCaptchaERROR",error);
+            }
+        }
+
+        return response.isSuccess();
+    }
 
 }

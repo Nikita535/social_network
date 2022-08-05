@@ -11,6 +11,7 @@
     <script src="https://netdna.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     <!--  css для логина  -->
     <link href="login/login.css" rel="stylesheet">
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
 
 <body>
@@ -22,7 +23,7 @@
                 <h1>Регистрация</h1>
                 <div class="panel panel-default text-center">
                     <img src="https://bootdey.com/img/Content/avatar/avatar1.png" class="img-circle img-login">
-                    <form class="panel-body" action="/register" th:object="${user}" th:method="POST">
+                    <form class="panel-body" action="/register" th:object="${user}" th:method="POST" onsubmit="return validateCaptcha()">
                         <div th:if="${errorLenUsername}">
                             <div class="alert alert-danger">
                                 Длина имени должна быть больше 5 символов!
@@ -56,6 +57,9 @@
                                required="true">
                         <input class="form-control" type="password" th:field="*{userPasswordConfirm}"
                                placeholder="Введите пароль еще раз" required="true">
+                            <div style="transform:scale(0.8); transform-origin:0;" class="g-recaptcha justify-content-center"
+                                 th:data-sitekey="${@environment.getProperty('recaptcha.key')}"></div>
+                            <br/>
                         <button type="submit" class="btn btn-success">Продолжить регистрацию <i
                                 class="fa fa-fw fa-unlock-alt"></i></button>
                     </form>
@@ -64,9 +68,19 @@
         </div>
     </div>
 </div>
-
-
 <!-- скрипт для логина  -->
 <script src="login/login.js"></script>
+
+<script type="text/javascript">
+    function validateCaptcha(){
+        if(grecaptcha.getResponse()){
+            return true;
+        }else{
+            alert("Заполните капчу")
+            return false;
+        }
+    }
+</script>
+
 </body>
 </html>
