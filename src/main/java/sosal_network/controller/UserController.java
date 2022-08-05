@@ -11,6 +11,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import sosal_network.entity.Post;
 import sosal_network.entity.User;
 import sosal_network.service.FriendService;
+import sosal_network.service.ImageService;
 import sosal_network.service.PostService;
 import sosal_network.service.UserService;
 
@@ -30,6 +31,9 @@ public class UserController {
     PostService postService;
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private ImageService imageService;
 
     @Autowired
     private FriendService friendService;
@@ -79,6 +83,7 @@ public class UserController {
         model.addAttribute("isInviteSend",friendService.isInviteSend(username.get()));
         model.addAttribute("post",new Post());
         model.addAttribute("posts",postService.showPost(userService.findUserByUsername(username.get())));
+        model.addAttribute("avatar",imageService.findImageByUserAndIsPreview( userService.findUserByUsername(username.get()),true));
         return "index";
 
     }

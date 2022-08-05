@@ -18,9 +18,10 @@ import java.io.ByteArrayInputStream;
 public class ImageController {
     private final ImageRepository imageRepository;
 
-    @GetMapping("/image/{username}")
-    private ResponseEntity<?> getImageById(@PathVariable String username){
-        Image image = imageRepository.findImageByUser_Username(username);
+    @GetMapping("/image/{id}")
+    private ResponseEntity<?> getImageById(@PathVariable Long id){
+//        Image image = imageRepository.findImageByUser_UsernameAndIsPreview(username,true);
+        Image image =imageRepository.findImageById(id);
         return ResponseEntity.ok()
                 .header("fileName",image.getOriginalFileName())
                 .contentType(MediaType.valueOf(image.getContentType()))

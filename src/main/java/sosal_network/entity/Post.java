@@ -7,8 +7,10 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
-@Entity
+@Entity(name = "post")
 @Getter
 @Setter
 @AllArgsConstructor
@@ -27,6 +29,10 @@ public class Post {
     @ManyToOne(targetEntity = User.class, fetch = FetchType.EAGER)
     @JoinColumn(nullable = false, name = "user_id")
     private User user;
+
+
+    @OneToMany(mappedBy = "post",fetch = FetchType.EAGER,orphanRemoval = true)
+    List<PostImage> images=new ArrayList<>();
 
     public Post(LocalDateTime dateOfCreate, String full_text, User user) {
         this.dateOfCreate = dateOfCreate;

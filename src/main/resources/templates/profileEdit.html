@@ -39,14 +39,14 @@
                 <section class="panel">
                     <div class="panel-body noradius padding-10">
                         <figure class="margin-bottom-10"><!-- image -->
-                            <img class="img-responsive"  th:src="${user.images.size()!=0 ? '/image/' + user.getUsername() :
+                            <img class="img-responsive" th:src="${user.images.size()!=0 ? '/image/' + avatar.getId() :
                                 'https://bootdey.com/img/Content/avatar/avatar6.png'}" alt="">
                         </figure><!-- /image -->
 
                         <!-- progress bar -->
                         <h6 class="progress-head">Profile Completion <span class="pull-right">60%</span></h6>
                         <div class="progress progress-xs">
-                            <div class="progress-bar" role="progressbar" style="width: 60%;" ></div>
+                            <div class="progress-bar" role="progressbar" style="width: 60%;"></div>
                         </div><!-- /progress bar -->
 
                         <!-- updated -->
@@ -60,11 +60,13 @@
                         <hr class="half-margins">
 
                         <!-- About -->
-                        <h3 class="text-black"  th:text="${profileInfo.name}+ ' '+ ${profileInfo.surname}">
+                        <h3 class="text-black" th:text="${profileInfo.name}+ ' '+ ${profileInfo.surname}">
 
                         </h3>
-                        <p class="size-12" th:text="${profileInfo.dateOfBirth!=null} ? ${profileInfo.getAge()} : 'Дата рождения не указана'" ></p>
-                        <p class="size-12" th:text="${profileInfo.description!='' and profileInfo.description!=null} ? *{profileInfo.description} : 'Нет описания'"></p>
+                        <p class="size-12"
+                           th:text="${profileInfo.dateOfBirth!=null} ? ${profileInfo.getAge()} : 'Дата рождения не указана'"></p>
+                        <p class="size-12"
+                           th:text="${profileInfo.description!='' and profileInfo.description!=null} ? *{profileInfo.description} : 'Нет описания'"></p>
                         <!-- /About -->
 
                         <!-- /About -->
@@ -125,40 +127,42 @@
                         <!-- Edit -->
                         <div id="edit" class="tab-pane active">
 
-                            <form class="form-horizontal padding-10" enctype="multipart/form-data" th:action="@{/edit} "
+                            <form class="form-horizontal padding-10" enctype="multipart/form-data"
+                                  th:action="@{/edit/profile} "
                                   th:object="${editedProfileInfo}" th:method="POST">
                                 <h4>Основная информация</h4>
                                 <fieldset>
-                                    <div th:if="${errorLen}">
-                                        <div class="alert alert-danger">
-                                            Поля не должны быть пустыми!
-                                        </div>
-                                    </div>
                                     <div th:if="${profileChanged}">
                                         <div class="alert alert-success">
-                                            Профиль сохранен
+                                            Основная информация обновлена
+                                        </div>
+                                    </div>
+                                    <div th:if="${photoChanged}">
+                                        <div class="alert alert-success">
+                                            Фото обновлено
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label class="col-md-3 control-label" >Имя</label>
+                                        <label class="col-md-3 control-label">Имя</label>
                                         <div class="col-md-8">
-                                            <input type="text" class="form-control profileFirstName" id="profileFirstName"
-                                                   name="name" th:value="${profileInfo.name}">
+                                            <input type="text" class="form-control profileFirstName"
+                                                   id="profileFirstName"
+                                                   name="name" th:value="${profileInfo.name}" required>
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="col-md-3 control-label" for="profileLastName">Фамилия</label>
                                         <div class="col-md-8">
                                             <input type="text" class="form-control" id="profileLastName"
-                                                  name="surname" th:value="${profileInfo.surname}">
+                                                   name="surname" th:value="${profileInfo.surname}" required>
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="col-md-3 control-label">Город</label>
                                         <div class="col-md-8">
-<!--                                            <input type="text" class="form-control" id="profileAddress"-->
-<!--                                                   name="city" th:value="${profileInfo.city}">-->
-                                            <input class="form-control" list="datalistOptions" id="exampleDataList" name="city" placeholder="Введите город" th:value="${profileInfo.city}">
+                                            <input class="form-control" list="datalistOptions" id="exampleDataList"
+                                                   name="city" placeholder="Введите город"
+                                                   th:value="${profileInfo.city}" required>
                                             <datalist id="datalistOptions">
                                                 <option value="Москва">Москва</option>
                                                 <option value="Санкт-Петербург">Санкт-Петербург</option>
@@ -189,15 +193,21 @@
                                                 <option value="Белгород">Белгород</option>
                                                 <option value="Белебей">Белебей</option>
                                                 <option value="Белово">Белово</option>
-                                                <option value="Белогорск (Амурская область)">Белогорск (Амурская область)</option>
+                                                <option value="Белогорск (Амурская область)">Белогорск (Амурская
+                                                    область)
+                                                </option>
                                                 <option value="Белорецк">Белорецк</option>
                                                 <option value="Белореченск">Белореченск</option>
                                                 <option value="Бердск">Бердск</option>
                                                 <option value="Березники">Березники</option>
-                                                <option value="Березовский (Свердловская область)">Березовский (Свердловская область)</option>
+                                                <option value="Березовский (Свердловская область)">Березовский
+                                                    (Свердловская область)
+                                                </option>
                                                 <option value="Бийск">Бийск</option>
                                                 <option value="Биробиджан">Биробиджан</option>
-                                                <option value="Благовещенск (Амурская область)">Благовещенск (Амурская область)</option>
+                                                <option value="Благовещенск (Амурская область)">Благовещенск (Амурская
+                                                    область)
+                                                </option>
                                                 <option value="Бор">Бор</option>
                                                 <option value="Борисоглебск">Борисоглебск</option>
                                                 <option value="Боровичи">Боровичи</option>
@@ -253,8 +263,12 @@
                                                 <option value="Елабуга">Елабуга</option>
                                                 <option value="Елец">Елец</option>
                                                 <option value="Ессентуки">Ессентуки</option>
-                                                <option value="Железногорск (Красноярский край)">Железногорск (Красноярский край)</option>
-                                                <option value="Железногорск (Курская область)">Железногорск (Курская область)</option>
+                                                <option value="Железногорск (Красноярский край)">Железногорск
+                                                    (Красноярский край)
+                                                </option>
+                                                <option value="Железногорск (Курская область)">Железногорск (Курская
+                                                    область)
+                                                </option>
                                                 <option value="Жигулевск">Жигулевск</option>
                                                 <option value="Жуковский">Жуковский</option>
                                                 <option value="Заречный">Заречный</option>
@@ -282,7 +296,8 @@
                                                 <option value="Керчь">Керчь</option>
                                                 <option value="Кинешма">Кинешма</option>
                                                 <option value="Кириши">Кириши</option>
-                                                <option value="Киров (Кировская область)">Киров (Кировская область)</option>
+                                                <option value="Киров (Кировская область)">Киров (Кировская область)
+                                                </option>
                                                 <option value="Кирово-Чепецк">Кирово-Чепецк</option>
                                                 <option value="Киселевск">Киселевск</option>
                                                 <option value="Кисловодск">Кисловодск</option>
@@ -331,7 +346,9 @@
                                                 <option value="Минеральные Воды">Минеральные Воды</option>
                                                 <option value="Минусинск">Минусинск</option>
                                                 <option value="Михайловка">Михайловка</option>
-                                                <option value="Михайловск (Ставропольский край)">Михайловск (Ставропольский край)</option>
+                                                <option value="Михайловск (Ставропольский край)">Михайловск
+                                                    (Ставропольский край)
+                                                </option>
                                                 <option value="Мичуринск">Мичуринск</option>
                                                 <option value="Мурманск">Мурманск</option>
                                                 <option value="Муром">Муром</option>
@@ -368,7 +385,9 @@
                                                 <option value="Нягань">Нягань</option>
                                                 <option value="Обнинск">Обнинск</option>
                                                 <option value="Одинцово">Одинцово</option>
-                                                <option value="Озерск (Челябинская область)">Озерск (Челябинская область)</option>
+                                                <option value="Озерск (Челябинская область)">Озерск (Челябинская
+                                                    область)
+                                                </option>
                                                 <option value="Октябрьский">Октябрьский</option>
                                                 <option value="Омск">Омск</option>
                                                 <option value="Орел">Орел</option>
@@ -380,7 +399,8 @@
                                                 <option value="Первоуральск">Первоуральск</option>
                                                 <option value="Пермь">Пермь</option>
                                                 <option value="Петрозаводск">Петрозаводск</option>
-                                                <option value="Петропавловск-Камчатский">Петропавловск-Камчатский</option>
+                                                <option value="Петропавловск-Камчатский">Петропавловск-Камчатский
+                                                </option>
                                                 <option value="Подольск">Подольск</option>
                                                 <option value="Полевской">Полевской</option>
                                                 <option value="Прокопьевск">Прокопьевск</option>
@@ -486,101 +506,124 @@
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label class="col-md-3 control-label" for="profileDateOfBirth" id="dateOfBirth">Дата рождения</label>
+                                        <label class="col-md-3 control-label" for="profileDateOfBirth" id="dateOfBirth">Дата
+                                            рождения</label>
                                         <div class="col-md-8">
                                             <input type="text" class="form-control" id="profileDateOfBirth"
-                                                   name="profileDateOfBirth"  placeholder="Добавьте дату рождения" th:value="${profileInfo.toTextDate()}">
+                                                   name="profileDateOfBirth" placeholder="Добавьте дату рождения"
+                                                   th:value="${profileInfo.dateOfBirth!=null ?  profileInfo.toTextDate() : ''}" pattern="\d{2}(-|\/)\d{2}(-|\/)\d{4}">
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label class="col-md-3 control-label" for="profileCompany" id="website">Веб-сайт</label>
-                                        <div class="col-md-8">
-                                            <input type="text" class="form-control" id="profileCompany"
-                                                   name="website" th:value="${profileInfo.website}" placeholder="Добавьте ваш веб-сайт">
-                                        </div>
-                                    </div>
-                                </fieldset>
-
-                                <hr>
-
-                                <h4>Обо мне</h4>
-                                <fieldset >
-                                    <div class="form-group">
-                                        <label class="col-xs-3 control-label" for="profileCompany" >Описание</label>
+                                        <label class="col-xs-3 control-label" for="profileCompany">Описание</label>
                                         <div class="col-md-8">
                                             <input type="text" class="form-control" id="profileDescription"
-                                                   name="description" th:value="${profileInfo.description}" placeholder="Добавьте описание">
+                                                   name="description" th:value="${profileInfo.description}"
+                                                   placeholder="Добавьте описание">
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <div class="sky-form">
-                                            <label class="col-xs-3 control-label">Фотография</label>
-                                            <div class="col-md-8">
-                                                <label for="file" class="input input-file">
-                                                    <div class="button">
-                                                        <input type="file" id="file" name="file">
-                                                    </div>
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-
-
-                                </fieldset>
-
-                                <hr>
-
-                                <h4>Смена пароля</h4>
-                                <div th:if="${errorCurrentPassword}">
-                                    <div class="alert alert-danger">
-                                        Неверный текущий пароль
-                                    </div>
-                                </div>
-                                <div th:if="${errorPassword}">
-                                    <div class="alert alert-danger">
-                                        Новые пароли не совпадают
-                                    </div>
-                                </div>
-                                <div th:if="${passwordChanged}">
-                                    <div class="alert alert-success">
-                                        Пароль изменен
-                                    </div>
-                                </div>
-                                <fieldset class="mb-xl">
-                                    <div class="form-group">
-                                        <label class="col-md-3 control-label" for="profileNewPassword">Current
-                                            Password</label>
+                                        <label class="col-md-3 control-label" for="profileCompany"
+                                               id="website">Веб-сайт</label>
                                         <div class="col-md-8">
-                                            <input type="text" class="form-control" id="profileNewPassword"
-                                                   name="currentPassword">
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="col-md-3 control-label" for="profileNewPasswordRepeat">New
-                                            Password</label>
-                                        <div class="col-md-8">
-                                            <input type="text" class="form-control" id="profileNewPasswordRepeat"
-                                                   name="newPassword">
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="col-md-3 control-label" for="profileNewPasswordRepeat">Repeat
-                                            Password</label>
-                                        <div class="col-md-8">
-                                            <input type="text" class="form-control" id="profileConfirmPasswordRepeat"
-                                                   name="passwordConfirm">
+                                            <input type="text" class="form-control" id="profileCompany"
+                                                   name="website" th:value="${profileInfo.website}"
+                                                   placeholder="Добавьте ваш веб-сайт">
                                         </div>
                                     </div>
                                 </fieldset>
-
                                 <div class="row">
                                     <div class="col-md-9 col-md-offset-3">
                                         <button type="submit" class="btn btn-primary">Сохранить изменения</button>
                                         <button type="reset" class="btn btn-default">Сбросить</button>
                                     </div>
                                 </div>
-
                             </form>
+
+                                <hr>
+                                <form class="form-horizontal padding-10" enctype="multipart/form-data"
+                                      th:action="@{/edit/photo} "
+                                      th:method="POST">
+                                    <fieldset>
+                                        <div class="form-group">
+                                            <div class="sky-form">
+                                                <label class="col-xs-3 control-label">Фотография</label>
+                                                <div class="col-md-8">
+                                                    <label for="file" class="input input-file">
+                                                        <div class="button">
+                                                            <input type="file" id="file" accept="image/*" name="file">
+                                                        </div>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </fieldset>
+                                    <div class="row">
+                                        <div class="col-md-9 col-md-offset-3">
+                                            <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+                                        </div>
+                                    </div>
+                                </form>
+
+                                <hr>
+
+                                <h4>Смена пароля</h4>
+                                <form class="form-horizontal padding-10"
+                                      th:action="@{/edit/password} "
+                                      th:method="POST">
+                                    <div th:if="${errorCurrentPassword}">
+                                        <div class="alert alert-danger">
+                                            Неверный текущий пароль
+                                        </div>
+                                    </div>
+                                    <div th:if="${errorPassword}">
+                                        <div class="alert alert-danger">
+                                            Новые пароли не совпадают
+                                        </div>
+                                    </div>
+                                    <div th:if="${passwordChanged}">
+                                        <div class="alert alert-success">
+                                            Пароль изменен
+                                        </div>
+                                    </div>
+                                    <fieldset class="mb-xl">
+                                        <div class="form-group">
+                                            <label class="col-md-3 control-label" for="profileNewPassword">Current
+                                                Password</label>
+                                            <div class="col-md-8">
+                                                <input type="text" class="form-control" id="profileNewPassword"
+                                                       name="currentPassword">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-md-3 control-label" for="profileNewPasswordRepeat">New
+                                                Password</label>
+                                            <div class="col-md-8">
+                                                <input type="text" class="form-control" id="profileNewPasswordRepeat"
+                                                       name="newPassword">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-md-3 control-label" for="profileNewPasswordRepeat">Repeat
+                                                Password</label>
+                                            <div class="col-md-8">
+                                                <input type="text" class="form-control"
+                                                       id="profileConfirmPasswordRepeat"
+                                                       name="passwordConfirm">
+                                            </div>
+                                        </div>
+                                    </fieldset>
+                                    <div class="row">
+                                        <div class="col-md-9 col-md-offset-3">
+                                            <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+                                            <button type="reset" class="btn btn-default">Сбросить</button>
+                                        </div>
+                                    </div>
+                                </form>
+
+
+
+
 
                         </div>
                     </div>

@@ -23,7 +23,7 @@
                         </figure>
                         <div class="cover-body d-flex justify-content-between align-items-center">
                             <div>
-                                <img class="profile-pic" th:src="${user.images.size()!=0 ? '/image/' +  user.getUsername() :
+                                <img class="profile-pic" th:src="${user.images.size()!=0 ? '/image/' +  user.getImages().get(0).getId() :
                                 'https://bootdey.com/img/Content/avatar/avatar6.png'}"
                                      alt="profile">
                                 <span class="profile-name"
@@ -258,7 +258,7 @@
                                 <div class="nearby-user" th:each="profile : ${friendProfiles}">
                                     <div class="row">
                                         <div class="col-md-2 col-sm-2">
-                                            <img th:src="${profile.getUser().images.size()!=0 ? '/image/' +  profile.getUser().getUsername() :
+                                            <img th:src="${profile.getUser().images.size()!=0 ? '/image/' +  imageService.findImageByUserAndIsPreview(profile.getUser(),true).getId() :
                                 'https://bootdey.com/img/Content/avatar/avatar6.png'}"
                                                  alt="user" class="profile-photo-lg">
                                         </div>
@@ -282,7 +282,7 @@
                                 <div class="nearby-user" th:if="!${friendService.isInviteRecieved(strangers.getUser().getUsername())}" th:each="strangers : ${profilesOfStrangers}">
                                     <div class="row">
                                         <div class="col-md-2 col-sm-2">
-                                            <img th:src="${strangers.getUser().images.size()!=0 ? '/image/' +  strangers.getUser().getUsername() :
+                                            <img th:src="${strangers.getUser().images.size()!=0 ? '/image/' +  imageService.findImageByUserAndIsPreview(stragers,true).getId() :
                                 'https://bootdey.com/img/Content/avatar/avatar6.png'}"
                                                  alt="user" class="profile-photo-lg">
 

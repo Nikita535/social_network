@@ -11,6 +11,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import sosal_network.entity.ProfileInfo;
 import sosal_network.entity.User;
 import sosal_network.repository.ProfileInfoRepository;
+import sosal_network.service.ImageService;
 import sosal_network.service.UserService;
 
 import java.io.IOException;
@@ -20,10 +21,13 @@ import java.util.Optional;
 public class ProfileEditController {
 
     @Autowired
-    UserService userService;
+    private UserService userService;
 
     @Autowired
-    ProfileInfoRepository profileInfoService;
+    private ProfileInfoRepository profileInfoService;
+
+    @Autowired
+    private ImageService imageService;
 
     /**
      * Get контроллер для страницы редактирования профиля пользователя
@@ -35,6 +39,7 @@ public class ProfileEditController {
         model.addAttribute("editedProfileInfo", new ProfileInfo());
         model.addAttribute("user", userFromSession);
         model.addAttribute("profileInfo", userService.findByUser_Username(userFromSession.getUsername()));
+        model.addAttribute("avatar",imageService.findImageByUserAndIsPreview( userFromSession,true));
         return "profileEdit";
     }
 
@@ -43,16 +48,28 @@ public class ProfileEditController {
      * param model - модель для добавления атрибутов на текущую страницу
      * author - Renat
      **/
-    @PostMapping("/edit")
-    public String getHome(Model model, @ModelAttribute("editedProfile")ProfileInfo editedProfile,
-                          @RequestParam("profileDateOfBirth") String dateOfBirth,
-                          RedirectAttributes redirectAttributes,
-                          @RequestParam("currentPassword") String currentPassword,
-                          @RequestParam("newPassword") String newPassword,
-                          @RequestParam("passwordConfirm") String passwordConfirm,
-                          @RequestParam("file")MultipartFile file) throws IOException {
+    @PostMapping("/edit/profile")
+    public String changeProfileInfo(RedirectAttributes redirectAttributes, @ModelAttribute("editedProfile") ProfileInfo editedProfile,
+                                    @RequestParam("profileDateOfBirth") String dateOfBirth,
+                                    @AuthenticationPrincipal User user){
 
-        return userService.editProfile(editedProfile,dateOfBirth, redirectAttributes, currentPassword, newPassword, passwordConfirm,file);
+        return userService.editProfile(editedProfile, dateOfBirth, redirectAttributes, user);
     }
+
+    @PostMapping("/edit/photo")
+    public String changePhoto(RedirectAttributes redirectAttributes, @RequestParam("file") MultipartFile file,
+                              @AuthenticationPrincipal User user) throws IOException {
+        return userService.changePhoto(redirectAttributes, file, user);
+    }
+
+
+    @PostMapping("/edit/password")
+    public String changePassword(RedirectAttributes redirectAttributes,
+                                 @RequestParam("currentPassword") String currentPassword,
+                                 @RequestParam("newPassword") String newPassword,
+                                 @RequestParam("passwordConfirm") String passwordConfirm, @AuthenticationPrincipal User user) {
+        return userService.changePassword(user, currentPassword, newPassword, passwordConfirm, redirectAttributes);
+    }
+
 
 }

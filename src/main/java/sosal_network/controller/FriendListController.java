@@ -10,6 +10,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import sosal_network.entity.ProfileInfo;
 import sosal_network.entity.User;
 import sosal_network.service.FriendService;
+import sosal_network.service.ImageService;
 import sosal_network.service.UserService;
 
 import java.util.LinkedList;
@@ -24,6 +25,8 @@ public class FriendListController {
     private FriendService friendService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private ImageService imageService;
 
     @GetMapping("/user/{username}/friendList/{page}")
     public String getFriendList(Model model, @PathVariable Optional<String> username,
@@ -49,6 +52,7 @@ public class FriendListController {
         model.addAttribute("friendAccepted",friendService.checkFriendStatus(username.get()));
         model.addAttribute("isInviteRecieved",friendService.isInviteRecieved(username.get()));
         model.addAttribute("isInviteSend",friendService.isInviteSend(username.get()));
+        model.addAttribute("imageService",imageService);
         return "friendList";
     }
 

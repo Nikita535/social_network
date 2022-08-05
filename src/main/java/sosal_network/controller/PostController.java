@@ -7,12 +7,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import sosal_network.entity.Post;
 import sosal_network.entity.User;
 import sosal_network.repository.PostRepository;
 import sosal_network.service.PostService;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Controller
 public class PostController {
@@ -21,10 +23,10 @@ public class PostController {
     private PostService postService;
 
     @PostMapping("/post")
-        public String addPost(@ModelAttribute("post") Post post, @AuthenticationPrincipal User user){
-            postService.savePost(post,user);
-            return "redirect:/";
-        }
+    public String addPost(@RequestParam("imageList") List<MultipartFile> files,@ModelAttribute("post") Post post,   @AuthenticationPrincipal User user) {
+        postService.savePost(files,post, user);
+        return "redirect:/";
+    }
 
 
 }
