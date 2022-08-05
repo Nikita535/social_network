@@ -4,12 +4,19 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import sosal_network.entity.Image;
 import sosal_network.entity.Post;
+import sosal_network.entity.PostImage;
 import sosal_network.entity.User;
+import sosal_network.repository.ImageRepository;
+import sosal_network.repository.PostImageRepository;
 import sosal_network.repository.PostRepository;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,12 +27,27 @@ import java.util.stream.Collectors;
 public class PostService {
 
     @Autowired
-    PostRepository postRepository;
+    private PostRepository postRepository;
 
-    public void savePost(Post post, User user) {
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private ImageRepository imageRepository;
+
+    @Autowired
+    private PostImageRepository postImageRepository;
+
+    public void savePost(List<MultipartFile> files,Post post, User user) {
+
         post.setDateOfCreate(LocalDateTime.now());
         post.setUser(user);
         postRepository.save(post);
+        if (!files.isEmpty())
+        {
+            List<PostImage> postImages=convertPostImages(files,user,post);
+            postImageRepository.saveAll(postImages);
+        }
     }
 
     public List<Post> showPost(User user) {
@@ -77,5 +99,19 @@ public class PostService {
         }
         return " давно";
     }
+
+    public List<PostImage> convertPostImages(List<MultipartFile> files,User user,Post post)
+    {
+        return files.stream().map(file-> {
+            try {
+                Image image=userService.toImageEntity(file,user,false);
+                imageRepository.save(image);
+                return new PostImage(post,image);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }).collect(Collectors.toList());
+    }
+
 
 }

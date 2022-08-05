@@ -32,6 +32,11 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.time.format.DateTimeFormatter;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Objects;
+import java.util.UUID;
 
 
 /**
@@ -374,25 +379,27 @@ public class UserService implements UserDetailsService {
     }
 
 
-    private Image toImageEntity(MultipartFile file, ProfileInfo profileSession) throws IOException {
+    public Image toImageEntity(MultipartFile file, User user,boolean isPreview) throws IOException {
         return new Image(file.getName(), file.getOriginalFilename(), file.getSize(), file.getContentType(),
-                file.getBytes(), profileSession.getUser(), true);
+                file.getBytes(), user, true);
     }
+
+
 
 
     private void saveImage(MultipartFile file, ProfileInfo profileSession) throws IOException {
         if (file.getSize() != 0) {
             if (!getUserAuth().getImages().isEmpty()) {
                 Image image = imageRepository.findImageByUser(profileSession.getUser());
-                Image img = toImageEntity(file, profileSession);
+                Image img = toImageEntity(file, profileSession.getUser(),true);
                 img.setId(image.getId());
                 img.setUser(image.getUser());
                 image = img;
                 profileSession.getUser().addImageToUser(image);
                 imageRepository.save(image);
             } else {
-                getUserAuth().addImageToUser(toImageEntity(file, profileSession));
-                imageRepository.save(toImageEntity(file, profileSession));
+                getUserAuth().addImageToUser(toImageEntity(file, profileSession.getUser(),true));
+                imageRepository.save(toImageEntity(file, profileSession.getUser(),true));
             }
         }
     }

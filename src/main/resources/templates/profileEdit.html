@@ -39,7 +39,7 @@
                 <section class="panel">
                     <div class="panel-body noradius padding-10">
                         <figure class="margin-bottom-10"><!-- image -->
-                            <img class="img-responsive"  th:src="${user.images.size()!=0 ? '/image/' + user.getUsername() :
+                            <img class="img-responsive"  th:src="${user.images.size()!=0 ? '/image/' + user.getImages().get(0).getId() :
                                 'https://bootdey.com/img/Content/avatar/avatar6.png'}" alt="">
                         </figure><!-- /image -->
 

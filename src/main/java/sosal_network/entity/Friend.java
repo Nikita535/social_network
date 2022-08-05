@@ -23,37 +23,7 @@ public class Friend {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    //    /**
-//     * Друг пользователя
-//     **/
-//    @ManyToOne(fetch = FetchType.EAGER)
-//    @JoinColumn(name = "friend_id")
-//    private User friendUser;
-//
-//    /**
-//     * Пользователь,у которого в друзьях friendUser
-//     **/
-//    @ManyToOne(fetch = FetchType.EAGER)
-//    @JoinColumn(name = "user_id")
-//    private User userID;
-//
-//    public Friend(User friendUser, User userID) {
-//        this.friendUser = friendUser;
-//        this.userID = userID;
-//    }
-//
-//    @Override
-//    public boolean equals(Object o) {
-//        if (this == o) return true;
-//        if (o == null || getClass() != o.getClass()) return false;
-//        Friend friend = (Friend) o;
-//        return Objects.equals(friendUser, friend.friendUser) && Objects.equals(userID, friend.userID);
-//    }
-//
-//    @Override
-//    public int hashCode() {
-//        return Objects.hash(friendUser, userID);
-//    }
+
     @OneToOne(cascade = CascadeType.MERGE,fetch = FetchType.EAGER)
     @JoinColumn(name = "first_user_id", referencedColumnName = "id")
     private User firstUser;
