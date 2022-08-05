@@ -11,6 +11,8 @@ import sosal_network.Enum.Role;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.*;
 
 
@@ -82,9 +84,6 @@ public class User implements UserDetails {
     private List<Image> images = new ArrayList<>();
 
 
-
-
-
     /**
      * Основной конструктор
      **/
@@ -96,9 +95,13 @@ public class User implements UserDetails {
         this.registrationDate = LocalDate.now();
     }
 
+    public String dateFormat() {
+        return DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG)
+                .withLocale(new Locale("ru"))
+                .format(this.registrationDate);
+    }
 
-
-    public void addImageToUser(Image image){
+    public void addImageToUser(Image image) {
         images.add(image);
     }
 
@@ -149,4 +152,6 @@ public class User implements UserDetails {
     public int hashCode() {
         return Objects.hash(username);
     }
+
+
 }

@@ -3,34 +3,17 @@ package sosal_network.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.context.annotation.Bean;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import sosal_network.entity.ActivationToken;
 import sosal_network.entity.ProfileInfo;
 import sosal_network.entity.User;
 import sosal_network.repository.ActivationTokenRepository;
 import sosal_network.service.UserService;
-import sosal_network.utility.ReCaptchaResponse;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.io.IOException;
 
 
 /**
@@ -54,21 +37,6 @@ public class RegisterController {
     private ActivationTokenRepository activationTokenRepository;
 
 
-    @Value("${recaptcha.secret}")
-    private String recaptchaSecret;
-
-    @Value("${recaptcha.url}")
-    private String recaptchaURL;
-
-
-    @Bean
-    public RestTemplate restTemplate(RestTemplateBuilder builder){
-        return builder.build();
-    }
-
-    @Autowired
-    private RestTemplate restTemplate;
-
     /**
      * Get контроллер для сбора данных из формы (thymeleaf)
      * author - Nikita
@@ -85,19 +53,10 @@ public class RegisterController {
      * author - Nikita, Renat
      **/
     @PostMapping("/register")
-    public String registerSave(HttpServletRequest request,
-                               HttpServletResponse response,
-                               @ModelAttribute("user") @Valid User user,
-                               Model model, RedirectAttributes redirectAttributes) throws IOException {
-
-        String gRecaptchaResponse=request.getParameter("g-recaptcha-response");
-        if(!UserService.verifyReCAPTCHA(gRecaptchaResponse,recaptchaSecret,recaptchaURL,restTemplate)){
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-        }
-
+    public String registerSave(@ModelAttribute("user") @Valid User user,
+                               Model model, RedirectAttributes redirectAttributes) {
         return userService.validateRegister(user, model, redirectAttributes);
     }
-
 
     /**
      * Get контроллер отображения страницы для завершения регистрации
@@ -128,8 +87,8 @@ public class RegisterController {
      * author - Nekit
      **/
     @PostMapping("/register/info/{username}")
-    public String saveProfileInfo(@ModelAttribute("profileInfo") ProfileInfo profileInfo, RedirectAttributes redirectAttributes, @PathVariable String username) {
-        return userService.addProfileInfo(profileInfo, redirectAttributes, username);
+    public String saveProfileInfo(@ModelAttribute("profileInfo") ProfileInfo profileInfo, RedirectAttributes redirectAttributes, @PathVariable String username, @RequestParam("date") String dateOfBirth) {
+        return userService.addProfileInfo(profileInfo, redirectAttributes, username,dateOfBirth);
     }
 
     /**

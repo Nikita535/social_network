@@ -101,7 +101,7 @@
                                     <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
                                     <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                                 </svg>
-                                <a class="pt-1px d-none d-md-block" th:href="@{'/' + ${user.username} + '/friendList/1'}" methods="GET">Friends <span class="text-muted tx-12"
+                                <a class="pt-1px d-none d-md-block" th:href="@{'/user/' + ${user.username} + '/friendList/1'}" methods="GET">Friends <span class="text-muted tx-12"
                                                                                                                                                       th:text="${friends.size()}"></span></a>
 
 
@@ -242,7 +242,7 @@
                         <div class="col-md-12">
                             <div class="people-nearby">
 
-                                <form class="input-group" th:action="@{'/' + ${user.username} + '/search'}" method="post">
+                                <form class="input-group" th:action="@{'/user/' + ${user.username} + '/search'}" method="post">
                                     <input type="search" name="searchLine" th:value="${searchLine}" class="form-control rounded" placeholder="Search" aria-label="Search" aria-describedby="search-addon" />
                                     <button type="submit" class="btn btn-outline-primary">Искать</button>
                                 </form>
@@ -311,7 +311,7 @@
                                         <nav aria-label="Page navigation example" th:each="page : ${#numbers.sequence( 1, pages, 1)}">
                                             <ul class="pagination">
                                                 <li class="page-item"><a class="page-link"
-                                                                         th:href="@{'/' + ${user.username} + '/friendList/' + ${page}}"
+                                                                         th:href="@{'/user/' + ${user.username} + '/friendList/' + ${page}}"
                                                                          th:text="${page}"></a></li>
                                             </ul>
                                         </nav>

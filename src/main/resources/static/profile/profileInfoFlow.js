@@ -46,10 +46,9 @@ function sendButton($mainObj){
 //Удаление из друзей
 function deleteButton($mainObj){
     const $friendButton = document.createElement('div');
-    $friendButton.classList.add("btn", "btn-dark")
+    $friendButton.classList.add("btn", "btn-dark","m-2")
     $friendButton.innerHTML += "В друзьях";
     $friendButton.id = "deleteFriend1";
-    $friendButton.style.marginRight = "5px";
     $mainObj.appendChild($friendButton);
 
     const $friendButton2 = document.createElement('button');
@@ -76,10 +75,9 @@ function successDeleteFriendHandler(){
 //Принятие или отклонение заявки
 function acceptAndReceiveButton($mainObj){
     const $friendButton1 = document.createElement('button');
-    $friendButton1.classList.add("btn", "btn-success");
+    $friendButton1.classList.add("btn", "btn-success","m-2");
     $friendButton1.innerHTML += "Принять заявку";
     $friendButton1.id = "acceptFriend";
-    $friendButton1.style.marginRight = "5px";
     $friendButton1.onclick=function(){acceptFriend()};
     $mainObj.appendChild($friendButton1);
 
