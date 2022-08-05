@@ -33,7 +33,7 @@ public class Image {
     @Lob
     private byte[] bytes;
 
-    private boolean isPreview;
+    private boolean isPreview = false;
 
 
     @ManyToOne(targetEntity = User.class, fetch = FetchType.EAGER)

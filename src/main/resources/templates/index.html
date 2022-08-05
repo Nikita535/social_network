@@ -24,7 +24,7 @@
                         </figure>
                         <div class="cover-body d-flex justify-content-between align-items-center">
                             <div>
-                                <img class="profile-pic" th:src="${user.images.size()!=0 ? '/image/' +  user.getImages().get(0).getId():
+                                <img class="profile-pic" th:src="${user.images.size()!=0 ? '/image/' +  avatar.getId():
                                 'https://bootdey.com/img/Content/avatar/avatar6.png'}"
                                      alt="profile">
                                 <span class="profile-name"
@@ -254,7 +254,7 @@
                             <div class="card-header">
                                 <div class="d-flex align-items-center justify-content-between">
                                     <div class="d-flex align-items-center">
-                                        <img th:src="${user.images.size()!=0 ? '/image/' +  user.getImages().get(0).getId() :
+                                        <img th:src="${user.images.size()!=0 ? '/image/' +  avatar.getId() :
                                 'https://bootdey.com/img/Content/avatar/avatar6.png'}" class="img-xs rounded-circle"
                                              alt="">
                                         <div class="ml-2">

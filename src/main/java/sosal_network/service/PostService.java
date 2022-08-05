@@ -30,22 +30,18 @@ public class PostService {
     private PostRepository postRepository;
 
     @Autowired
-    private UserService userService;
-
-    @Autowired
-    private ImageRepository imageRepository;
+    private ImageService imageService;
 
     @Autowired
     private PostImageRepository postImageRepository;
 
-    public void savePost(List<MultipartFile> files,Post post, User user) {
+    public void savePost(List<MultipartFile> files, Post post, User user) {
 
         post.setDateOfCreate(LocalDateTime.now());
         post.setUser(user);
         postRepository.save(post);
-        if (!files.isEmpty())
-        {
-            List<PostImage> postImages=convertPostImages(files,user,post);
+        if (!files.isEmpty()) {
+            List<PostImage> postImages = imageService.convertPostImages(files, user, post);
             postImageRepository.saveAll(postImages);
         }
     }
@@ -98,19 +94,6 @@ public class PostService {
             }
         }
         return " давно";
-    }
-
-    public List<PostImage> convertPostImages(List<MultipartFile> files,User user,Post post)
-    {
-        return files.stream().map(file-> {
-            try {
-                Image image=userService.toImageEntity(file,user,false);
-                imageRepository.save(image);
-                return new PostImage(post,image);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }).collect(Collectors.toList());
     }
 
 

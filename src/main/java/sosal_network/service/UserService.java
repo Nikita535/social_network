@@ -6,8 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -23,15 +21,16 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import sosal_network.Enum.Role;
-import sosal_network.entity.*;
+import sosal_network.entity.ActivationToken;
+import sosal_network.entity.PasswordResetToken;
+import sosal_network.entity.ProfileInfo;
+import sosal_network.entity.User;
 import sosal_network.repository.*;
 import sosal_network.utility.ReCaptchaResponse;
 
 import javax.mail.MessagingException;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.Date;
@@ -80,10 +79,10 @@ public class UserService implements UserDetailsService {
      * Bean сервиса для почты
      **/
     @Autowired
-    EmailService emailService;
+    private EmailService emailService;
 
     @Autowired
-    ImageRepository imageRepository;
+    private ImageService imageService;
 
 
     /**
@@ -115,7 +114,7 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
-    public void resaveUser(User user) {
+    public void save(User user) {
         userRepository.save(user);
     }
 
@@ -151,7 +150,7 @@ public class UserService implements UserDetailsService {
         user.setRoles(Collections.singleton(Role.ROLE_USER));
         user.setActive(true);
         user.setRegistrationDate(LocalDate.now());
-        userRepository.save(user);
+        save(user);
 
         createActivationCode(user.getUserEmail());
 
@@ -212,7 +211,7 @@ public class UserService implements UserDetailsService {
         }
         user.setActive(true);
         activationTokenRepository.deleteByToken(code);
-        userRepository.save(user);
+        save(user);
     }
 
     /**
@@ -278,7 +277,7 @@ public class UserService implements UserDetailsService {
         try {
             User user = passwordTokenRepository.findByToken(token).getUser();
             user.setPassword(bCryptPasswordEncoder.encode(userPassword));
-            userRepository.save(user);
+            save(user);
             passwordTokenRepository.deleteByToken(token);
             log.info("password changed");
             return "redirect:/login";
@@ -317,47 +316,37 @@ public class UserService implements UserDetailsService {
      **/
     @Transactional
     public User getUserAuth() {
-
         return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
-    @Transactional
-    public Boolean getUserActive() {
-        return getUserAuth().getActive();
-    }
 
     public String editProfile(ProfileInfo editedProfile, String dateOfBirth, RedirectAttributes redirectAttributes,
-                              String currentPassword, String newPassword,
-                              String passwordConfirm,
-                              MultipartFile file) throws IOException {
-        ProfileInfo profileSession = findByUser_Username(getUserAuth().getUsername());
-
-        if (Objects.equals(editedProfile.getName(), "") || Objects.equals(editedProfile.getCity(), "")
-                || Objects.equals(editedProfile.getSurname(), "")
-        ) {
-            redirectAttributes.addFlashAttribute("errorLen", true);
-            log.warn("error len of profile");
-            return "redirect:/edit";
-        }
-        if (!Objects.equals(dateOfBirth, "")) {
+                              User user) {
+        ProfileInfo profileSession = findByUser_Username(user.getUsername());
+        if (dateOfBirth.isEmpty()) {
             LocalDate changedDate = LocalDate.parse(dateOfBirth, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
             editedProfile.setDateOfBirth(changedDate);
         }
         redirectAttributes.addFlashAttribute("profileChanged", true);
-        editedProfile.setUser(profileSession.getUser());
-
-
+        editedProfile.setUser(user);
         editedProfile.setId(profileSession.getId());
         profileSession = editedProfile;
-
-        saveImage(file, profileSession);
-
         profileInfoRepository.save(profileSession);
+        return "redirect:/edit";
+    }
 
+    public String changePhoto(RedirectAttributes redirectAttributes,
+                              MultipartFile file, User user) throws IOException {
+        imageService.saveImage(file, user);
+        redirectAttributes.addFlashAttribute("photoChanged", true);
+        return "redirect:/edit";
+    }
 
+    public String changePassword(User user, String currentPassword, String newPassword,
+                                 String passwordConfirm, RedirectAttributes redirectAttributes) {
         if (!Objects.equals(currentPassword, "") && !Objects.equals(newPassword, "")
                 && !Objects.equals(passwordConfirm, "")) {
-            if (!bCryptPasswordEncoder.matches(currentPassword, profileSession.getUser().getPassword())) {
+            if (!bCryptPasswordEncoder.matches(currentPassword, user.getPassword())) {
                 redirectAttributes.addFlashAttribute("errorCurrentPassword", true);
                 log.warn("error current passwords");
                 return "redirect:/edit";
@@ -369,59 +358,33 @@ public class UserService implements UserDetailsService {
                 return "redirect:/edit";
             }
 
-
-            profileSession.getUser().setPassword(bCryptPasswordEncoder.encode(newPassword));
+            user.setPassword(bCryptPasswordEncoder.encode(newPassword));
             redirectAttributes.addFlashAttribute("passwordChanged", true);
-            userRepository.save(profileSession.getUser());
+            save(user);
 
         }
         return "redirect:/edit";
     }
 
 
-    public Image toImageEntity(MultipartFile file, User user,boolean isPreview) throws IOException {
-        return new Image(file.getName(), file.getOriginalFilename(), file.getSize(), file.getContentType(),
-                file.getBytes(), user, true);
-    }
-
-
-
-
-    private void saveImage(MultipartFile file, ProfileInfo profileSession) throws IOException {
-        if (file.getSize() != 0) {
-            if (!getUserAuth().getImages().isEmpty()) {
-                Image image = imageRepository.findImageByUser(profileSession.getUser());
-                Image img = toImageEntity(file, profileSession.getUser(),true);
-                img.setId(image.getId());
-                img.setUser(image.getUser());
-                image = img;
-                profileSession.getUser().addImageToUser(image);
-                imageRepository.save(image);
-            } else {
-                getUserAuth().addImageToUser(toImageEntity(file, profileSession.getUser(),true));
-                imageRepository.save(toImageEntity(file, profileSession.getUser(),true));
-            }
-        }
-    }
-
     public static boolean verifyReCAPTCHA(String gRecaptchaResponse, String recaptchaSecret, String recaptchaURL, RestTemplate restTemplate) {
-        HttpHeaders headers=new org.springframework.http.HttpHeaders();
+        HttpHeaders headers = new org.springframework.http.HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-        LinkedMultiValueMap<String, String> map=new LinkedMultiValueMap<>();
-        map.add("secret",recaptchaSecret);
-        map.add("response",gRecaptchaResponse);
+        LinkedMultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+        map.add("secret", recaptchaSecret);
+        map.add("response", gRecaptchaResponse);
 
 
-        HttpEntity<MultiValueMap<String,String>> request=new HttpEntity<>(map,headers);
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
 
-        ReCaptchaResponse response= restTemplate.postForObject(recaptchaURL,request,
+        ReCaptchaResponse response = restTemplate.postForObject(recaptchaURL, request,
                 ReCaptchaResponse.class);
 
         assert response != null;
-        if(response.getErrorCodes()!=null){
-            for(String error: response.getErrorCodes()){
-                log.error("responseCaptchaERROR",error);
+        if (response.getErrorCodes() != null) {
+            for (String error : response.getErrorCodes()) {
+                log.error("responseCaptchaERROR", error);
             }
         }
 
