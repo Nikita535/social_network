@@ -1,6 +1,7 @@
 package sosal_network.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.Banner;
 import org.springframework.stereotype.Service;
@@ -226,13 +227,13 @@ public class FriendService {
     }
 
 
-    public Model generateModelOfFriendList(Model model, String username, String searchLine, String pageString, Integer length){
-        model = findFriendProfilesByUsernameFirst(model, username, searchLine, pageString, length);
-        return model;
+    public JSONObject generateModelOfFriendList(JSONObject response, String username, String searchLine, String pageString, Integer length){
+        response = findFriendProfilesByUsernameFirst(response, username, searchLine, pageString, length);
+        return response;
     }
 
 
-    public Model findFriendProfilesByUsernameFirst(Model model, String username, String searchLine, String pageString,
+    public JSONObject findFriendProfilesByUsernameFirst(JSONObject response, String username, String searchLine, String pageString,
                                                  Integer length){
         int page = Integer.parseInt(pageString);
         int sizeOfFriends;
@@ -243,7 +244,7 @@ public class FriendService {
         if (Objects.equals(searchLine, "")){
             for (int i = (page - 1) * length; i < page * length && i < friends.size(); i++)
                 profiles.add(userService.findByUser_Username(friends.get(i).getUsername()));
-            model.addAttribute("friendProfiles", profiles);
+            response.append("friendProfiles", profiles);
             sizeOfFriends = friends.size();
 
             for (User friend : friends)
@@ -265,20 +266,20 @@ public class FriendService {
             profiles = new LinkedList<>();
             for (int i = (page - 1) * length; i < page * length && i < newProfiles.size(); i++)
                 profiles.add(newProfiles.get(i));
-            model.addAttribute("friendProfiles", profiles);
+            response.append("friendProfiles", profiles);
         }
 
         if (profiles.size() == 0 && sizeOfFriends == 0 && !Objects.equals(searchLine, ""))
-            model.addAttribute("errorNoSuchFriends", true);
+            response.append("errorNoSuchFriends", true);
 
-        if (profiles.size() != 0)
-                model.addAttribute("errorNoShowFriends", true);
+        if (page == 1)
+            response.append("showFriends", true);
 
 
-        findStrangersProfilesByUsernameSecond(model, username, searchLine, page,allFriendProfiles,
+        response = findStrangersProfilesByUsernameSecond(response, username, searchLine, page,allFriendProfiles,
                 length - profiles.size(), length, sizeOfFriends);
 
-        return model;
+        return response;
     }
 
 
@@ -288,13 +289,14 @@ public class FriendService {
                 .setParameter("similarTo", similarTo).getResultList();
     }
 
-    public Model findStrangersProfilesByUsernameSecond(Model model, String username, String searchLine,Integer page,
+    public JSONObject findStrangersProfilesByUsernameSecond(JSONObject response, String username, String searchLine,Integer page,
                                                        List<ProfileInfo> profilesOfFriends,Integer size,
                                                        Integer length, Integer sizeOfFriends){
         int sizeOfStrangers;
         List<ProfileInfo> profiles;
 
         List<ProfileInfo> profilesNew = new LinkedList<>();
+        List<ProfileInfo> profilesReceived = new LinkedList<>();
         profiles = allProfileInfos(searchLine);
         profilesOfFriends.add(profileInfoRepository.findByUser_Username(username));
 
@@ -305,27 +307,47 @@ public class FriendService {
         sizeOfStrangers = profilesNew.size();
 
         if (Objects.equals(searchLine, "")){
+            for (int i = page == 1 ? 0 : ((page - 1) * length - profilesOfFriends.size()); i < page * length && i < profilesNew.size() && profiles.size() < size && i > -1; i++) {
+                if (!isInviteRecieved(profilesNew.get(i).getUser().getUsername()))
+                    profiles.add(profilesNew.get(i));
+                else
+                    profilesReceived.add(profilesNew.get(i));
+            }
 
-            for (int i = page == 1 ? 0 : (page * length - profilesOfFriends.size() - 1); i < page * length && i < profilesNew.size() && profiles.size() < size; i++)
-                profiles.add(profilesNew.get(i));
+            response.append("profilesOfStrangers", profiles);
 
-            model.addAttribute("profilesOfStrangers", profiles);
+            response.append("profilesOfReceivedStrangers", profilesReceived);
 
         }else {
-            for (int i = page == 1 ? 0 : (page * length - profilesOfFriends.size()); i < page * length && i < profilesNew.size() && profiles.size() < size; i++)
-                profiles.add(profilesNew.get(i));
+            for (int i = page == 1 ? 0 : (page * length - profilesOfFriends.size()); i < page * length && i < profilesNew.size() && profiles.size() < size && i > -1; i++)
+                if (!isInviteRecieved(username))
+                    profiles.add(profilesNew.get(i));
+                else
+                    profilesReceived.add(profilesNew.get(i));
 
-            model.addAttribute("profilesOfStrangers", profiles);
+            response.append("profilesOfStrangers", profiles);
+            response.append("profilesOfReceivedStrangers", profilesReceived);
         }
 
         if (profiles.size() == 0 && sizeOfStrangers == 0 && !Objects.equals(searchLine, ""))
-            model.addAttribute("errorNoSuchStrangers", true);
+            response.append("errorNoSuchStrangers", true);
 
-        if (profiles.size() != 0)
-            model.addAttribute("errorNoShowStrangers", true);
+        if (profiles.size() != 0 && page * length - profilesOfFriends.size() <= length)
+            response.append("ShowStrangers", true);
 
-        model.addAttribute("pages", Math.ceil(((float)sizeOfFriends + (float)sizeOfStrangers) / length));
-        return model;
+        response = checkIsFriendArray(response, profiles);
+
+        response.append("pages", Math.ceil(((float)sizeOfFriends + (float)sizeOfStrangers) / length));
+        return response;
+    }
+
+    public JSONObject checkIsFriendArray(JSONObject response, List<ProfileInfo> profiles){
+        List<Boolean> profilesChecked = new LinkedList<>();
+        for (ProfileInfo profile : profiles) {
+            profilesChecked.add(isInviteSend(profile.getUser().getUsername()));
+        }
+        response.append("profilesChecked", profilesChecked);
+        return response;
     }
 
 

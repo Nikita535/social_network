@@ -226,7 +226,7 @@
             <!-- left wrapper end -->
             <!-- middle wrapper start -->
             <div class="col-md-8 col-xl-6 middle-wrapper">
-                <div class="col-md-12">
+                <div th:if="${#authentication.getPrincipal().username}==${user.username}" class="col-md-12">
                     <div class="panel">
                         <form class="panel-body" th:method="POST" th:object="${post}" th:action="@{/post}">
                             <textarea class="form-control" rows="2" th:field="*{full_text}" placeholder="What are you thinking?"></textarea>
