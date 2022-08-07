@@ -228,7 +228,7 @@
             <!-- left wrapper end -->
             <!-- middle wrapper start -->
             <div class="col-md-8 col-xl-6 middle-wrapper">
-                <div class="col-md-12">
+                <div th:if="${#authentication.getPrincipal().username}==${user.username}" class="col-md-12">
                     <div class="panel">
                         <form class="panel-body" th:method="POST" th:object="${post}" enctype="multipart/form-data"
                               th:action="@{/post}">

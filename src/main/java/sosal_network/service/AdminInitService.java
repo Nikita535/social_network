@@ -5,8 +5,12 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import sosal_network.Enum.Role;
+import sosal_network.entity.ProfileInfo;
 import sosal_network.entity.User;
+import sosal_network.repository.ProfileInfoRepository;
 import sosal_network.repository.UserRepository;
+
+import java.time.LocalDate;
 
 @Service
 public class AdminInitService implements CommandLineRunner {
@@ -18,10 +22,15 @@ public class AdminInitService implements CommandLineRunner {
     @Autowired
     private UserService userService;
 
-    public AdminInitService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder, UserService userService) {
+    @Autowired
+    private ProfileInfoRepository profileInfoRepository;
+
+    public AdminInitService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder,
+                            UserService userService, ProfileInfoRepository profileInfoRepository) {
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.userService = userService;
+        this.profileInfoRepository = profileInfoRepository;
     }
 
     @Override
@@ -33,6 +42,16 @@ public class AdminInitService implements CommandLineRunner {
         if (userRepository.findByUsername("ADMIN") == null) {
             userRepository.save(admin);
         }
+
+        // 40 пользователей
+        //for(int i = 0; i < 40; i++) {
+        //    User user= new User("renat0" + i, password, password, "victor." + i + "@gmail.com");
+        //    user.getRoles().add(Role.ROLE_USER);
+        //    userRepository.save(user);
+        //    ProfileInfo profileInfo = new ProfileInfo(user, "Ренат" + i, "Хакимов" + i, "город" + i,
+        //            LocalDate.of(2020, 1, 8), "das", "Dsa");
+        //    profileInfoRepository.save(profileInfo);
+        //}
         System.out.println(admin.getRoles().toArray()[0].toString().getClass());
     }
 
