@@ -59,6 +59,7 @@ public class ProfileEditController {
         {
             model.addAttribute("user", user);
             model.addAttribute("profileInfo", userService.findByUser_Username(user.getUsername()));
+            model.addAttribute("avatar",imageService.findImageByUserAndIsPreview( user,true));
             return "profileEdit";
         }
         return userService.editProfile(editedProfile, dateOfBirth, redirectAttributes, user);
