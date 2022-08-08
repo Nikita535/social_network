@@ -43,7 +43,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .disable()
                 .authorizeRequests().antMatchers("/login",
                         "/logout", "/register", "/activate/*", "/recovery",
-                        "/recoveryPage/*", "/recover/*", "/recoveryPage", "/invalidToken", "/register/info/*", "/registerContinue").permitAll()
+                        "/recoveryPage/*", "/recover/*", "/recoveryPage", "/invalidToken", "/register/info/*", "/registerContinue","/registerContinue/*").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()

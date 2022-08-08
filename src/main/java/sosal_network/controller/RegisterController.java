@@ -6,15 +6,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import sosal_network.entity.ActivationToken;
@@ -24,10 +25,15 @@ import sosal_network.repository.ActivationTokenRepository;
 import sosal_network.service.UserService;
 import sosal_network.utility.ReCaptchaResponse;
 
+import javax.mail.Session;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.Map;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 
 /**
@@ -36,7 +42,14 @@ import java.io.IOException;
 @RequiredArgsConstructor
 @Slf4j
 @Controller
+@SessionAttributes("user")
 public class RegisterController {
+
+    @ModelAttribute("user")
+    public User user()
+    {
+        return new User();
+    }
 
     /**
      * поле сервиса пользователя
@@ -72,8 +85,8 @@ public class RegisterController {
      **/
     @GetMapping("/register")
     public String getForm(Model model) {
-        User user = new User();
-        model.addAttribute("user", user);
+//        User user = new User();
+//        model.addAttribute("user", user);
         return "register";
     }
 
@@ -85,14 +98,26 @@ public class RegisterController {
     public String registerSave(HttpServletRequest request,
                                HttpServletResponse response,
                                @ModelAttribute("user") @Valid User user,
+                               BindingResult bindingResult,
                                Model model, RedirectAttributes redirectAttributes) throws IOException {
-
-        String gRecaptchaResponse=request.getParameter("g-recaptcha-response");
-        if(!UserService.verifyReCAPTCHA(gRecaptchaResponse,recaptchaSecret,recaptchaURL,restTemplate)){
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+        if (bindingResult.hasErrors())
+        {
+            return "/register";
         }
+        else {
+            String gRecaptchaResponse = request.getParameter("g-recaptcha-response");
+            if (!UserService.verifyReCAPTCHA(gRecaptchaResponse, recaptchaSecret, recaptchaURL, restTemplate)) {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            }
+            return userService.validateRegister(user,bindingResult, model, redirectAttributes);
+        }
+    }
 
-        return userService.validateRegister(user, model, redirectAttributes);
+    @GetMapping("/register/again")
+    public String registerAgain(@AuthenticationPrincipal User user,RedirectAttributes redirectAttributes)
+    {
+        redirectAttributes.addFlashAttribute("user",user);
+        return "redirect:/registerContinue";
     }
 
 
@@ -101,32 +126,29 @@ public class RegisterController {
      * author - Nekit
      **/
     @GetMapping("/registerContinue")
-    public String showRegisterContinue(Model model) {
+    public String showRegisterContinue(Model model, @ModelAttribute("user") User user) {
+        if (userService.findUserByUsername(user.getUsername()) == null)
+        {
+            return "/error-404";
+        }
         ProfileInfo profileInfo = new ProfileInfo();
         model.addAttribute("profileInfo", profileInfo);
         return "registerContinue";
     }
 
     /**
-     * Get контроллер для завершения регистрации
-     * author - Nekit
-     **/
-    @GetMapping("/register/info/{username}")
-    public String getRegisterContinue(@PathVariable String username, RedirectAttributes redirectAttributes) {
-        if (userService.findByUser_Username(username) != null) {
-            return "/error-404";
-        }
-        redirectAttributes.addFlashAttribute("username", username);
-        return "redirect:/registerContinue";
-    }
-
-    /**
      * Post контроллер для обработки данных о пользователе
      * author - Nekit
      **/
-    @PostMapping("/register/info/{username}")
-    public String saveProfileInfo(@ModelAttribute("profileInfo") ProfileInfo profileInfo, RedirectAttributes redirectAttributes, @PathVariable String username, @RequestParam("date") String dateOfBirth) {
-        return userService.addProfileInfo(profileInfo, redirectAttributes, username,dateOfBirth);
+    @PostMapping("/registerContinue")
+    public String saveProfileInfo(@ModelAttribute("user") User user, @RequestParam("date") String dateOfBirth, @ModelAttribute("profileInfo") @Valid ProfileInfo profileInfo, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes, SessionStatus status) {
+        if (bindingResult.hasErrors())
+        {
+            return "registerContinue";
+        }
+        else {
+            return userService.addProfileInfo(profileInfo, redirectAttributes, user, dateOfBirth,status);
+        }
     }
 
     /**
