@@ -8,6 +8,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
     <link href="https://netdna.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
+
     <script src="https://netdna.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     <!--  css для логина  -->
     <link href="login/login.css" rel="stylesheet">
@@ -39,18 +42,34 @@
                 <h1 th:text="${username}">Заполните дополнительную информацию о себе</h1>
                 <div class="panel panel-default text-center">
                     <img src="https://bootdey.com/img/Content/avatar/avatar1.png" class="img-circle img-login">
-                    <form class="panel-body" th:action="@{/register/info/}+${username}" th:object="${profileInfo}"
+                    <form class="panel-body" action="/registerContinue" th:object="${profileInfo}"
                           th:method="POST">
                         <div th:if="${errorAnomaly}">
                             <div class="alert alert-danger">
                                 Сегодня вам не повезло. Это неизвестная ошибка!
                             </div>
                         </div>
-                        <input class="form-control" type="text" required="true" th:field="*{name}"
-                               placeholder="Введите имя">
-                        <input class="form-control" type="text" required="true" th:field="*{surname}"
+                        <input class="form-control mb-3" type="text"
+                               th:value="${user.username}" placeholder="Введите имя" disabled >
+                        <input class="form-control" type="text"
+                               th:classappend=" ${#fields.hasErrors('name')} ? 'is-invalid' : 'mb-3'"
+                               th:field="*{name}" placeholder="Введите имя">
+                        <div class="invalid-feedback text-left mb-3 fs-5"
+                             th:if="${#fields.hasErrors('name')}"
+                             th:text=" ${#fields.errors('name').get(0) }">
+
+                        </div>
+                        <input class="form-control" type="text"  th:field="*{surname}"
+                               th:classappend=" ${#fields.hasErrors('surname')} ? 'is-invalid' : 'mb-3'"
                                placeholder="Введите фамилию">
-                        <input class="form-control" list="datalistOptions" id="exampleDataList" placeholder="Введите город" th:field="*{city}">
+                        <div class="invalid-feedback text-left mb-3 fs-5"
+                             th:if="${#fields.hasErrors('surname')}"
+                             th:text=" ${#fields.errors('surname').get(0) }">
+
+                        </div>
+                        <input class="form-control" list="datalistOptions" id="exampleDataList"
+                               th:classappend=" ${#fields.hasErrors('city')} ? 'is-invalid' : 'mb-3'"
+                               placeholder="Введите город" th:field="*{city}">
                         <datalist id="datalistOptions">
                             <option value="Москва">Москва</option>
                             <option value="Санкт-Петербург">Санкт-Петербург</option>
@@ -86,7 +105,8 @@
                             <option value="Белореченск">Белореченск</option>
                             <option value="Бердск">Бердск</option>
                             <option value="Березники">Березники</option>
-                            <option value="Березовский (Свердловская область)">Березовский (Свердловская область)</option>
+                            <option value="Березовский (Свердловская область)">Березовский (Свердловская область)
+                            </option>
                             <option value="Бийск">Бийск</option>
                             <option value="Биробиджан">Биробиджан</option>
                             <option value="Благовещенск (Амурская область)">Благовещенск (Амурская область)</option>
@@ -375,13 +395,23 @@
                             <option value="Ялта">Ялта</option>
                             <option value="Ярославль">Ярославль</option>
                         </datalist>
-                        <input class="form-control" id="date"  placeholder="Введите дату рождения (необязательно)" type="text" name="date">
-                        <input class="form-control" type="text" th:field="*{description}"
+                        <div class="invalid-feedback text-left mb-3 fs-5"
+                             th:if="${#fields.hasErrors('city')}"
+                             th:text=" ${#fields.errors('city').get(0) }">
+                        </div>
+                        <input class="form-control" id="date" placeholder="Введите дату рождения (необязательно)"
+                               th:classappend=" ${#fields.hasErrors('dateOfBirth')} ? 'is-invalid' : 'mb-3'"
+                               type="text" name="date" pattern="\d{2}(/)\d{2}(/)\d{4}">
+                        <input class="form-control" type="text"
+                               th:classappend=" ${#fields.hasErrors('description')} ? 'is-invalid' : 'mb-3'"
+                               th:field="*{description}"
                                placeholder="Расскажите о себе (необязательно)"
                         >
-                        <input class="form-control" type="text" th:field="*{website}"
+                        <input class="form-control" type="text"
+                               th:classappend=" ${#fields.hasErrors('website')} ? 'is-invalid' : 'mb-3'"th:field="*{website}"
+                               pattern="[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)"
                                placeholder="Ваш сайт (необязательно)">
-                        <button type="submit" class="btn btn-success">Завершить регистрацию <i
+                        <button type="submit" class="btn btn-success fs-4">Завершить регистрацию <i
                                 class="fa fa-fw fa-unlock-alt"></i></button>
                     </form>
                 </div>

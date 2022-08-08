@@ -5,6 +5,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Null;
+import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
@@ -36,14 +39,19 @@ public class ProfileInfo {
     /**
      * имя пользователя
      **/
+    @NotBlank(message = "Поле не может быть пустым")
+    @Pattern(regexp = "^([А-Я]{1}[а-яё]{1,23}|[A-Z]{1}[a-z]{1,23})$" ,message = "Неправильный формат имени")
     private String name;
     /**
      * фамилия пользователя
      **/
+    @NotBlank(message = "Поле не может быть пустым")
+    @Pattern(regexp = "^([А-Я]{1}[а-яё]{1,23}|[A-Z]{1}[a-z]{1,23})$" ,message = "Неправильный формат фамилии")
     private String surname;
     /**
      * город пользователя
      **/
+    @NotBlank(message = "Поле не может быть пустым")
     private String city;
     /**
      * описание пользователя

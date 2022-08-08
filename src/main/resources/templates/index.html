@@ -12,7 +12,7 @@
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
 </head>
 <body>
-<div class="container" th:if="${#authentication.getPrincipal().getActive()}">
+<div class="container" th:if="${#authentication.getPrincipal().getActive() and profileInfo!=null}">
     <div class="profile-page tx-13">
         <div class="row">
             <div class="col-12 grid-margin">
@@ -583,14 +583,14 @@
     </div>
 </div>
 
-<section class="error-404-section section-padding" th:if="!${#authentication.getPrincipal().getActive()}">
+<section class="error-404-section section-padding" th:if="${#authentication.getPrincipal().getActive()==false or profileInfo==null }">
     <div class="error">
         <img src="/img/error404.png" alt>
     </div>
     <div class="error-message">
         <h3>Ой! Аккаунт не активирован!</h3>
-        <p>Активируйте аккаунт, перейдя по ссылке из письма.</p>
-        <a href="javascript:history.go(-1)" class="theme-btn">Вернуться назад</a>
+        <p>Активируйте аккаунт, перейдя по ссылке из письма или завершите регистрацию</p>
+        <a href="/register/again" class="theme-btn">Завершить регистрацию</a>
     </div>
 </section>
 

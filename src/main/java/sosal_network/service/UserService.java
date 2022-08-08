@@ -17,6 +17,9 @@ import org.springframework.ui.Model;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -155,7 +158,6 @@ public class UserService implements UserDetailsService {
         user.setRegistrationDate(LocalDate.now());
         save(user);
 
-        createActivationCode(user.getUserEmail());
 
         return true;
     }
@@ -168,36 +170,34 @@ public class UserService implements UserDetailsService {
      * param redirectAttributes - модель для добавления атрибутов на переадресованную страницу
      * author - Nikita, Nekit, Renat
      **/
-    public String validateRegister(User user, Model model, RedirectAttributes redirectAttributes) {
+    public String validateRegister(User user, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
 
-        if (!Objects.equals(user.getPassword(), user.getUserPasswordConfirm())) {
-            model.addAttribute("errorConfPassword", true);
+        if (!Objects.equals(user.getPassword(), user.getPasswordConfirm())) {
+//            model.addAttribute("passwordConfirmError", "Пароли не совпадают");
+            bindingResult.addError(new FieldError("user", "passwordConfirm", "Пароли не совпадают"));
             log.warn("error confirm pass");
-            return "register";
-        }
-        if (user.getPassword().length() < 5) {
-            model.addAttribute("errorLenPassword", true);
-            log.warn("error pass length");
-            return "register";
         }
         if (findUserByUsername(user.getUsername()) != null) {
-            model.addAttribute("errorAlreadyExistsUsername", true);
+//            model.addAttribute("usernameError", "Пользователь с таким никнеймом уже существует");
+            bindingResult.addError(new FieldError("user", "username", "Пользователь с таким никнеймом уже существует"));
             log.warn("error user already exists");
-            return "register";
         }
         if (findUserByEmail(user.getUserEmail()) != null) {
-            model.addAttribute("errorAlreadyExistsEmail", true);
+//            model.addAttribute("userEmailError", "Пользователь с такой почтой уже существует");
+            bindingResult.addError(new FieldError("user", "userEmail", "Пользователь с такой почтой уже существует"));
             log.warn("mail already exists");
-            return "register";
+        }
+        if (bindingResult.hasErrors())
+        {
+            return "/register";
         }
         try {
             saveUser(user);
-//            log.info("user add");
-//            redirectAttributes.addFlashAttribute("registerSuccess", true);
-            return "redirect:/register/info/" + user.getUsername();
+            redirectAttributes.addFlashAttribute("user", user);
+            return "redirect:/registerContinue";
         } catch (Exception e) {
             log.error(e.getClass().toString());
-            return "register";
+            return "/register";
         }
     }
 
@@ -298,17 +298,18 @@ public class UserService implements UserDetailsService {
      * author - Nekit
      **/
     @Transactional
-    public String addProfileInfo(ProfileInfo profileInfo, RedirectAttributes redirectAttributes, String username, String dateOfBirth) {
+    public String addProfileInfo(ProfileInfo profileInfo, RedirectAttributes redirectAttributes, User user, String dateOfBirth, SessionStatus status) {
         try {
-            if (!Objects.equals(dateOfBirth, null)) {
+            if (!Objects.equals(dateOfBirth, "")) {
                 profileInfo.setDateOfBirth(LocalDate.parse(dateOfBirth, DateTimeFormatter.ofPattern("dd/MM/yyyy")));
             }
-            profileInfo.setUser(findUserByUsername(username));
+            profileInfo.setUser(user);
             profileInfoRepository.save(profileInfo);
+            createActivationCode(user.getUserEmail());
             redirectAttributes.addFlashAttribute("registerSuccess", true);
+            status.setComplete();
             return "redirect:/login";
         } catch (Exception e) {
-            userRepository.deleteUserByUsername(username);
             return "redirect:/register";
         }
     }
@@ -327,7 +328,7 @@ public class UserService implements UserDetailsService {
     public String editProfile(ProfileInfo editedProfile, String dateOfBirth, RedirectAttributes redirectAttributes,
                               User user) {
         ProfileInfo profileSession = findByUser_Username(user.getUsername());
-        if (dateOfBirth.isEmpty()) {
+        if (!dateOfBirth.isEmpty()) {
             LocalDate changedDate = LocalDate.parse(dateOfBirth, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
             editedProfile.setDateOfBirth(changedDate);
         }

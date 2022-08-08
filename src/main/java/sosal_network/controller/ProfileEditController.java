@@ -1,11 +1,14 @@
 package sosal_network.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.Banner;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import sosal_network.entity.ProfileInfo;
@@ -14,8 +17,8 @@ import sosal_network.repository.ProfileInfoRepository;
 import sosal_network.service.ImageService;
 import sosal_network.service.UserService;
 
+import javax.validation.Valid;
 import java.io.IOException;
-import java.util.Optional;
 
 @Controller
 public class ProfileEditController {
@@ -49,10 +52,15 @@ public class ProfileEditController {
      * author - Renat
      **/
     @PostMapping("/edit/profile")
-    public String changeProfileInfo(RedirectAttributes redirectAttributes, @ModelAttribute("editedProfile") ProfileInfo editedProfile,
+    public String changeProfileInfo(RedirectAttributes redirectAttributes, @ModelAttribute("editedProfileInfo") @Valid ProfileInfo editedProfile, BindingResult bindingResult,Model model,
                                     @RequestParam("profileDateOfBirth") String dateOfBirth,
                                     @AuthenticationPrincipal User user){
-
+        if (bindingResult.hasErrors())
+        {
+            model.addAttribute("user", user);
+            model.addAttribute("profileInfo", userService.findByUser_Username(user.getUsername()));
+            return "profileEdit";
+        }
         return userService.editProfile(editedProfile, dateOfBirth, redirectAttributes, user);
     }
 

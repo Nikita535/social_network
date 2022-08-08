@@ -10,6 +10,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import sosal_network.Enum.Role;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
@@ -33,6 +36,9 @@ public class User implements UserDetails {
     /**
      * имя пользователя
      **/
+    @NotBlank(message = "Поле не может быть пустым")
+    @Size(min = 3,message = "Никнейм не может содержать менее 3-ёх символов")
+    @Size(max = 20,message = "Слишком длинный никнейм")
     private String username;
 //    /** фамилия пользователя  **/
 //    private String userSurname;
@@ -40,17 +46,22 @@ public class User implements UserDetails {
     /**
      * пароль пользователя
      **/
+    @NotBlank(message = "Поле не может быть пустым")
+    @Size(min = 5,message = "Пароль не может состоять менее чем из 5ти символов")
     private String password;
 
     /**
      * подтвержденный пароль пользователя
      **/
     @Transient
-    private String userPasswordConfirm;
+    @NotBlank(message = "Поле не может быть пустым")
+    private String passwordConfirm;
 
     /**
      * почта пользователя
      **/
+    @Email(message = "Поле должно иметь формат эл.почты")
+    @NotBlank(message = "Поле не может быть пустым")
     private String userEmail;
 
     /**
@@ -90,7 +101,7 @@ public class User implements UserDetails {
     public User(String username, String password, String passwordConfirm, String email) {
         this.username = username;
         this.password = password;
-        this.userPasswordConfirm = passwordConfirm;
+        this.passwordConfirm = passwordConfirm;
         this.userEmail = email;
         this.registrationDate = LocalDate.now();
     }
