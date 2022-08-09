@@ -12,14 +12,12 @@ import sosal_network.entity.Friend;
 import sosal_network.entity.ProfileInfo;
 import sosal_network.entity.User;
 import sosal_network.repository.FriendRepository;
+import sosal_network.repository.ImageRepository;
 import sosal_network.repository.ProfileInfoRepository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -38,6 +36,8 @@ public class FriendService {
 
     @Autowired
     private ProfileInfoRepository profileInfoRepository;
+    @Autowired
+    private ImageRepository imageRepository;
 
 
     public String redirectToFriendListOrToProfile(String username, String where){
@@ -226,13 +226,13 @@ public class FriendService {
         friendRepository.save(friend);
     }
 
-
+    @Transactional
     public JSONObject generateModelOfFriendList(JSONObject response, String username, String searchLine, String pageString, Integer length){
         response = findFriendProfilesByUsernameFirst(response, username, searchLine, pageString, length);
         return response;
     }
 
-
+    @Transactional
     public JSONObject findFriendProfilesByUsernameFirst(JSONObject response, String username, String searchLine, String pageString,
                                                  Integer length){
         int page = Integer.parseInt(pageString);
@@ -241,11 +241,17 @@ public class FriendService {
         List<ProfileInfo> profiles = new LinkedList<>();
         List<User> friends = new LinkedList<>(getAcceptedFriends(username) );
         List<ProfileInfo> allFriendProfiles = new LinkedList<>();
+        Map<String,Long> allImages = new HashMap<String,Long>();
+
         if (Objects.equals(searchLine, "")){
-            for (int i = (page - 1) * length; i < page * length && i < friends.size(); i++)
+            for (int i = (page - 1) * length; i < page * length && i < friends.size(); i++) {
                 profiles.add(userService.findByUser_Username(friends.get(i).getUsername()));
-            response.append("friendProfiles", profiles);
+                allImages.put(friends.get(i).getUsername(),
+                        imageRepository.findImageByUserAndIsPreview(friends.get(i), true) != null ?
+                        imageRepository.findImageByUserAndIsPreview(friends.get(i), true).getId() : -1);
+            }
             sizeOfFriends = friends.size();
+            response.append("friendProfiles", profiles);
 
             for (User friend : friends)
                 allFriendProfiles.add(userService.findByUser_Username(friend.getUsername()));
@@ -265,7 +271,11 @@ public class FriendService {
 
             profiles = new LinkedList<>();
             for (int i = (page - 1) * length; i < page * length && i < newProfiles.size(); i++)
+            {
                 profiles.add(newProfiles.get(i));
+                allImages.put(newProfiles.get(i).getUser().getUsername(), imageRepository.findImageByUserAndIsPreview(newProfiles.get(i).getUser(), true) != null ?
+                        imageRepository.findImageByUserAndIsPreview(newProfiles.get(i).getUser(), true).getId() : -1);
+            }
             response.append("friendProfiles", profiles);
         }
 
@@ -276,8 +286,9 @@ public class FriendService {
             response.append("showFriends", true);
 
 
+
         response = findStrangersProfilesByUsernameSecond(response, username, searchLine, page,allFriendProfiles,
-                length - profiles.size(), length, sizeOfFriends);
+         length - profiles.size(), length, sizeOfFriends, allImages);
 
         return response;
     }
@@ -289,9 +300,10 @@ public class FriendService {
                 .setParameter("similarTo", similarTo).getResultList();
     }
 
+    @Transactional
     public JSONObject findStrangersProfilesByUsernameSecond(JSONObject response, String username, String searchLine,Integer page,
                                                        List<ProfileInfo> profilesOfFriends,Integer size,
-                                                       Integer length, Integer sizeOfFriends){
+                                                       Integer length, Integer sizeOfFriends, Map<String,Long> allImages){
         int sizeOfStrangers;
         List<ProfileInfo> profiles;
 
@@ -308,22 +320,39 @@ public class FriendService {
 
         if (Objects.equals(searchLine, "")){
             for (int i = page == 1 ? 0 : ((page - 1) * length - profilesOfFriends.size()); i < page * length && i < profilesNew.size() && profiles.size() < size && i > -1; i++) {
-                if (!isInviteRecieved(profilesNew.get(i).getUser().getUsername()))
+                if (!isInviteRecieved(profilesNew.get(i).getUser().getUsername())){
                     profiles.add(profilesNew.get(i));
-                else
+                    allImages.put(profilesNew.get(i).getUser().getUsername(), imageRepository.findImageByUserAndIsPreview(profilesNew.get(i).getUser(), true) != null ?
+                            imageRepository.findImageByUserAndIsPreview(profilesNew.get(i).getUser(), true).getId() : -1);
+                }
+            }
+
+            for (int i = 0; i < profilesNew.size() && profilesReceived.size() < 5; i++) {
+                if (isInviteRecieved(profilesNew.get(i).getUser().getUsername())){
                     profilesReceived.add(profilesNew.get(i));
+                    allImages.put(profilesNew.get(i).getUser().getUsername(), imageRepository.findImageByUserAndIsPreview(profilesNew.get(i).getUser(), true) != null ?
+                            imageRepository.findImageByUserAndIsPreview(profilesNew.get(i).getUser(), true).getId() : -1);
+                }
             }
 
             response.append("profilesOfStrangers", profiles);
-
             response.append("profilesOfReceivedStrangers", profilesReceived);
 
         }else {
             for (int i = page == 1 ? 0 : (page * length - profilesOfFriends.size()); i < page * length && i < profilesNew.size() && profiles.size() < size && i > -1; i++)
-                if (!isInviteRecieved(username))
+                if (!isInviteRecieved(username)) {
                     profiles.add(profilesNew.get(i));
-                else
+                    allImages.put(profilesNew.get(i).getUser().getUsername(), imageRepository.findImageByUserAndIsPreview(profilesNew.get(i).getUser(), true) != null ?
+                            imageRepository.findImageByUserAndIsPreview(profilesNew.get(i).getUser(), true).getId() : -1);
+                }
+
+            for (int i = 0; i < profilesNew.size() && profilesReceived.size() < 5; i++) {
+                if (isInviteRecieved(profilesNew.get(i).getUser().getUsername())){
                     profilesReceived.add(profilesNew.get(i));
+                    allImages.put(profilesNew.get(i).getUser().getUsername(), imageRepository.findImageByUserAndIsPreview(profilesNew.get(i).getUser(), true) != null ?
+                            imageRepository.findImageByUserAndIsPreview(profilesNew.get(i).getUser(), true).getId() : -1);
+                }
+            }
 
             response.append("profilesOfStrangers", profiles);
             response.append("profilesOfReceivedStrangers", profilesReceived);
@@ -336,6 +365,7 @@ public class FriendService {
             response.append("ShowStrangers", true);
 
         response = checkIsFriendArray(response, profiles);
+        response.append("allImages", allImages);
 
         response.append("pages", Math.ceil(((float)sizeOfFriends + (float)sizeOfStrangers) / length));
         return response;

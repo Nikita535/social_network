@@ -13,6 +13,7 @@ var maxPages;
 var errorNoSuchFriends;
 var errorNoSuchStrangers;
 var profilesOfReceivedStrangers;
+var allImages;
 var page = 1;
 
 
@@ -126,6 +127,7 @@ function successAddAndDenyFriendHandler($username, from){
 function addReceivedPerson(person){
     var source = person["user"]["images"].length!==0 ? '/image/' +
         person["user"]["username"] : 'https://bootdey.com/img/Content/avatar/avatar6.png';
+
     $receivedList.innerHTML += "<div  class=\"d-flex justify-content-between mb-2 pb-2 border-bottom rec" + person["user"]["username"] + "\">\n" +
         "                                        <div class=\"d-flex align-items-center hover-pointer\">\n" +
         "                                            <img src=\"" + source + "\"" +
@@ -164,10 +166,10 @@ function addReceivedPerson(person){
 
 // ФУНКЦИЯ ДОБАВЛЕНИЯ 1 БЛОКА USER
 function addPerson(person, isStranger=false, isSend = true, fromRight = false){
-   var source;
+    var source;
     if (fromRight === false)
         source = person["user"]["images"].length!==0 ? '/image/' +
-            person["user"]["username"] : 'https://bootdey.com/img/Content/avatar/avatar6.png';
+                allImages[person["user"]["username"]] : 'https://bootdey.com/img/Content/avatar/avatar6.png';
     else
         source = person["user"]["images"];
     const personContainer = document.createElement('div');
@@ -211,7 +213,9 @@ var successHandler = function( data, textStatus, jqXHR ) {
     jsonDataOfThePage = data;
     friendProfiles = data["friendProfiles"];
     profilesOfStrangers = data["profilesOfStrangers"];
+    allImages = data["allImages"];
 
+    console.log(data);
     profilesChecked = data["profilesChecked"];
     showFriends = data["showFriends"];
     ShowStrangers = data["ShowStrangers"];

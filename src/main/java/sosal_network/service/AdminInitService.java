@@ -52,7 +52,7 @@ public class AdminInitService implements CommandLineRunner {
         //            LocalDate.of(2020, 1, 8), "das", "Dsa");
         //    profileInfoRepository.save(profileInfo);
         //}
-        System.out.println(admin.getRoles().toArray()[0].toString().getClass());
+        //System.out.println(admin.getRoles().toArray()[0].toString().getClass());
     }
 
 
