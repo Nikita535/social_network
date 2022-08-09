@@ -38,12 +38,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
      **/
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
+
         httpSecurity
                 .csrf()
                 .disable()
                 .authorizeRequests().antMatchers("/login",
                         "/logout", "/register", "/activate/*", "/recovery",
-                        "/recoveryPage/*", "/recover/*", "/recoveryPage", "/invalidToken", "/register/info/*", "/registerContinue").permitAll()
+                        "/recoveryPage/*", "/recover/*", "/recoveryPage", "/invalidToken", "/register/info/*", "/registerContinue","/registerContinue/*").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()

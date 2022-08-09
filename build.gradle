@@ -57,7 +57,8 @@ dependencies {
 	implementation 'org.json:json:20220320'
 
 
-
+// swagger
+	implementation('org.springdoc:springdoc-openapi-ui:1.6.9')
 
 }
 
