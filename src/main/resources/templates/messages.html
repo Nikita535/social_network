@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>social network user profile example - Bootdey.com</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <link href="/message/style.css" rel="stylesheet">
+    <link href="/profile/profile.css" rel="stylesheet">
+
+
+    <link href="/error/error-404.css" rel="stylesheet">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+
+</head>
+<body>
+<div class="container" th:if="${#authentication.getPrincipal().getActive() and profileInfo!=null}">
+    <div class="profile-page tx-13">
+        <div class="row">
+            <div class="col-12 grid-margin">
+                <div class="profile-header">
+                    <div class="cover">
+                        <div class="gray-shade"></div>
+                        <figure>
+                            <img src="https://bootdey.com/img/Content/bg1.jpg" class="img-fluid" alt="profile cover">
+                        </figure>
+                        <div class="cover-body d-flex justify-content-between align-items-center">
+                            <div>
+                                <img class="profile-pic" th:src="${user.images.size()!=0 ? '/image/' +  avatar.getId():
+                                'https://bootdey.com/img/Content/avatar/avatar6.png'}"
+                                     alt="profile">
+                                <span class="profile-name"
+                                      th:text="${user.username} + ' ( '+ ${profileInfo.name} + ' ' + ${profileInfo.surname}+' )' "></span>
+                            </div>
+                            <div id="friendStatus" class="d-none d-md-block d-flex justify-space-between">
+                                <a href="/edit" class="btn btn-primary btn-icon-text btn-edit-profile m-2"
+                                   th:if="${#authentication.getPrincipal().username}==${user.username}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                         stroke-linejoin="round" class="feather feather-edit btn-icon-prepend">
+                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                    </svg>
+                                    Редактировать информацию
+                                </a>
+
+                            </div>
+                            <script th:inline="javascript">
+                                window.isFriend = /*[[${isFriend}]]*/ 'false';
+                                window.friendAccepted = /*[[${friendAccepted}]]*/ 'false';
+                                window.isInviteSend = /*[[${isInviteSend}]]*/ 'false';
+                                window.isInviteRecieved = /*[[${isInviteRecieved}]]*/ 'false';
+                                window.usernameOfSession = /*[[${#authentication.getPrincipal().username}]]*/ '';
+                                window.usernameOfPage = /*[[${user.username}]]*/ '';
+                            </script>
+
+                            <script src="/profile/profileInfoFlow.js"></script>
+                        </div>
+
+                    </div>
+                    <div class="header-links">
+                        <ul class="links d-flex align-items-center mt-3 mt-md-0">
+                            <li class="header-link-item d-flex align-items-center active">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                     stroke-linejoin="round" class="feather feather-columns mr-1 icon-md">
+                                    <path d="M12 3h7a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-7m0-18H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h7m0-18v18"></path>
+                                </svg>
+                                <a class="pt-1px d-none d-md-block" href="#">Записи</a>
+                            </li>
+                            <li class="header-link-item ml-3 pl-3 border-left d-flex align-items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                     stroke-linejoin="round" class="feather feather-user mr-1 icon-md">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="12" cy="7" r="4"></circle>
+                                </svg>
+                                <a class="pt-1px d-none d-md-block" href="#">О вас</a>
+                            </li>
+                            <li class="header-link-item ml-3 pl-3 border-left d-flex align-items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                     stroke-linejoin="round" class="feather feather-users mr-1 icon-md">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="9" cy="7" r="4"></circle>
+                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                </svg>
+                                <a class="pt-1px d-none d-md-block"
+                                   th:href="@{'/user/' + ${user.username} + '/friendList/1'}" methods="GET">Друзья <span
+                                        class="text-muted tx-12"
+                                        th:text="${friends.size()}"></span></a>
+
+
+                            </li>
+                            <li class="header-link-item ml-3 pl-3 border-left d-flex align-items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                     stroke-linejoin="round" class="feather feather-image mr-1 icon-md">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                    <polyline points="21 15 16 10 5 21"></polyline>
+                                </svg>
+                                <a class="pt-1px d-none d-md-block" href="#">Photos</a>
+                            </li>
+                            <li class="header-link-item ml-3 pl-3 border-left d-flex align-items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                     stroke-linejoin="round" class="feather feather-video mr-1 icon-md">
+                                    <polygon points="23 7 16 12 23 17 23 7"></polygon>
+                                    <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+                                </svg>
+                                <a class="pt-1px d-none d-md-block"
+                                   th:href="@{'/user/messages'}" methods="GET">Сообщения</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row profile-body">
+
+            <!-- left middle end -->
+            <div class="container bootstrap snippets bootdey">
+                <div class="tile tile-alt" id="messages-main">
+                    <div class="ms-menu">
+
+                        <div class="list-group lg-alt" th:each="friend:${friends}">
+                            <a class="list-group-item media" th:href="@{/messages/${friend.getUsername()}}">
+                                <div class="lv-avatar pull-left">
+                                </div>
+                                <div class="media-body">
+                                    <div class="list-group-item-heading" th:text="${userService.findByUser_Username(friend.username).getSurname()} + ' ' + ${userService.findByUser_Username(friend.username).getName()}"></div>
+                                    <small class="list-group-item-text c-gray"></small>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="ms-body">
+                        <div class="action-header clearfix">
+                            <div class="visible-xs" id="ms-menu-trigger">
+                                <i class="fa fa-bars"></i>
+                            </div>
+
+                            <div class="pull-left hidden-xs">
+                                <img src="https://bootdey.com/img/Content/avatar/avatar2.png" alt="" class="img-avatar m-r-10">
+                                <div class="lv-avatar pull-left">
+
+                                </div>
+                                <span>David Parbell</span>
+                            </div>
+
+                            <ul class="ah-actions actions">
+                                <li>
+                                    <a href="">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="">
+                                        <i class="fa fa-check"></i>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="">
+                                        <i class="fa fa-clock-o"></i>
+                                    </a>
+                                </li>
+                                <li class="dropdown">
+                                    <a href="" data-toggle="dropdown" aria-expanded="true">
+                                        <i class="fa fa-sort"></i>
+                                    </a>
+
+                                    <ul class="dropdown-menu dropdown-menu-right">
+                                        <li>
+                                            <a href="">Latest</a>
+                                        </li>
+                                        <li>
+                                            <a href="">Oldest</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li class="dropdown">
+                                    <a href="" data-toggle="dropdown" aria-expanded="true">
+                                        <i class="fa fa-bars"></i>
+                                    </a>
+
+                                    <ul class="dropdown-menu dropdown-menu-right">
+                                        <li>
+                                            <a href="">Refresh</a>
+                                        </li>
+                                        <li>
+                                            <a href="">Message Settings</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="message-feed media">
+                            <div class="pull-left">
+                                <img src="https://bootdey.com/img/Content/avatar/avatar1.png" alt="" class="img-avatar">
+                            </div>
+                            <div class="media-body">
+                                <div class="mf-content">
+                                    Quisque consequat arcu eget odio cursus, ut tempor arcu vestibulum. Etiam ex arcu, porta a urna non, lacinia pellentesque orci. Proin semper sagittis erat, eget condimentum sapien viverra et. Mauris volutpat magna nibh, et condimentum est rutrum a. Nunc sed turpis mi. In eu massa a sem pulvinar lobortis.
+                                </div>
+                                <small class="mf-date"><i class="fa fa-clock-o"></i> 20/02/2015 at 09:00</small>
+                            </div>
+                        </div>
+
+                        <div class="message-feed right">
+                            <div class="pull-right">
+                                <img src="https://bootdey.com/img/Content/avatar/avatar2.png" alt="" class="img-avatar">
+                            </div>
+                            <div class="media-body">
+                                <div class="mf-content">
+                                    Mauris volutpat magna nibh, et condimentum est rutrum a. Nunc sed turpis mi. In eu massa a sem pulvinar lobortis.
+                                </div>
+                                <small class="mf-date"><i class="fa fa-clock-o"></i> 20/02/2015 at 09:30</small>
+                            </div>
+                        </div>
+
+                        <div class="message-feed media">
+                            <div class="pull-left">
+                                <img src="https://bootdey.com/img/Content/avatar/avatar1.png" alt="" class="img-avatar">
+                            </div>
+                            <div class="media-body">
+                                <div class="mf-content">
+                                    Etiam ex arcumentum
+                                </div>
+                                <small class="mf-date"><i class="fa fa-clock-o"></i> 20/02/2015 at 09:33</small>
+                            </div>
+                        </div>
+
+                        <div class="message-feed right">
+                            <div class="pull-right">
+                                <img src="https://bootdey.com/img/Content/avatar/avatar2.png" alt="" class="img-avatar">
+                            </div>
+                            <div class="media-body">
+                                <div class="mf-content">
+                                    Etiam nec facilisis lacus. Nulla imperdiet augue ullamcorper dui ullamcorper, eu laoreet sem consectetur. Aenean et ligula risus. Praesent sed posuere sem. Cum sociis natoque penatibus et magnis dis parturient montes,
+                                </div>
+                                <small class="mf-date"><i class="fa fa-clock-o"></i> 20/02/2015 at 10:10</small>
+                            </div>
+                        </div>
+
+                        <div class="message-feed media">
+                            <div class="pull-left">
+                                <img src="https://bootdey.com/img/Content/avatar/avatar1.png" alt="" class="img-avatar">
+                            </div>
+                            <div class="media-body">
+                                <div class="mf-content">
+                                    Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Etiam ac tortor ut elit sodales varius. Mauris id ipsum id mauris malesuada tincidunt. Vestibulum elit massa, pulvinar at sapien sed, luctus vestibulum eros. Etiam finibus tristique ante, vitae rhoncus sapien volutpat eget
+                                </div>
+                                <small class="mf-date"><i class="fa fa-clock-o"></i> 20/02/2015 at 10:24</small>
+                            </div>
+                        </div>
+
+                        <div class="msb-reply">
+                            <textarea placeholder="What's on your mind..."></textarea>
+                            <button><i class="fa fa-paper-plane-o"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+
+<section class="error-404-section section-padding" th:if="${#authentication.getPrincipal().getActive()==false or profileInfo==null }">
+    <div class="error">
+        <img src="/img/error404.png" alt>
+    </div>
+    <div class="error-message">
+        <h3>Ой! Аккаунт не активирован!</h3>
+        <p>Активируйте аккаунт, перейдя по ссылке из письма или завершите регистрацию</p>
+        <a href="/register/again" class="theme-btn">Завершить регистрацию</a>
+    </div>
+</section>
+
+<script type="text/javascript">
+
+</script>
+</body>
+</html>
