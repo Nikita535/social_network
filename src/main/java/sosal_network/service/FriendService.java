@@ -239,7 +239,7 @@ public class FriendService {
         jsonProfile.append("name", profile.getName());
         jsonProfile.append("surname", profile.getSurname());
         jsonProfile.append("city", profile.getCity());
-        jsonProfile.append("images", profile.getUser().getImages().size());
+        jsonProfile.append("image", profile.getUser().getImage());
         return jsonProfile;
     }
 
@@ -256,10 +256,9 @@ public class FriendService {
 
         if (Objects.equals(searchLine, "")){
             for (int i = (page - 1) * length; i < page * length && i < friends.size(); i++) {
-                profiles.add(profileToJson(userService.findByUser_Username(friends.get(i).getUsername())));
+                profiles.add(profileToJson(userService.findByUser(friends.get(i)));
                 allImages.put(friends.get(i).getUsername(),
-                        imageRepository.findImageByUserAndIsPreview(friends.get(i), true) != null ?
-                        imageRepository.findImageByUserAndIsPreview(friends.get(i), true).getId() : -1);
+                        friends.get(i).getImage()!= null ? friends.get(i).getImage().getId(): -1 );
             }
 
 
@@ -277,7 +276,7 @@ public class FriendService {
                 if (pattern.matcher( profile.getSurname() + " " + profile.getName()).find())
                     newProfiles.add(profile);
             for (User friend: friends){
-                ProfileInfo element = userService.findByUser_Username(friend.getUsername());
+                ProfileInfo element = userService.findProfileInfoByUser(friend);
                 if (pattern.matcher( element.getSurname()+ " " + element.getName()).find())
                     newProfiles.add(element);
             }
