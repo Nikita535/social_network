@@ -110,13 +110,14 @@ function denyFriend($name){
 function successAddAndDenyFriendHandler($username, from){
     let obj=document.querySelector(".rec" + $username);
     let findName = obj.getElementsByTagName("a").item(0);
-    var request = {"user":{}, "name":"", "surname":""};
-    request.user.images = obj.getElementsByTagName("img").item(0).src;
-    request.user.username = findName.href.split("/").at(-1);
-    request.name = findName.text.split(" ").at(1);
-    request.surname = findName.text.split(" ").at(0);
-    request.city = obj.getElementsByTagName("span").item(0).innerText;
+    var request = {"images":{}, "name": {}, "surname": {}, "username": {}, "city": {}};
+    request.images[0] = obj.getElementsByTagName("img").item(0).src;
+    request.username[0] = findName.href.split("/").at(-1);
+    request.name[0] = findName.text.split(" ").at(1);
+    request.surname[0] = findName.text.split(" ").at(0);
+    request.city[0] = obj.getElementsByTagName("span").item(0).innerText;
     obj.parentNode.removeChild(obj);
+    console.log($username, from);
     if (from === 1)
         addPerson(request, false, false, true);
     else
@@ -125,19 +126,19 @@ function successAddAndDenyFriendHandler($username, from){
 
 
 function addReceivedPerson(person){
-    var source = person["user"]["images"].length!==0 ? '/image/' +
-        person["user"]["username"] : 'https://bootdey.com/img/Content/avatar/avatar6.png';
+    var source = allImages[0][person["username"][0]]!==-1 ? '/image/' +
+            allImages[0][person["username"][0]] : 'https://bootdey.com/img/Content/avatar/avatar6.png';
 
-    $receivedList.innerHTML += "<div  class=\"d-flex justify-content-between mb-2 pb-2 border-bottom rec" + person["user"]["username"] + "\">\n" +
+    $receivedList.innerHTML += "<div  class=\"d-flex justify-content-between mb-2 pb-2 border-bottom rec" + person["username"] + "\">\n" +
         "                                        <div class=\"d-flex align-items-center hover-pointer\">\n" +
         "                                            <img src=\"" + source + "\"" +
         "                                                 alt=\"\" class=\"img-xs rounded-circle\">\n" +
         "                                            <div class=\"ml-2\">\n" +
-        "                                            <p><a href=\" " + '/user/' + person["user"]["username"] + " \" class=\"profile-link\">" + person["surname"] + " " + person["name"] + "</a></p>\n" +
+        "                                            <p><a href=\" " + '/user/' + person["username"] + " \" class=\"profile-link\">" + person["surname"] + " " + person["name"] + "</a></p>\n" +
         "                                            <span style='display: none'>" + person["city"] + "</span>  " +
         "                                         </div>\n" +
         "                                        </div>\n" +
-        "                                        <button onclick=\"addFriend(\'" + person["user"]["username"] + "\')\" class=\"btn btn-icon\">\n" +
+        "                                        <button onclick=\"addFriend(\'" + person["username"] + "\')\" class=\"btn btn-icon\">\n" +
         "                                            <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\"\n" +
         "                                                 viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"\n" +
         "                                                 stroke-linecap=\"round\" stroke-linejoin=\"round\"\n" +
@@ -149,7 +150,7 @@ function addReceivedPerson(person){
         "                                                <line x1=\"23\" y1=\"11\" x2=\"17\" y2=\"11\"></line>\n" +
         "                                            </svg>\n" +
         "                                        </button>\n" +
-        "                                        <button onclick=\"denyFriend(\'" + person["user"]["username"] + "\')\" class=\"btn btn-icon\">\n" +
+        "                                        <button onclick=\"denyFriend(\'" + person["username"] + "\')\" class=\"btn btn-icon\">\n" +
         "                                            <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\"\n" +
         "                                                 viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"\n" +
         "                                                 stroke-linecap=\"round\" stroke-linejoin=\"round\"\n" +
@@ -168,31 +169,31 @@ function addReceivedPerson(person){
 function addPerson(person, isStranger=false, isSend = true, fromRight = false){
     var source;
     if (fromRight === false)
-        source = person["user"]["images"].length!==0 ? '/image/' +
-                allImages[person["user"]["username"]] : 'https://bootdey.com/img/Content/avatar/avatar6.png';
+        source = allImages[0][person["username"][0]]!==-1 ? '/image/' +
+                allImages[0][person["username"][0]] : 'https://bootdey.com/img/Content/avatar/avatar6.png';
     else
-        source = person["user"]["images"];
+        source = person["images"][0];
     const personContainer = document.createElement('div');
     personContainer.classList.add("nearby-user")
-    personContainer.innerHTML += "<div class=\"row " + person["user"]["username"] + "\">\n" +
+    personContainer.innerHTML += "<div class=\"row " + person["username"][0] + "\">\n" +
         "                                        <div class=\"col-md-2 col-sm-2\">\n" +
         "                                            <img src=\"" + source + "\"\n" +
         "                                                 alt=\"user\" class=\"profile-photo-lg\">\n" +
         "                                        </div>\n" +
         "                                        <div class=\"col-md-7 col-sm-7\">\n" +
-        "                                            <h5><a href=\" " + '/user/' + person["user"]["username"] + " \" class=\"profile-link\">" + person["surname"] + " " + person["name"] + "</a></h5>\n" +
-        "                                            <p class=\"text-muted\">" + person["city"] + "</p>\n" +
+        "                                            <h5><a href=\" " + '/user/' + person["username"][0] + " \" class=\"profile-link\">" + person["surname"][0] + " " + person["name"][0] + "</a></h5>\n" +
+        "                                            <p class=\"text-muted\">" + person["city"][0] + "</p>\n" +
         "                                        </div>\n" +
         "                                    </div>\n";
 
     if (isStranger === false) {
-        personContainer.querySelector("." + person["user"]["username"]).appendChild(deleteButton(person["user"]["username"]));
+        personContainer.querySelector("." + person["username"][0]).appendChild(deleteButton(person["username"][0]));
         document.getElementById("friendStatusText").insertAdjacentElement('afterEnd', personContainer);
     }else if (isSend === false){
-        personContainer.querySelector("." + person["user"]["username"]).appendChild(sendButton(person["user"]["username"]));
+        personContainer.querySelector("." + person["username"][0]).appendChild(sendButton(person["username"][0]));
         $name.appendChild(personContainer);}
     else {
-        personContainer.querySelector("." + person["user"]["username"]).appendChild(alreadySendButton(person["user"]["username"]));
+        personContainer.querySelector("." + person["username"][0]).appendChild(alreadySendButton(person["username"][0]));
         $name.appendChild(personContainer);
     }
 }
@@ -200,6 +201,7 @@ function addPerson(person, isStranger=false, isSend = true, fromRight = false){
 //Создание запросов
 function createAjaxQuery(url, toFunction)
 {
+    console.log(currentLocation + url);
     jQuery.ajax({
         type       : 'GET',
         url        : currentLocation + url,
@@ -215,7 +217,6 @@ var successHandler = function( data, textStatus, jqXHR ) {
     profilesOfStrangers = data["profilesOfStrangers"];
     allImages = data["allImages"];
 
-    console.log(data);
     profilesChecked = data["profilesChecked"];
     showFriends = data["showFriends"];
     ShowStrangers = data["ShowStrangers"];

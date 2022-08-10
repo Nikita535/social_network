@@ -43,7 +43,7 @@ public class AdminInitService implements CommandLineRunner {
             userRepository.save(admin);
         }
 
-        // 40 пользователей
+         //40 пользователей
         //for(int i = 0; i < 40; i++) {
         //    User user= new User("renat0" + i, password, password, "victor." + i + "@gmail.com");
         //    user.getRoles().add(Role.ROLE_USER);

@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import sosal_network.Enum.InviteStatus;
 import sosal_network.entity.Friend;
+import sosal_network.entity.Image;
 import sosal_network.entity.ProfileInfo;
 import sosal_network.entity.User;
 import sosal_network.repository.FriendRepository;
@@ -232,60 +233,66 @@ public class FriendService {
         return response;
     }
 
+    public JSONObject profileToJson(ProfileInfo profile){
+        JSONObject jsonProfile = new JSONObject();
+        jsonProfile.append("username", profile.getUser().getUsername());
+        jsonProfile.append("name", profile.getName());
+        jsonProfile.append("surname", profile.getSurname());
+        jsonProfile.append("city", profile.getCity());
+        jsonProfile.append("images", profile.getUser().getImages().size());
+        return jsonProfile;
+    }
+
     @Transactional
     public JSONObject findFriendProfilesByUsernameFirst(JSONObject response, String username, String searchLine, String pageString,
                                                  Integer length){
         int page = Integer.parseInt(pageString);
         int sizeOfFriends;
 
-        List<ProfileInfo> profiles = new LinkedList<>();
+        List<JSONObject> profiles = new LinkedList<>();
         List<User> friends = new LinkedList<>(getAcceptedFriends(username) );
         List<ProfileInfo> allFriendProfiles = new LinkedList<>();
         Map<String,Long> allImages = new HashMap<String,Long>();
 
         if (Objects.equals(searchLine, "")){
             for (int i = (page - 1) * length; i < page * length && i < friends.size(); i++) {
-                profiles.add(userService.findByUser_Username(friends.get(i).getUsername()));
+                profiles.add(profileToJson(userService.findByUser_Username(friends.get(i).getUsername())));
                 allImages.put(friends.get(i).getUsername(),
                         imageRepository.findImageByUserAndIsPreview(friends.get(i), true) != null ?
                         imageRepository.findImageByUserAndIsPreview(friends.get(i), true).getId() : -1);
             }
-            sizeOfFriends = friends.size();
-            response.append("friendProfiles", profiles);
 
+
+            sizeOfFriends = friends.size();
             for (User friend : friends)
                 allFriendProfiles.add(userService.findByUser_Username(friend.getUsername()));
         }else {
             Pattern pattern = Pattern.compile(searchLine);
-
             List<ProfileInfo> newProfiles = new LinkedList<>();
-            for (User friend: friends)
-                profiles.add(userService.findByUser_Username(friend.getUsername()));
-
-            for (ProfileInfo profile: profiles){
-                if (pattern.matcher( profile.getSurname() + " " + profile.getName()).find())
-                    newProfiles.add(profile);
+            for (User friend: friends){
+                ProfileInfo element = userService.findByUser_Username(friend.getUsername());
+                if (pattern.matcher( element.getSurname()+ " " + element.getName()).find())
+                    newProfiles.add(element);
             }
+
             sizeOfFriends = newProfiles.size();
             allFriendProfiles = newProfiles;
 
-            profiles = new LinkedList<>();
             for (int i = (page - 1) * length; i < page * length && i < newProfiles.size(); i++)
             {
-                profiles.add(newProfiles.get(i));
-                allImages.put(newProfiles.get(i).getUser().getUsername(), imageRepository.findImageByUserAndIsPreview(newProfiles.get(i).getUser(), true) != null ?
+                profiles.add(profileToJson(newProfiles.get(i)));
+                allImages.put(newProfiles.get(i).getUser().getUsername(), imageRepository.findImageByUserAndIsPreview(
+                        newProfiles.get(i).getUser(), true) != null ?
                         imageRepository.findImageByUserAndIsPreview(newProfiles.get(i).getUser(), true).getId() : -1);
             }
-            response.append("friendProfiles", profiles);
         }
+
+        response.append("friendProfiles", profiles);
 
         if (profiles.size() == 0 && sizeOfFriends == 0 && !Objects.equals(searchLine, ""))
             response.append("errorNoSuchFriends", true);
-
         if (page == 1)
             response.append("showFriends", true);
-
-
 
         response = findStrangersProfilesByUsernameSecond(response, username, searchLine, page,allFriendProfiles,
          length - profiles.size(), length, sizeOfFriends, allImages);
@@ -305,57 +312,48 @@ public class FriendService {
                                                        List<ProfileInfo> profilesOfFriends,Integer size,
                                                        Integer length, Integer sizeOfFriends, Map<String,Long> allImages){
         int sizeOfStrangers;
-        List<ProfileInfo> profiles;
-
+        List<ProfileInfo> allProfiles = allProfileInfos(searchLine);;
         List<ProfileInfo> profilesNew = new LinkedList<>();
-        List<ProfileInfo> profilesReceived = new LinkedList<>();
-        profiles = allProfileInfos(searchLine);
-        profilesOfFriends.add(profileInfoRepository.findByUser_Username(username));
+        List<JSONObject> profilesReceived = new LinkedList<>();
+        List<JSONObject> profiles = new LinkedList<>();
 
-        for (ProfileInfo profile: profiles)
+        profilesOfFriends.add(profileInfoRepository.findByUser_Username(username));
+        for (ProfileInfo profile: allProfiles)
             if (!profilesOfFriends.contains(profile))
                 profilesNew.add(profile);
-        profiles = new LinkedList<>();
         sizeOfStrangers = profilesNew.size();
 
         if (Objects.equals(searchLine, "")){
             for (int i = page == 1 ? 0 : ((page - 1) * length - profilesOfFriends.size()); i < page * length && i < profilesNew.size() && profiles.size() < size && i > -1; i++) {
                 if (!isInviteRecieved(profilesNew.get(i).getUser().getUsername())){
-                    profiles.add(profilesNew.get(i));
+                    profiles.add(profileToJson(profilesNew.get(i)));
                     allImages.put(profilesNew.get(i).getUser().getUsername(), imageRepository.findImageByUserAndIsPreview(profilesNew.get(i).getUser(), true) != null ?
                             imageRepository.findImageByUserAndIsPreview(profilesNew.get(i).getUser(), true).getId() : -1);
                 }
             }
-
             for (int i = 0; i < profilesNew.size() && profilesReceived.size() < 5; i++) {
                 if (isInviteRecieved(profilesNew.get(i).getUser().getUsername())){
-                    profilesReceived.add(profilesNew.get(i));
+                    profilesReceived.add(profileToJson(profilesNew.get(i)));
                     allImages.put(profilesNew.get(i).getUser().getUsername(), imageRepository.findImageByUserAndIsPreview(profilesNew.get(i).getUser(), true) != null ?
                             imageRepository.findImageByUserAndIsPreview(profilesNew.get(i).getUser(), true).getId() : -1);
                 }
             }
-
-            response.append("profilesOfStrangers", profiles);
-            response.append("profilesOfReceivedStrangers", profilesReceived);
 
         }else {
             for (int i = page == 1 ? 0 : (page * length - profilesOfFriends.size()); i < page * length && i < profilesNew.size() && profiles.size() < size && i > -1; i++)
                 if (!isInviteRecieved(username)) {
-                    profiles.add(profilesNew.get(i));
+                    profiles.add(profileToJson(profilesNew.get(i)));
                     allImages.put(profilesNew.get(i).getUser().getUsername(), imageRepository.findImageByUserAndIsPreview(profilesNew.get(i).getUser(), true) != null ?
                             imageRepository.findImageByUserAndIsPreview(profilesNew.get(i).getUser(), true).getId() : -1);
                 }
 
             for (int i = 0; i < profilesNew.size() && profilesReceived.size() < 5; i++) {
                 if (isInviteRecieved(profilesNew.get(i).getUser().getUsername())){
-                    profilesReceived.add(profilesNew.get(i));
+                    profilesReceived.add(profileToJson(profilesNew.get(i)));
                     allImages.put(profilesNew.get(i).getUser().getUsername(), imageRepository.findImageByUserAndIsPreview(profilesNew.get(i).getUser(), true) != null ?
                             imageRepository.findImageByUserAndIsPreview(profilesNew.get(i).getUser(), true).getId() : -1);
                 }
             }
-
-            response.append("profilesOfStrangers", profiles);
-            response.append("profilesOfReceivedStrangers", profilesReceived);
         }
 
         if (profiles.size() == 0 && sizeOfStrangers == 0 && !Objects.equals(searchLine, ""))
@@ -363,18 +361,18 @@ public class FriendService {
 
         if (profiles.size() != 0 && page * length - profilesOfFriends.size() <= length)
             response.append("ShowStrangers", true);
-
+        response.append("profilesOfStrangers", profiles);
+        response.append("profilesOfReceivedStrangers", profilesReceived);
         response = checkIsFriendArray(response, profiles);
         response.append("allImages", allImages);
-
         response.append("pages", Math.ceil(((float)sizeOfFriends + (float)sizeOfStrangers) / length));
         return response;
     }
 
-    public JSONObject checkIsFriendArray(JSONObject response, List<ProfileInfo> profiles){
+    public JSONObject checkIsFriendArray(JSONObject response, List<JSONObject> profiles){
         List<Boolean> profilesChecked = new LinkedList<>();
-        for (ProfileInfo profile : profiles) {
-            profilesChecked.add(isInviteSend(profile.getUser().getUsername()));
+        for (JSONObject profile : profiles) {
+            profilesChecked.add(isInviteSend(profile.get("username").toString()));
         }
         response.append("profilesChecked", profilesChecked);
         return response;
