@@ -29,7 +29,7 @@
                         </figure>
                         <div class="cover-body d-flex justify-content-between align-items-center">
                             <div>
-                                <img class="profile-pic" th:src="${user.images.size()!=0 ? '/image/' +  avatar.getId():
+                                <img class="profile-pic" th:src="${user.image!=null ? '/image/' +  user.image.getId():
                                 'https://bootdey.com/img/Content/avatar/avatar6.png'}"
                                      alt="profile">
                                 <span class="profile-name"
@@ -130,10 +130,15 @@
 
                         <div class="list-group lg-alt" th:each="friend:${friends}">
                             <a class="list-group-item media" th:href="@{/messages/${friend.getUsername()}}">
+
+
                                 <div class="lv-avatar pull-left">
+                                    <img class="img-avatar mr-2" th:src="${friend.getImage()!=null ?
+                                     '/image/' +  friend.getImage().getId():
+                                'https://bootdey.com/img/Content/avatar/avatar6.png'}" alt="">
                                 </div>
                                 <div class="media-body">
-                                    <div class="list-group-item-heading" th:text="${userService.findByUser_Username(friend.username).getSurname()} + ' ' + ${userService.findByUser_Username(friend.username).getName()}"></div>
+                                    <div class="list-group-item-heading" th:text="${userService.findProfileInfoByUser(friend).getSurname()} + ' ' + ${userService.findProfileInfoByUser(friend).getName()}"></div>
                                     <small class="list-group-item-text c-gray"></small>
                                 </div>
                             </a>
@@ -250,7 +255,7 @@
                         </div>
 
                         <div class="message-feed media">
-                            <div class="pull-left">
+                            <div class="pull-left mr-3">
                                 <img src="https://bootdey.com/img/Content/avatar/avatar1.png" alt="" class="img-avatar">
                             </div>
                             <div class="media-body">
@@ -273,6 +278,8 @@
         </div>
     </div>
 </div>
+
+<script src="/message/message.js"></script>
 
 <section class="error-404-section section-padding" th:if="${#authentication.getPrincipal().getActive()==false or profileInfo==null }">
     <div class="error">

@@ -51,19 +51,14 @@ public class ChatController {
         List<User> friends = friendService.getAcceptedFriends(authentificatedUser.getUsername());
 
         model.addAttribute("user", userService.findUserByUsername(authentificatedUser.getUsername()));
-        model.addAttribute("profileInfo", userService.findByUser_Username(authentificatedUser.getUsername()));
+        model.addAttribute("profileInfo", userService.findProfileInfoByUser(authentificatedUser));
         model.addAttribute("friends",friendService.getAcceptedFriends(authentificatedUser.getUsername()));
+
         model.addAttribute("isFriend",friendService.isFriends(authentificatedUser.getUsername()));
         model.addAttribute("friendAccepted",friendService.checkFriendStatus(authentificatedUser.getUsername()));
         model.addAttribute("isInviteRecieved",friendService.isInviteRecieved(authentificatedUser.getUsername()));
         model.addAttribute("isInviteSend",friendService.isInviteSend(authentificatedUser.getUsername()));
-        model.addAttribute("avatar",imageService.findImageByUserAndIsPreview( userService.findUserByUsername(authentificatedUser.getUsername()),true));
         model.addAttribute("userService", userService);
-
-        Map<String, Image> avatars = new HashMap<String, Image>();
-        for (int i = 0; i < friends.size(); i++)
-            avatars.put(friends.get(i).getUsername(), imageService.findImageByUserAndIsPreview( userService.findUserByUsername(authentificatedUser.getUsername()),true));
-        model.addAttribute("avatars",avatars);
 
         return "messages";
     }
