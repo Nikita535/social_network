@@ -59,31 +59,20 @@ public class UserController {
             return "/error";
         }
         model.addAttribute("postService", postService);
-        if (username.isEmpty()) {
-            model.addAttribute("user", authentificatedUser);
-            model.addAttribute("profileInfo", userService.findByUser_Username(authentificatedUser.getUsername()));
-            model.addAttribute("friends",friendService.getFriends(authentificatedUser.getUsername()));
-            model.addAttribute("isFriend",friendService.isFriends(authentificatedUser.getUsername()));
-            model.addAttribute("friendAccepted",friendService.checkFriendStatus(authentificatedUser.getUsername()));
-            model.addAttribute("isInviteRecieved",friendService.isInviteRecieved(authentificatedUser.getUsername()));
-            model.addAttribute("isInviteSend",friendService.isInviteSend(authentificatedUser.getUsername()));
-            model.addAttribute("post",new Post());
-            model.addAttribute("posts",postService.showPost(authentificatedUser));
-            return "index";
-        }
         if (userService.findUserByUsername(username.get()) == null) {
             return "error-404";
         }
+        User currentUser=userService.findUserByUsername(username.get());
         model.addAttribute("user", userService.findUserByUsername(username.get()));
-        model.addAttribute("profileInfo", userService.findByUser_Username(username.get()));
+        model.addAttribute("profileInfo", userService.findProfileInfoByUser(currentUser));
         model.addAttribute("friends",friendService.getAcceptedFriends(username.get()));
         model.addAttribute("isFriend",friendService.isFriends(username.get()));
         model.addAttribute("friendAccepted",friendService.checkFriendStatus(username.get()));
         model.addAttribute("isInviteRecieved",friendService.isInviteRecieved(username.get()));
         model.addAttribute("isInviteSend",friendService.isInviteSend(username.get()));
         model.addAttribute("post",new Post());
-        model.addAttribute("posts",postService.showPost(userService.findUserByUsername(username.get())));
-        model.addAttribute("avatar",imageService.findImageByUserAndIsPreview( userService.findUserByUsername(username.get()),true));
+        model.addAttribute("posts",postService.showPost(currentUser));
+//        model.addAttribute("avatar",imageService.findImageByUserAndIsPreview( userService.findUserByUsername(username.get()),true));
         return "index";
 
     }

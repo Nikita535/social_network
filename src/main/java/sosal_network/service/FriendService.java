@@ -242,18 +242,18 @@ public class FriendService {
         List<ProfileInfo> allFriendProfiles = new LinkedList<>();
         if (Objects.equals(searchLine, "")){
             for (int i = (page - 1) * length; i < page * length && i < friends.size(); i++)
-                profiles.add(userService.findByUser_Username(friends.get(i).getUsername()));
+                profiles.add(userService.findProfileInfoByUser(friends.get(i)));
             model.addAttribute("friendProfiles", profiles);
             sizeOfFriends = friends.size();
 
             for (User friend : friends)
-                allFriendProfiles.add(userService.findByUser_Username(friend.getUsername()));
+                allFriendProfiles.add(userService.findProfileInfoByUser(friend));
         }else {
             Pattern pattern = Pattern.compile(searchLine);
 
             List<ProfileInfo> newProfiles = new LinkedList<>();
             for (User friend: friends)
-                profiles.add(userService.findByUser_Username(friend.getUsername()));
+                profiles.add(userService.findProfileInfoByUser(friend));
 
             for (ProfileInfo profile: profiles){
                 if (pattern.matcher( profile.getSurname() + " " + profile.getName()).find())
@@ -296,7 +296,8 @@ public class FriendService {
 
         List<ProfileInfo> profilesNew = new LinkedList<>();
         profiles = allProfileInfos(searchLine);
-        profilesOfFriends.add(profileInfoRepository.findByUser_Username(username));
+        User user=userService.findUserByUsername(username);
+        profilesOfFriends.add(profileInfoRepository.findProfileInfoByUser(user));
 
         for (ProfileInfo profile: profiles)
             if (!profilesOfFriends.contains(profile))

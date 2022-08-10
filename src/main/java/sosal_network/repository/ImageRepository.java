@@ -11,9 +11,6 @@ import java.util.List;
 
 @Repository
 public interface ImageRepository extends JpaRepository<Image, Long> {
-    Image findImageByUserAndIsPreview(User user,boolean isPreview);
-
-    Image findImageByUser_UsernameAndIsPreview(String user_username, boolean isPreview);
 
     Image findImageById(Long id);
 

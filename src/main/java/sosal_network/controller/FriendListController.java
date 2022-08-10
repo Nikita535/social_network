@@ -40,13 +40,11 @@ public class FriendListController {
         int sizeOfPage = 10;
         model = friendService.generateModelOfFriendList(model, username.get(), searchLine, page.get(), sizeOfPage);
 
-
-
         model.addAttribute("isAdminOfTheFriendList", Objects.equals(userService.findUserByUsername(username.get()).getUsername(), user.getUsername()));
         model.addAttribute("searchLine", searchLine);
         model.addAttribute("friendService", friendService);
         model.addAttribute("user", userService.findUserByUsername(username.get()));
-        model.addAttribute("profileInfo", userService.findByUser_Username(username.get()));
+        model.addAttribute("profileInfo", userService.findProfileInfoByUser(user));
         model.addAttribute("friends",friendService.getAcceptedFriends(username.get()));
         model.addAttribute("isFriend",friendService.isFriends(username.get()));
         model.addAttribute("friendAccepted",friendService.checkFriendStatus(username.get()));
