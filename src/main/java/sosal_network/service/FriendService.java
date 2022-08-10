@@ -239,7 +239,6 @@ public class FriendService {
         jsonProfile.append("name", profile.getName());
         jsonProfile.append("surname", profile.getSurname());
         jsonProfile.append("city", profile.getCity());
-        jsonProfile.append("image", profile.getUser().getImage());
         return jsonProfile;
     }
 
@@ -256,9 +255,10 @@ public class FriendService {
 
         if (Objects.equals(searchLine, "")){
             for (int i = (page - 1) * length; i < page * length && i < friends.size(); i++) {
-                profiles.add(profileToJson(userService.findByUser(friends.get(i)));
+                profiles.add(profileToJson(userService.findProfileInfoByUser(friends.get(i))));
                 allImages.put(friends.get(i).getUsername(),
-                        friends.get(i).getImage()!= null ? friends.get(i).getImage().getId(): -1 );
+                        friends.get(i).getImage() != null ?
+                               friends.get(i).getImage().getId() : -1);
             }
 
 
@@ -266,31 +266,23 @@ public class FriendService {
             for (User friend : friends)
                 allFriendProfiles.add(userService.findProfileInfoByUser(friend));
         }else {
-            Pattern pattern = Pattern.compile(searchLine);
+                Pattern pattern = Pattern.compile(searchLine);
+                List<ProfileInfo> newProfiles = new LinkedList<>();
+                for (User friend: friends){
+                    ProfileInfo element = userService.findProfileInfoByUser(friend);
+                    if (pattern.matcher( element.getSurname()+ " " + element.getName()).find())
+                        newProfiles.add(element);
+                }
 
-            List<ProfileInfo> newProfiles = new LinkedList<>();
-            for (User friend: friends)
-                profiles.add(userService.findProfileInfoByUser(friend));
+                sizeOfFriends = newProfiles.size();
+                allFriendProfiles = newProfiles;
 
-            for (ProfileInfo profile: profiles){
-                if (pattern.matcher( profile.getSurname() + " " + profile.getName()).find())
-                    newProfiles.add(profile);
-            for (User friend: friends){
-                ProfileInfo element = userService.findProfileInfoByUser(friend);
-                if (pattern.matcher( element.getSurname()+ " " + element.getName()).find())
-                    newProfiles.add(element);
-            }
-
-            sizeOfFriends = newProfiles.size();
-            allFriendProfiles = newProfiles;
-
-            for (int i = (page - 1) * length; i < page * length && i < newProfiles.size(); i++)
-            {
-                profiles.add(profileToJson(newProfiles.get(i)));
-                allImages.put(newProfiles.get(i).getUser().getUsername(), imageRepository.findImageByUserAndIsPreview(
-                        newProfiles.get(i).getUser(), true) != null ?
-                        imageRepository.findImageByUserAndIsPreview(newProfiles.get(i).getUser(), true).getId() : -1);
-            }
+                for (int i = (page - 1) * length; i < page * length && i < newProfiles.size(); i++)
+                {
+                    profiles.add(profileToJson(newProfiles.get(i)));
+                    allImages.put(newProfiles.get(i).getUser().getUsername(), newProfiles.get(i).getUser().getImage() != null ?
+                            newProfiles.get(i).getUser().getImage().getId() : -1);
+                }
         }
 
         response.append("friendProfiles", profiles);
@@ -301,7 +293,7 @@ public class FriendService {
             response.append("showFriends", true);
 
         response = findStrangersProfilesByUsernameSecond(response, username, searchLine, page,allFriendProfiles,
-         length - profiles.size(), length, sizeOfFriends, allImages);
+                length - profiles.size(), length, sizeOfFriends, allImages);
 
         return response;
     }
@@ -320,11 +312,6 @@ public class FriendService {
         int sizeOfStrangers;
         List<ProfileInfo> allProfiles = allProfileInfos(searchLine);;
         List<ProfileInfo> profilesNew = new LinkedList<>();
-        profiles = allProfileInfos(searchLine);
-        User user=userService.findUserByUsername(username);
-        profilesOfFriends.add(profileInfoRepository.findProfileInfoByUser(user));
-
-        for (ProfileInfo profile: profiles)
         List<JSONObject> profilesReceived = new LinkedList<>();
         List<JSONObject> profiles = new LinkedList<>();
 
@@ -338,15 +325,15 @@ public class FriendService {
             for (int i = page == 1 ? 0 : ((page - 1) * length - profilesOfFriends.size()); i < page * length && i < profilesNew.size() && profiles.size() < size && i > -1; i++) {
                 if (!isInviteRecieved(profilesNew.get(i).getUser().getUsername())){
                     profiles.add(profileToJson(profilesNew.get(i)));
-                    allImages.put(profilesNew.get(i).getUser().getUsername(), imageRepository.findImageByUserAndIsPreview(profilesNew.get(i).getUser(), true) != null ?
-                            imageRepository.findImageByUserAndIsPreview(profilesNew.get(i).getUser(), true).getId() : -1);
+                    allImages.put(profilesNew.get(i).getUser().getUsername(), profilesNew.get(i).getUser().getImage() != null ?
+                            profilesNew.get(i).getUser().getImage().getId() : -1);
                 }
             }
             for (int i = 0; i < profilesNew.size() && profilesReceived.size() < 5; i++) {
                 if (isInviteRecieved(profilesNew.get(i).getUser().getUsername())){
                     profilesReceived.add(profileToJson(profilesNew.get(i)));
-                    allImages.put(profilesNew.get(i).getUser().getUsername(), imageRepository.findImageByUserAndIsPreview(profilesNew.get(i).getUser(), true) != null ?
-                            imageRepository.findImageByUserAndIsPreview(profilesNew.get(i).getUser(), true).getId() : -1);
+                    allImages.put(profilesNew.get(i).getUser().getUsername(), profilesNew.get(i).getUser().getImage()!= null ?
+                            profilesNew.get(i).getUser().getImage().getId() : -1);
                 }
             }
 
@@ -354,15 +341,15 @@ public class FriendService {
             for (int i = page == 1 ? 0 : (page * length - profilesOfFriends.size()); i < page * length && i < profilesNew.size() && profiles.size() < size && i > -1; i++)
                 if (!isInviteRecieved(username)) {
                     profiles.add(profileToJson(profilesNew.get(i)));
-                    allImages.put(profilesNew.get(i).getUser().getUsername(), imageRepository.findImageByUserAndIsPreview(profilesNew.get(i).getUser(), true) != null ?
-                            imageRepository.findImageByUserAndIsPreview(profilesNew.get(i).getUser(), true).getId() : -1);
+                    allImages.put(profilesNew.get(i).getUser().getUsername(), profilesNew.get(i).getUser().getImage() != null ?
+                            profilesNew.get(i).getUser().getImage().getId() : -1);
                 }
 
             for (int i = 0; i < profilesNew.size() && profilesReceived.size() < 5; i++) {
                 if (isInviteRecieved(profilesNew.get(i).getUser().getUsername())){
                     profilesReceived.add(profileToJson(profilesNew.get(i)));
-                    allImages.put(profilesNew.get(i).getUser().getUsername(), imageRepository.findImageByUserAndIsPreview(profilesNew.get(i).getUser(), true) != null ?
-                            imageRepository.findImageByUserAndIsPreview(profilesNew.get(i).getUser(), true).getId() : -1);
+                    allImages.put(profilesNew.get(i).getUser().getUsername(), profilesNew.get(i).getUser().getImage() != null ?
+                            profilesNew.get(i).getUser().getImage().getId() : -1);
                 }
             }
         }
