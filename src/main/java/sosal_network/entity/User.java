@@ -54,7 +54,7 @@ public class User implements UserDetails {
      * подтвержденный пароль пользователя
      **/
     @Transient
-    @NotBlank(message = "Поле не может быть пустым")
+//    @NotBlank(message = "Поле не может быть пустым")
     private String passwordConfirm;
 
     /**
@@ -91,8 +91,9 @@ public class User implements UserDetails {
 //    private Set<User> friends = new HashSet<>();
 
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, orphanRemoval = true)
-    private List<Image> images = new ArrayList<>();
+    @OneToOne(targetEntity = Image.class,cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    @JoinColumn(name = "image_id", referencedColumnName = "id")
+    private Image image;
 
 
     /**
@@ -112,9 +113,9 @@ public class User implements UserDetails {
                 .format(this.registrationDate);
     }
 
-    public void addImageToUser(Image image) {
-        images.add(image);
-    }
+//    public void addImageToUser(Image image) {
+//        images.add(image);
+//    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

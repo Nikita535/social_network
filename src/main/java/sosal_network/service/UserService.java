@@ -121,7 +121,7 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public void save(User user) {
-        userRepository.save(user);
+        userRepository.saveAndFlush(user);
     }
 
     /**
@@ -135,10 +135,15 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
-    public ProfileInfo findByUser_Username(String username) {
-        return profileInfoRepository.findByUser_Username(username);
+    public ProfileInfo findProfileInfoByUser(User user) {
+        return profileInfoRepository.findProfileInfoByUser(user);
     }
 
+    @Transactional
+    public ProfileInfo findByUser(User user)
+    {
+        return profileInfoRepository.findProfileInfoByUser(user);
+    }
     /**
      * Метод сохранения пользователя в БД
      * param User user - пользователь
@@ -327,7 +332,7 @@ public class UserService implements UserDetailsService {
 
     public String editProfile(ProfileInfo editedProfile, String dateOfBirth, RedirectAttributes redirectAttributes,
                               User user) {
-        ProfileInfo profileSession = findByUser_Username(user.getUsername());
+        ProfileInfo profileSession = findProfileInfoByUser(user);
         if (!dateOfBirth.isEmpty()) {
             LocalDate changedDate = LocalDate.parse(dateOfBirth, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
             editedProfile.setDateOfBirth(changedDate);

@@ -26,12 +26,6 @@ public class ProfileEditController {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private ProfileInfoRepository profileInfoService;
-
-    @Autowired
-    private ImageService imageService;
-
     /**
      * Get контроллер для страницы редактирования профиля пользователя
      * param model - модель для добавления атрибутов на текущую страницу
@@ -40,9 +34,8 @@ public class ProfileEditController {
     @GetMapping("/edit")
     public String getEditProfile(Model model, @AuthenticationPrincipal User userFromSession) {
         model.addAttribute("editedProfileInfo", new ProfileInfo());
-        model.addAttribute("user", userFromSession);
-        model.addAttribute("profileInfo", userService.findByUser_Username(userFromSession.getUsername()));
-        model.addAttribute("avatar",imageService.findImageByUserAndIsPreview( userFromSession,true));
+        model.addAttribute("user", userService.findUserByUsername(userFromSession.getUsername()));
+        model.addAttribute("profileInfo", userService.findProfileInfoByUser(userFromSession));
         return "profileEdit";
     }
 
@@ -57,9 +50,8 @@ public class ProfileEditController {
                                     @AuthenticationPrincipal User user){
         if (bindingResult.hasErrors())
         {
-            model.addAttribute("user", user);
-            model.addAttribute("profileInfo", userService.findByUser_Username(user.getUsername()));
-            model.addAttribute("avatar",imageService.findImageByUserAndIsPreview( user,true));
+            model.addAttribute("user", userService.findUserByUsername(user.getUsername()));
+            model.addAttribute("profileInfo", userService.findProfileInfoByUser(user));
             return "profileEdit";
         }
         return userService.editProfile(editedProfile, dateOfBirth, redirectAttributes, user);
@@ -68,7 +60,7 @@ public class ProfileEditController {
     @PostMapping("/edit/photo")
     public String changePhoto(RedirectAttributes redirectAttributes, @RequestParam("file") MultipartFile file,
                               @AuthenticationPrincipal User user) throws IOException {
-        return userService.changePhoto(redirectAttributes, file, user);
+        return userService.changePhoto(redirectAttributes, file, userService.findUserByUsername(user.getUsername()));
     }
 
 

@@ -31,7 +31,9 @@ public class FriendListController {
 
     @GetMapping("/user/{username}/friendList/{page}")
     public String getFriendList(Model model, @PathVariable Optional<String> username,
+                                @PathVariable Optional<String> page,
                                 @ModelAttribute("searchLine") String searchLine, @AuthenticationPrincipal User user){
+
 
         if (username.isEmpty()) {
             return "/error";
@@ -42,7 +44,7 @@ public class FriendListController {
         model.addAttribute("searchLine", searchLine);
         model.addAttribute("friendService", friendService);
         model.addAttribute("user", userService.findUserByUsername(username.get()));
-        model.addAttribute("profileInfo", userService.findByUser_Username(username.get()));
+        model.addAttribute("profileInfo", userService.findProfileInfoByUser(user));
         model.addAttribute("friends",friendService.getAcceptedFriends(username.get()));
         model.addAttribute("isFriend",friendService.isFriends(username.get()));
         model.addAttribute("friendAccepted",friendService.checkFriendStatus(username.get()));

@@ -265,10 +265,17 @@ public class FriendService {
 
             sizeOfFriends = friends.size();
             for (User friend : friends)
-                allFriendProfiles.add(userService.findByUser_Username(friend.getUsername()));
+                allFriendProfiles.add(userService.findProfileInfoByUser(friend));
         }else {
             Pattern pattern = Pattern.compile(searchLine);
+
             List<ProfileInfo> newProfiles = new LinkedList<>();
+            for (User friend: friends)
+                profiles.add(userService.findProfileInfoByUser(friend));
+
+            for (ProfileInfo profile: profiles){
+                if (pattern.matcher( profile.getSurname() + " " + profile.getName()).find())
+                    newProfiles.add(profile);
             for (User friend: friends){
                 ProfileInfo element = userService.findByUser_Username(friend.getUsername());
                 if (pattern.matcher( element.getSurname()+ " " + element.getName()).find())
@@ -314,6 +321,11 @@ public class FriendService {
         int sizeOfStrangers;
         List<ProfileInfo> allProfiles = allProfileInfos(searchLine);;
         List<ProfileInfo> profilesNew = new LinkedList<>();
+        profiles = allProfileInfos(searchLine);
+        User user=userService.findUserByUsername(username);
+        profilesOfFriends.add(profileInfoRepository.findProfileInfoByUser(user));
+
+        for (ProfileInfo profile: profiles)
         List<JSONObject> profilesReceived = new LinkedList<>();
         List<JSONObject> profiles = new LinkedList<>();
 

@@ -33,20 +33,18 @@ public class Image {
     @Lob
     private byte[] bytes;
 
-    private boolean isPreview = false;
 
 
-    @ManyToOne(targetEntity = User.class, fetch = FetchType.EAGER)
-    @JoinColumn(nullable = false, name = "user_id")
+    @OneToOne(targetEntity = User.class, cascade = {CascadeType.MERGE}, fetch = FetchType.EAGER,orphanRemoval = false)
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
-    public Image(String name, String originalFileName, Long size, String contentType, byte[] bytes, User user,boolean isPreview) {
+    public Image(String name, String originalFileName, Long size, String contentType, byte[] bytes, User user) {
         this.name = name;
         this.originalFileName = originalFileName;
         this.size = size;
         this.contentType = contentType;
         this.bytes = bytes;
         this.user = user;
-        this.isPreview=isPreview;
     }
 }
