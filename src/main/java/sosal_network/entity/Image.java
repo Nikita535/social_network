@@ -1,5 +1,6 @@
 package sosal_network.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,6 +32,7 @@ public class Image {
     private String contentType;
 
     @Lob
+    @JsonIgnore
     private byte[] bytes;
 
 

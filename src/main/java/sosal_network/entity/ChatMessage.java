@@ -1,6 +1,7 @@
 package sosal_network.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
 import javax.persistence.*;
@@ -27,5 +28,6 @@ public class ChatMessage {
 
     private String content;
 
+    @JsonFormat(pattern="dd/MM/yyyy HH:mm")
     private LocalDateTime time;
 }

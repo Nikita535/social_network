@@ -1,10 +1,11 @@
 package sosal_network.entity;
 
 
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.json.JSONPropertyIgnore;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import sosal_network.Enum.Role;
@@ -37,8 +38,8 @@ public class User implements UserDetails {
      * имя пользователя
      **/
     @NotBlank(message = "Поле не может быть пустым")
-    @Size(min = 3,message = "Никнейм не может содержать менее 3-ёх символов")
-    @Size(max = 20,message = "Слишком длинный никнейм")
+    @Size(min = 3, message = "Никнейм не может содержать менее 3-ёх символов")
+    @Size(max = 20, message = "Слишком длинный никнейм")
     private String username;
 //    /** фамилия пользователя  **/
 //    private String userSurname;
@@ -47,7 +48,7 @@ public class User implements UserDetails {
      * пароль пользователя
      **/
     @NotBlank(message = "Поле не может быть пустым")
-    @Size(min = 5,message = "Пароль не может состоять менее чем из 5ти символов")
+    @Size(min = 5, message = "Пароль не может состоять менее чем из 5ти символов")
     private String password;
 
     /**
@@ -91,7 +92,7 @@ public class User implements UserDetails {
 //    private Set<User> friends = new HashSet<>();
 
 
-    @OneToOne(targetEntity = Image.class,cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    @OneToOne(targetEntity = Image.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "image_id", referencedColumnName = "id")
     private Image image;
 
@@ -118,6 +119,7 @@ public class User implements UserDetails {
 //    }
 
     @Override
+    @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles;
     }

@@ -59,24 +59,23 @@ public class ChatController {
     }
 
     @GetMapping("/chat/{username}")
-    public String getChat1(Model model, @PathVariable String username, @AuthenticationPrincipal User authentificatedUser){
-        model.addAttribute("profileInfo", userService.findProfileInfoByUser(authentificatedUser));
-        model.addAttribute("friends",friendService.getAcceptedFriends(authentificatedUser.getUsername()));
+    public String getChat1(Model model, @PathVariable String username, @AuthenticationPrincipal User authenticatedUser){
+        model.addAttribute("profileInfo", userService.findProfileInfoByUser(authenticatedUser));
+        model.addAttribute("friends",friendService.getAcceptedFriends(authenticatedUser.getUsername()));
         model.addAttribute("userService", userService);
 
         User friend = userRepository.findByUsername(username);
-        model.addAttribute("user", userService.findUserByUsername(authentificatedUser.getUsername()));
+        model.addAttribute("user", userService.findUserByUsername(authenticatedUser.getUsername()));
         model.addAttribute("userTo", friend);
-        model.addAttribute("allMessages", chatMessageService.showAllMessages(authentificatedUser, friend));
+        model.addAttribute("userToProfile",userService.findProfileInfoByUser(friend));
+        model.addAttribute("allMessages", chatMessageService.showAllMessages(authenticatedUser, friend));
         return "messages";
     }
 
 
     @MessageMapping("/chat.send/{id1}/{id2}")
     @SendTo("/topic/{id1}/{id2}")
-    public ChatMessage sendMessage(@Payload final ChatMessage chatMessage, @DestinationVariable long id1,@DestinationVariable long id2){
-        chatMessage.setUserFrom(userRepository.findUserById(id1));
-        chatMessage.setUserTo(userRepository.findUserById(id2));
+    public ChatMessage sendMessage(@Payload final ChatMessage chatMessage){
         messageRepository.save(chatMessage);
         return chatMessage;
     }

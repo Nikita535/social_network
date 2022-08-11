@@ -135,90 +135,67 @@
                     </div>
 
                     <div class="ms-body" id="chat" th:if="${userTo} != null">
-<!--                        <div class="action-header clearfix">-->
+                        <div class="action-header clearfix">
 <!--                            <div class="visible-xs" id="ms-menu-trigger">-->
 <!--                                <i class="fa fa-bars"></i>-->
 <!--                            </div>-->
 
-<!--                            <div class="pull-left hidden-xs">-->
-<!--                                <img src="https://bootdey.com/img/Content/avatar/avatar2.png" alt="" class="img-avatar m-r-10">-->
-<!--                                <div class="lv-avatar pull-left">-->
+                            <div class="pull-left hidden-xs">
+                                <img th:src="${userTo.image!=null ?
+                                     '/image/' +  userTo.image.getId():
+                                'https://bootdey.com/img/Content/avatar/avatar6.png'}" alt="" class="img-avatar m-r-10">
+                                <div class="lv-avatar pull-left">
 
-<!--                                </div>-->
-<!--                                <span>David Parbell</span>-->
-<!--                            </div>-->
-
-<!--                            <ul class="ah-actions actions">-->
-<!--                                <li>-->
-<!--                                    <a href="">-->
-<!--                                        <i class="fa fa-trash"></i>-->
-<!--                                    </a>-->
-<!--                                </li>-->
-<!--                                <li>-->
-<!--                                    <a href="">-->
-<!--                                        <i class="fa fa-check"></i>-->
-<!--                                    </a>-->
-<!--                                </li>-->
-<!--                                <li>-->
-<!--                                    <a href="">-->
-<!--                                        <i class="fa fa-clock-o"></i>-->
-<!--                                    </a>-->
-<!--                                </li>-->
-<!--                                <li class="dropdown">-->
-<!--                                    <a href="" data-toggle="dropdown" aria-expanded="true">-->
-<!--                                        <i class="fa fa-sort"></i>-->
-<!--                                    </a>-->
-
-<!--                                    <ul class="dropdown-menu dropdown-menu-right">-->
-<!--                                        <li>-->
-<!--                                            <a href="">Latest</a>-->
-<!--                                        </li>-->
-<!--                                        <li>-->
-<!--                                            <a href="">Oldest</a>-->
-<!--                                        </li>-->
-<!--                                    </ul>-->
-<!--                                </li>-->
-<!--                                <li class="dropdown">-->
-<!--                                    <a href="" data-toggle="dropdown" aria-expanded="true">-->
-<!--                                        <i class="fa fa-bars"></i>-->
-<!--                                    </a>-->
-
-<!--                                    <ul class="dropdown-menu dropdown-menu-right">-->
-<!--                                        <li>-->
-<!--                                            <a href="">Refresh</a>-->
-<!--                                        </li>-->
-<!--                                        <li>-->
-<!--                                            <a href="">Message Settings</a>-->
-<!--                                        </li>-->
-<!--                                    </ul>-->
-<!--                                </li>-->
-<!--                            </ul>-->
-<!--                        </div>-->
-
-                        <div class="message-feed media">
-                            <div class="pull-left">
-                                <img src="https://bootdey.com/img/Content/avatar/avatar1.png" alt="" class="img-avatar">
-                            </div>
-                            <div class="media-body">
-                                <div class="mf-content">
-                                    Quisque consequat arcu eget odio cursus, ut tempor arcu vestibulum. Etiam ex arcu, porta a urna non, lacinia pellentesque orci. Proin semper sagittis erat, eget condimentum sapien viverra et. Mauris volutpat magna nibh, et condimentum est rutrum a. Nunc sed turpis mi. In eu massa a sem pulvinar lobortis.
                                 </div>
-                                <small class="mf-date"><i class="fa fa-clock-o"></i> 20/02/2015 at 09:00</small>
+                                <span th:text="${userToProfile.name + ' '+userToProfile.surname }">David Parbell</span>
                             </div>
-                        </div>
 
-                        <div class="message-feed right">
-                            <div class="pull-right">
-                                <img src="https://bootdey.com/img/Content/avatar/avatar2.png" alt="" class="img-avatar">
-                            </div>
-                            <div class="media-body">
-                                <div class="mf-content">
-                                    Mauris volutpat magna nibh, et condimentum est rutrum a. Nunc sed turpis mi. In eu massa a sem pulvinar lobortis.
-                                </div>
-                                <small class="mf-date"><i class="fa fa-clock-o"></i> 20/02/2015 at 09:30</small>
-                            </div>
-                        </div>
+                            <ul class="ah-actions actions">
+                                <li>
+                                    <a href="">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="">
+                                        <i class="fa fa-check"></i>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="">
+                                        <i class="fa fa-clock-o"></i>
+                                    </a>
+                                </li>
+                                <li class="dropdown">
+                                    <a href="" data-toggle="dropdown" aria-expanded="true">
+                                        <i class="fa fa-sort"></i>
+                                    </a>
 
+                                    <ul class="dropdown-menu dropdown-menu-right">
+                                        <li>
+                                            <a href="">Latest</a>
+                                        </li>
+                                        <li>
+                                            <a href="">Oldest</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li class="dropdown">
+                                    <a href="" data-toggle="dropdown" aria-expanded="true">
+                                        <i class="fa fa-bars"></i>
+                                    </a>
+
+                                    <ul class="dropdown-menu dropdown-menu-right">
+                                        <li>
+                                            <a href="">Refresh</a>
+                                        </li>
+                                        <li>
+                                            <a href="">Message Settings</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
 
 
                         <form class="msb-reply" id="message-controls">
