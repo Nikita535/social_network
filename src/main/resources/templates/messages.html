@@ -48,16 +48,6 @@
                                 </a>
 
                             </div>
-                            <script th:inline="javascript">
-                                window.isFriend = /*[[${isFriend}]]*/ 'false';
-                                window.friendAccepted = /*[[${friendAccepted}]]*/ 'false';
-                                window.isInviteSend = /*[[${isInviteSend}]]*/ 'false';
-                                window.isInviteRecieved = /*[[${isInviteRecieved}]]*/ 'false';
-                                window.usernameOfSession = /*[[${#authentication.getPrincipal().username}]]*/ '';
-                                window.usernameOfPage = /*[[${user.username}]]*/ '';
-                            </script>
-
-                            <script src="/profile/profileInfoFlow.js"></script>
                         </div>
 
                     </div>
@@ -127,10 +117,8 @@
             <div class="container bootstrap snippets bootdey">
                 <div class="tile tile-alt" id="messages-main">
                     <div class="ms-menu">
-
                         <div class="list-group lg-alt" th:each="friend:${friends}">
-                            <a class="list-group-item media" th:href="@{/messages/${friend.getUsername()}}">
-
+                            <a class="list-group-item media" th:href="@{/chat/} + ${friend.getUsername()}">
 
                                 <div class="lv-avatar pull-left">
                                     <img class="img-avatar mr-2" th:src="${friend.getImage()!=null ?
@@ -145,66 +133,66 @@
                         </div>
                     </div>
 
-                    <div class="ms-body">
-                        <div class="action-header clearfix">
-                            <div class="visible-xs" id="ms-menu-trigger">
-                                <i class="fa fa-bars"></i>
-                            </div>
+                    <div class="ms-body" id="chat" th:if="${userTo} != null">
+<!--                        <div class="action-header clearfix">-->
+<!--                            <div class="visible-xs" id="ms-menu-trigger">-->
+<!--                                <i class="fa fa-bars"></i>-->
+<!--                            </div>-->
 
-                            <div class="pull-left hidden-xs">
-                                <img src="https://bootdey.com/img/Content/avatar/avatar2.png" alt="" class="img-avatar m-r-10">
-                                <div class="lv-avatar pull-left">
+<!--                            <div class="pull-left hidden-xs">-->
+<!--                                <img src="https://bootdey.com/img/Content/avatar/avatar2.png" alt="" class="img-avatar m-r-10">-->
+<!--                                <div class="lv-avatar pull-left">-->
 
-                                </div>
-                                <span>David Parbell</span>
-                            </div>
+<!--                                </div>-->
+<!--                                <span>David Parbell</span>-->
+<!--                            </div>-->
 
-                            <ul class="ah-actions actions">
-                                <li>
-                                    <a href="">
-                                        <i class="fa fa-trash"></i>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="">
-                                        <i class="fa fa-check"></i>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="">
-                                        <i class="fa fa-clock-o"></i>
-                                    </a>
-                                </li>
-                                <li class="dropdown">
-                                    <a href="" data-toggle="dropdown" aria-expanded="true">
-                                        <i class="fa fa-sort"></i>
-                                    </a>
+<!--                            <ul class="ah-actions actions">-->
+<!--                                <li>-->
+<!--                                    <a href="">-->
+<!--                                        <i class="fa fa-trash"></i>-->
+<!--                                    </a>-->
+<!--                                </li>-->
+<!--                                <li>-->
+<!--                                    <a href="">-->
+<!--                                        <i class="fa fa-check"></i>-->
+<!--                                    </a>-->
+<!--                                </li>-->
+<!--                                <li>-->
+<!--                                    <a href="">-->
+<!--                                        <i class="fa fa-clock-o"></i>-->
+<!--                                    </a>-->
+<!--                                </li>-->
+<!--                                <li class="dropdown">-->
+<!--                                    <a href="" data-toggle="dropdown" aria-expanded="true">-->
+<!--                                        <i class="fa fa-sort"></i>-->
+<!--                                    </a>-->
 
-                                    <ul class="dropdown-menu dropdown-menu-right">
-                                        <li>
-                                            <a href="">Latest</a>
-                                        </li>
-                                        <li>
-                                            <a href="">Oldest</a>
-                                        </li>
-                                    </ul>
-                                </li>
-                                <li class="dropdown">
-                                    <a href="" data-toggle="dropdown" aria-expanded="true">
-                                        <i class="fa fa-bars"></i>
-                                    </a>
+<!--                                    <ul class="dropdown-menu dropdown-menu-right">-->
+<!--                                        <li>-->
+<!--                                            <a href="">Latest</a>-->
+<!--                                        </li>-->
+<!--                                        <li>-->
+<!--                                            <a href="">Oldest</a>-->
+<!--                                        </li>-->
+<!--                                    </ul>-->
+<!--                                </li>-->
+<!--                                <li class="dropdown">-->
+<!--                                    <a href="" data-toggle="dropdown" aria-expanded="true">-->
+<!--                                        <i class="fa fa-bars"></i>-->
+<!--                                    </a>-->
 
-                                    <ul class="dropdown-menu dropdown-menu-right">
-                                        <li>
-                                            <a href="">Refresh</a>
-                                        </li>
-                                        <li>
-                                            <a href="">Message Settings</a>
-                                        </li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </div>
+<!--                                    <ul class="dropdown-menu dropdown-menu-right">-->
+<!--                                        <li>-->
+<!--                                            <a href="">Refresh</a>-->
+<!--                                        </li>-->
+<!--                                        <li>-->
+<!--                                            <a href="">Message Settings</a>-->
+<!--                                        </li>-->
+<!--                                    </ul>-->
+<!--                                </li>-->
+<!--                            </ul>-->
+<!--                        </div>-->
 
                         <div class="message-feed media">
                             <div class="pull-left">
@@ -230,47 +218,19 @@
                             </div>
                         </div>
 
-                        <div class="message-feed media">
-                            <div class="pull-left">
-                                <img src="https://bootdey.com/img/Content/avatar/avatar1.png" alt="" class="img-avatar">
-                            </div>
-                            <div class="media-body">
-                                <div class="mf-content">
-                                    Etiam ex arcumentum
-                                </div>
-                                <small class="mf-date"><i class="fa fa-clock-o"></i> 20/02/2015 at 09:33</small>
-                            </div>
-                        </div>
 
-                        <div class="message-feed right">
-                            <div class="pull-right">
-                                <img src="https://bootdey.com/img/Content/avatar/avatar2.png" alt="" class="img-avatar">
-                            </div>
-                            <div class="media-body">
-                                <div class="mf-content">
-                                    Etiam nec facilisis lacus. Nulla imperdiet augue ullamcorper dui ullamcorper, eu laoreet sem consectetur. Aenean et ligula risus. Praesent sed posuere sem. Cum sociis natoque penatibus et magnis dis parturient montes,
-                                </div>
-                                <small class="mf-date"><i class="fa fa-clock-o"></i> 20/02/2015 at 10:10</small>
-                            </div>
-                        </div>
-
-                        <div class="message-feed media">
-                            <div class="pull-left mr-3">
-                                <img src="https://bootdey.com/img/Content/avatar/avatar1.png" alt="" class="img-avatar">
-                            </div>
-                            <div class="media-body">
-                                <div class="mf-content">
-                                    Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Etiam ac tortor ut elit sodales varius. Mauris id ipsum id mauris malesuada tincidunt. Vestibulum elit massa, pulvinar at sapien sed, luctus vestibulum eros. Etiam finibus tristique ante, vitae rhoncus sapien volutpat eget
-                                </div>
-                                <small class="mf-date"><i class="fa fa-clock-o"></i> 20/02/2015 at 10:24</small>
-                            </div>
-                        </div>
 
                         <div class="msb-reply">
                             <textarea placeholder="What's on your mind..."></textarea>
                             <button><i class="fa fa-paper-plane-o"></i></button>
                         </div>
                     </div>
+                    <div class="ms-body" th:if="${userTo} == null">
+                        <div>
+                            Выберите диалог
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
@@ -279,6 +239,11 @@
     </div>
 </div>
 
+<script th:inline="javascript">
+    var userFrom= [[${user}]];
+    var userTo= [[${userTo}]];
+    var allMessages = [[${allMessages}]];
+</script>
 <script src="/message/message.js"></script>
 
 <section class="error-404-section section-padding" th:if="${#authentication.getPrincipal().getActive()==false or profileInfo==null }">

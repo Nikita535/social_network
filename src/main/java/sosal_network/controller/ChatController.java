@@ -53,23 +53,21 @@ public class ChatController {
         model.addAttribute("user", userService.findUserByUsername(authentificatedUser.getUsername()));
         model.addAttribute("profileInfo", userService.findProfileInfoByUser(authentificatedUser));
         model.addAttribute("friends",friendService.getAcceptedFriends(authentificatedUser.getUsername()));
-
-        model.addAttribute("isFriend",friendService.isFriends(authentificatedUser.getUsername()));
-        model.addAttribute("friendAccepted",friendService.checkFriendStatus(authentificatedUser.getUsername()));
-        model.addAttribute("isInviteRecieved",friendService.isInviteRecieved(authentificatedUser.getUsername()));
-        model.addAttribute("isInviteSend",friendService.isInviteSend(authentificatedUser.getUsername()));
         model.addAttribute("userService", userService);
-
         return "messages";
     }
 
-    @GetMapping("/messages/{username}")
-    public String getChat1(Model model, @PathVariable String username, @AuthenticationPrincipal User user){
+    @GetMapping("/chat/{username}")
+    public String getChat1(Model model, @PathVariable String username, @AuthenticationPrincipal User authentificatedUser){
+        model.addAttribute("profileInfo", userService.findProfileInfoByUser(authentificatedUser));
+        model.addAttribute("friends",friendService.getAcceptedFriends(authentificatedUser.getUsername()));
+        model.addAttribute("userService", userService);
+
         User friend = userRepository.findByUsername(username);
-        model.addAttribute("userFrom", user);
+        model.addAttribute("user", userService.findUserByUsername(authentificatedUser.getUsername()));
         model.addAttribute("userTo", friend);
-        model.addAttribute("allMessages", chatMessageService.showAllMessages(user, friend));
-        return "index";
+        model.addAttribute("allMessages", chatMessageService.showAllMessages(authentificatedUser, friend));
+        return "messages";
     }
 
 
