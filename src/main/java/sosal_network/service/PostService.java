@@ -5,18 +5,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import sosal_network.entity.Image;
 import sosal_network.entity.Post;
 import sosal_network.entity.PostImage;
 import sosal_network.entity.User;
-import sosal_network.repository.ImageRepository;
 import sosal_network.repository.PostImageRepository;
 import sosal_network.repository.PostRepository;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -41,7 +37,7 @@ public class PostService {
         post.setUser(user);
         postRepository.save(post);
         if (!files.isEmpty()) {
-            List<PostImage> postImages = imageService.convertPostImages(files, user, post);
+            List<PostImage> postImages = imageService.convertPostImages(files, post);
             postImageRepository.saveAll(postImages);
         }
     }

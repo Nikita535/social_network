@@ -4,55 +4,52 @@ let stompClient
 let username
 
 $(function () {
+    connect()
     for (let i = 0; i < allMessages.length; i++)
         createMessageLine(allMessages[i]);
 })
 
 
 function createMessageLine(message){
-    const chatCard = document.createElement('div')
-    chatCard.className = 'card-body'
 
     const flexBox = document.createElement('div')
-
-
+    flexBox.classList.add('message-feed')
 
     const messageElement = document.createElement('div')
-    messageElement.className = 'msg_container_send'
+    messageElement.className = 'media-body'
 
+    const messageText =document.createElement('div')
+    messageText.className='mf-content'
+    messageText.innerText=message["content"]
 
-    messageElement.classList.add('chat-message')
+    const date = document.createElement('small')
+    date.className='mf-date'
 
-    const avatarContainer = document.createElement('div')
-    avatarContainer.className = 'img_cont_msg'
-    const avatarElement = document.createElement('div')
-    avatarElement.className = 'circle user_img_msg'
-    const avatarText = document.createTextNode(message.userFrom["username"][0])
-    avatarElement.appendChild(avatarText);
-    avatarElement.style['background-color'] = getAvatarColor(message.userFrom["username"][0])
-    avatarContainer.appendChild(avatarElement)
+    const clock = document.createElement('i')
+    clock.classList.add('fa fa-clock-o')
 
-    messageElement.style['background-color'] = getAvatarColor(message.userFrom["username"][0])
+    date.appendChild(clock)
+    date.innerText=message["time"]
 
-    flexBox.appendChild(avatarContainer)
+    messageElement.appendChild(messageText,date)
+
+    const avatarContainer=document.createElement('div')
+    const avatar =document.createElement('img')
+    avatar.className='img-avatar'
+    var source = userFrom["image"]!=null ? '/image/' +
+        userFrom["image"]["id"] : 'https://bootdey.com/img/Content/avatar/avatar6.png';
+    avatar.src=source
+
 
     if (message["userFrom"].id === userFrom.id) {
-        flexBox.className = 'd-flex justify-content-end mb-4'
-        messageElement.classList.add("mr-2")
-        flexBox.appendChild(messageElement)
-        flexBox.appendChild(avatarContainer)
+        flexBox.classList.add('media')
+        avatarContainer.classList.add('pull-left')
     }
     else {
-        flexBox.className = 'd-flex justify-content-start mb-4'
-        messageElement.classList.add("ml-2");
-        flexBox.appendChild(avatarContainer)
-        flexBox.appendChild(messageElement)
+        flexBox.classList.add('right')
+        avatarContainer.classList.add('pull-right')
     }
-
-    chatCard.appendChild(flexBox)
-
-
-    messageElement.innerHTML = message.content
+    flexBox.appendChild(avatarContainer,messageElement)
 
     const chat = document.querySelector('#chat')
     chat.appendChild(flexBox)
@@ -62,14 +59,8 @@ function createMessageLine(message){
 
 const connect = (event) => {
     username = userFrom["username"];
-
+    console.log(username)
     if (username) {
-        const login = document.querySelector('#login')
-        login.classList.add('hide')
-
-        const chatPage = document.querySelector('#chat-page')
-        chatPage.classList.remove('hide')
-
         const socket = new SockJS('/chat-example')
         stompClient = Stomp.over(socket)
         stompClient.connect({}, onConnected, onError)
@@ -78,16 +69,16 @@ const connect = (event) => {
 }
 
 const onConnected = () => {
+    console.log("dada")
     if (userFrom["id"] < userTo["id"])
         stompClient.subscribe('/topic/' + userFrom["id"] + "/" + userTo["id"], onMessageReceived)
+
     else
         stompClient.subscribe('/topic/' + userTo["id"] + "/" + userFrom["id"], onMessageReceived)
     //stompClient.send("/app/chat.newUser",
     //    {},
     //    JSON.stringify({sender: username})
     //)
-    const status = document.querySelector('#status')
-    status.className = 'hide'
 }
 
 const onError = (error) => {
@@ -102,8 +93,8 @@ const sendMessage = (event) => {
 
     if (messageContent && stompClient) {
         const chatMessage = {
-            userFrom: userFrom,
-            userTo: userTo,
+            userFrom: null,
+            userTo: null,
             content: messageInput.value,
             time: new Date()
         }
@@ -122,22 +113,7 @@ const onMessageReceived = (payload) => {
     createMessageLine(message);
 }
 
-const hashCode = (str) => {
-    let hash = 0
-    for (let i = 0; i < str.length; i++) {
-        hash = str.charCodeAt(i) + ((hash << 5) - hash)
-    }
-    return hash
-}
 
 
-const getAvatarColor = (messageSender) => {
-    const colours = ['#2196F3', '#32c787', '#1BC6B4', '#A1B4C4']
-    const index = Math.abs(hashCode(messageSender) % colours.length)
-    return colours[index]
-}
-
-const loginForm = document.querySelector('#login-form')
-loginForm.addEventListener('submit', connect, true)
 const messageControls = document.querySelector('#message-controls')
 messageControls.addEventListener('submit', sendMessage, true)

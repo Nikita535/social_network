@@ -35,16 +35,16 @@ public class Image {
 
 
 
-    @OneToOne(targetEntity = User.class, cascade = {CascadeType.MERGE}, fetch = FetchType.EAGER,orphanRemoval = false)
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
-    private User user;
+//    @OneToOne(targetEntity = User.class, cascade = {CascadeType.MERGE}, fetch = FetchType.EAGER,orphanRemoval = false)
+//    @JoinColumn(name = "user_id", referencedColumnName = "id")
+//    private User user;
 
-    public Image(String name, String originalFileName, Long size, String contentType, byte[] bytes, User user) {
+    public Image(String name, String originalFileName, Long size, String contentType, byte[] bytes) {
         this.name = name;
         this.originalFileName = originalFileName;
         this.size = size;
         this.contentType = contentType;
         this.bytes = bytes;
-        this.user = user;
     }
+
 }

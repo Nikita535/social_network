@@ -21,10 +21,10 @@ public class ImageService {
     @Autowired
     private ImageRepository imageRepository;
 
-    public List<PostImage> convertPostImages(List<MultipartFile> files, User user, Post post) {
+    public List<PostImage> convertPostImages(List<MultipartFile> files, Post post) {
         return files.stream().map(file -> {
             try {
-                Image image = toImageEntity(file, user);
+                Image image = toImageEntity(file);
                 imageRepository.save(image);
                 return new PostImage(post, image);
             } catch (IOException e) {
@@ -33,9 +33,9 @@ public class ImageService {
         }).collect(Collectors.toList());
     }
 
-    public Image toImageEntity(MultipartFile file, User user )throws IOException {
+    public Image toImageEntity(MultipartFile file )throws IOException {
         return new Image(file.getName(), file.getOriginalFilename(), file.getSize(), file.getContentType(),
-                file.getBytes(), user);
+                file.getBytes());
     }
 
 
@@ -43,12 +43,12 @@ public class ImageService {
         if (file.getSize() != 0) {
             if (user.getImage() != null) {
                 Image oldImage =user.getImage();
-                Image img = toImageEntity(file, user);
+                Image img = toImageEntity(file);
                 user.setImage(img);
                 userService.save(user);
                 imageRepository.deleteById(oldImage.getId());
             } else {
-                user.setImage(toImageEntity(file, user));
+                user.setImage(toImageEntity(file));
                 userService.save(user);
             }
         }

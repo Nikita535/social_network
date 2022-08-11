@@ -2,6 +2,7 @@ package sosal_network.controller;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -73,7 +74,9 @@ public class ChatController {
 
     @MessageMapping("/chat.send/{id1}/{id2}")
     @SendTo("/topic/{id1}/{id2}")
-    public ChatMessage sendMessage(@Payload final ChatMessage chatMessage){
+    public ChatMessage sendMessage(@Payload final ChatMessage chatMessage, @DestinationVariable long id1,@DestinationVariable long id2){
+        chatMessage.setUserFrom(userRepository.findUserById(id1));
+        chatMessage.setUserTo(userRepository.findUserById(id2));
         messageRepository.save(chatMessage);
         return chatMessage;
     }
