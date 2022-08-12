@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.json.JSONPropertyIgnore;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import sosal_network.Enum.Role;
@@ -41,21 +40,21 @@ public class User implements UserDetails {
     @Size(min = 3, message = "Никнейм не может содержать менее 3-ёх символов")
     @Size(max = 20, message = "Слишком длинный никнейм")
     private String username;
-//    /** фамилия пользователя  **/
-//    private String userSurname;
 
     /**
      * пароль пользователя
      **/
+
     @NotBlank(message = "Поле не может быть пустым")
     @Size(min = 5, message = "Пароль не может состоять менее чем из 5ти символов")
+    @JsonIgnore
     private String password;
 
     /**
      * подтвержденный пароль пользователя
      **/
     @Transient
-//    @NotBlank(message = "Поле не может быть пустым")
+    @JsonIgnore
     private String passwordConfirm;
 
     /**
@@ -68,6 +67,7 @@ public class User implements UserDetails {
     /**
      * активность пользователя
      **/
+    @JsonIgnore
     private Boolean active;
 
     /**
@@ -82,18 +82,14 @@ public class User implements UserDetails {
     @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
     @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))
     @Enumerated(EnumType.STRING)
+    @JsonIgnore
     private Set<Role> roles = new HashSet<>();
 
-//    /**
-//     * Соединение таблиц пользователя с друзьями
-//     * author - Nikita
-//     **/
-//    @ManyToMany(fetch = FetchType.EAGER, cascade=CascadeType.ALL)
-//    private Set<User> friends = new HashSet<>();
 
 
     @OneToOne(targetEntity = Image.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "image_id", referencedColumnName = "id")
+    @JsonIgnore
     private Image image;
 
 
@@ -114,9 +110,6 @@ public class User implements UserDetails {
                 .format(this.registrationDate);
     }
 
-//    public void addImageToUser(Image image) {
-//        images.add(image);
-//    }
 
     @Override
     @JsonIgnore
@@ -125,31 +118,30 @@ public class User implements UserDetails {
     }
 
     @Override
-    public String getPassword() {
-        return this.password;
-    }
-
-    @Override
     public String getUsername() {
         return this.username;
     }
 
     @Override
+    @JsonIgnore
     public boolean isAccountNonExpired() {
         return true;
     }
 
     @Override
+    @JsonIgnore
     public boolean isAccountNonLocked() {
         return true;
     }
 
     @Override
+    @JsonIgnore
     public boolean isCredentialsNonExpired() {
         return true;
     }
 
     @Override
+    @JsonIgnore
     public boolean isEnabled() {
         return true;
     }

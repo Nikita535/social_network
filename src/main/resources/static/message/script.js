@@ -26,12 +26,8 @@ function createMessageLine(message) {
     const clock = document.createElement('i')
     clock.classList.add('fa', 'fa-clock-o')
 
-    // const dateTime=document.createElement('p')
-    // dateTime.innerText=message.time
     clock.innerText = message.time
-    console.log(clock)
     date.appendChild(clock)
-    // date.appendChild(dateTime)
 
 
     messageElement.appendChild(messageText)
@@ -90,22 +86,29 @@ const onConnected = () => {
 }
 
 const onError = (error) => {
-    const status = document.querySelector('#status')
-    status.innerHTML = 'Could not find the connection you were looking for. Move along. Or, Refresh the page!'
-    status.style.color = 'red'
+    console.log(error)
 }
 
 const sendMessage = (event) => {
     const messageInput = document.querySelector('#message')
     const messageContent = messageInput.value.trim();
+    let d = new Date();
+    let ye = new Intl.DateTimeFormat('ru', { year: 'numeric' }).format(d);
+    let mo = new Intl.DateTimeFormat('ru', { month: '2-digit' }).format(d);
+    let da = new Intl.DateTimeFormat('ru', { day: '2-digit' }).format(d);
+    let time = new Intl.DateTimeFormat('ru',
+        {hour: "numeric",
+                minute:"numeric",
+    }).format(d)
 
+    console.log(`${da}/${mo}/${ye} ${time}`)
 
     if (messageContent && stompClient) {
         const chatMessage = {
             userFrom: userFrom,
             userTo: userTo,
             content: messageInput.value,
-            time: new Date()
+            time: `${da}/${mo}/${ye} ${time}`
         }
         if (userFrom["id"] < userTo["id"])
             stompClient.send("/app/chat.send/" + userFrom["id"] + "/" + userTo["id"], {}, JSON.stringify(chatMessage))
