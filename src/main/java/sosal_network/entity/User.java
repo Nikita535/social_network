@@ -89,7 +89,6 @@ public class User implements UserDetails {
 
     @OneToOne(targetEntity = Image.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "image_id", referencedColumnName = "id")
-    @JsonIgnore
     private Image image;
 
 
