@@ -1,6 +1,7 @@
 package sosal_network.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -19,6 +20,7 @@ public class PostImage {
 
     @ManyToOne( targetEntity = Post.class,fetch = FetchType.EAGER)
     @JoinColumn(name = "post_id")
+    @JsonIgnore
     private Post post;
 
     @OneToOne(targetEntity = Image.class,fetch = FetchType.EAGER)

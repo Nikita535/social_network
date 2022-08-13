@@ -1,5 +1,6 @@
 package sosal_network.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,7 +16,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name="posts")
+@Table(name = "posts")
 public class Post {
 
     @Id
@@ -31,8 +32,11 @@ public class Post {
     private User user;
 
 
-    @OneToMany(mappedBy = "post",fetch = FetchType.EAGER,orphanRemoval = true)
-    List<PostImage> images=new ArrayList<>();
+    @OneToMany(mappedBy = "post", fetch = FetchType.EAGER, orphanRemoval = true)
+    List<PostImage> images = new ArrayList<>();
+
+    @Transient
+    private String fromNow;
 
     public Post(LocalDateTime dateOfCreate, String full_text, User user) {
         this.dateOfCreate = dateOfCreate;

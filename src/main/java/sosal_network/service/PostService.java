@@ -3,6 +3,8 @@ package sosal_network.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import sosal_network.entity.Post;
@@ -36,7 +38,7 @@ public class PostService {
         post.setDateOfCreate(LocalDateTime.now());
         post.setUser(user);
         postRepository.save(post);
-        if (!files.isEmpty()) {
+        if (!files.isEmpty() && !files.get(0).isEmpty()) {
             List<PostImage> postImages = imageService.convertPostImages(files, post);
             postImageRepository.saveAll(postImages);
         }
@@ -44,6 +46,17 @@ public class PostService {
 
     public List<Post> showPost(User user) {
         return postRepository.findPostsByUser(user).stream().sorted(Comparator.comparing(Post::getDateOfCreate).reversed()).collect(Collectors.toList());
+    }
+
+    public List<Post> showLast5Posts(User user)
+    {
+        return postRepository.findLast5ByUser(user);
+    }
+
+    public List<Post> showLastPosts(User user,int page)
+    {
+        Pageable pageable=PageRequest.of(page,5);
+        return postRepository.findAllByUserOrderByIdDesc(user,pageable).stream().peek(p->p.setFromNow(showTimeAgo(p))).collect(Collectors.toList());
     }
 
     public String showTimeAgo(Post post) {

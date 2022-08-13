@@ -71,8 +71,7 @@ public class UserController {
         model.addAttribute("isInviteRecieved",friendService.isInviteRecieved(username.get()));
         model.addAttribute("isInviteSend",friendService.isInviteSend(username.get()));
         model.addAttribute("post",new Post());
-        model.addAttribute("posts",postService.showPost(currentUser));
-//        model.addAttribute("avatar",imageService.findImageByUserAndIsPreview( userService.findUserByUsername(username.get()),true));
+        model.addAttribute("posts",postService.showLastPosts(currentUser,0));
         return "index";
 
     }
