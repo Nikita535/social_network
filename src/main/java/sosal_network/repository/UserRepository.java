@@ -4,6 +4,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import sosal_network.entity.User;
 
+import java.util.List;
+
 /**
  * Class UserRepository - класс для основных действий с БД
  **/
@@ -25,4 +27,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     User findUserById(Long id);
     void deleteUserByUsername(String username);
+
+    List<User> findUserBy();
 }

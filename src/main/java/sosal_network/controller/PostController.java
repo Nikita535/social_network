@@ -23,6 +23,10 @@ public class PostController {
 
     @PostMapping("/post")
     public String addPost(@RequestParam("imageList") List<MultipartFile> files,@ModelAttribute("post") Post post,   @AuthenticationPrincipal User user) {
+        if (user.isBanStatus()) {
+            return "banError";
+        }
+
         postService.savePost(files,post, user);
         return "redirect:/";
     }

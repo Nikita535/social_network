@@ -39,8 +39,12 @@ public class AdminInitService implements CommandLineRunner {
         User admin = new User("ADMIN", password, password, "victor.hodinsciy.com@gmail.com");
         admin.getRoles().add(Role.ROLE_ADMIN);
         admin.setActive(true);
+        admin.setBanStatus(false);
         if (userRepository.findByUsername("ADMIN") == null) {
             userRepository.save(admin);
+            ProfileInfo profileInfoAdmin=new ProfileInfo(admin,"ADMIN","ADMIN","Москва",
+                    LocalDate.now(),"","");
+            profileInfoRepository.save(profileInfoAdmin);
         }
 
          //40 пользователей

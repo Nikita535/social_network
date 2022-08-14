@@ -38,10 +38,7 @@ import javax.mail.MessagingException;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 
 /**
@@ -161,6 +158,7 @@ public class UserService implements UserDetailsService {
         user.setRoles(Collections.singleton(Role.ROLE_USER));
         user.setActive(true);
         user.setRegistrationDate(LocalDate.now());
+        user.setBanStatus(false);
         save(user);
 
 
@@ -182,7 +180,7 @@ public class UserService implements UserDetailsService {
             bindingResult.addError(new FieldError("user", "passwordConfirm", "Пароли не совпадают"));
             log.warn("error confirm pass");
         }
-        if (findUserByUsername(user.getUsername()) != null) {
+        if (findUserByUsername(user.getUsername())!= null) {
 //            model.addAttribute("usernameError", "Пользователь с таким никнеймом уже существует");
             bindingResult.addError(new FieldError("user", "username", "Пользователь с таким никнеймом уже существует"));
             log.warn("error user already exists");
@@ -212,7 +210,7 @@ public class UserService implements UserDetailsService {
      * author - Nikita, Renat
      **/
     @Transactional
-    public void activateUser(String code) {
+    public void activateUser(String code){
         User user = activationTokenRepository.findByToken(code).getUser();
         if (user == null) {
             return;
@@ -401,5 +399,11 @@ public class UserService implements UserDetailsService {
         return response.isSuccess();
     }
 
+    public List<User> showAllUser() {
+        return userRepository.findUserBy();
+    }
 
+    public Boolean checkRole(User user){
+        return user.getRoles().contains(Role.ROLE_ADMIN);
+    }
 }

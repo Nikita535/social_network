@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import sosal_network.Enum.Role;
 import sosal_network.entity.Post;
 import sosal_network.entity.User;
 import sosal_network.service.FriendService;
@@ -62,6 +63,11 @@ public class UserController {
         if (userService.findUserByUsername(username.get()) == null) {
             return "error-404";
         }
+
+        if (authentificatedUser.isBanStatus()) {
+            return "banError";
+        }
+
         User currentUser=userService.findUserByUsername(username.get());
         model.addAttribute("user", userService.findUserByUsername(username.get()));
         model.addAttribute("profileInfo", userService.findProfileInfoByUser(currentUser));
@@ -72,6 +78,7 @@ public class UserController {
         model.addAttribute("isInviteSend",friendService.isInviteSend(username.get()));
         model.addAttribute("post",new Post());
         model.addAttribute("posts",postService.showLastPosts(currentUser,0));
+        model.addAttribute("ADMIN", Role.ROLE_ADMIN);
         return "index";
 
     }
@@ -81,6 +88,9 @@ public class UserController {
                              @RequestParam(value = "where", required = false) String where) {
         if (authentificatedUser == null && (username.isEmpty()) || Objects.equals(userService.findUserByUsername(username.get()).getUsername(), userService.getUserAuth().getUsername())) {
             return "/error";
+        }
+        if (authentificatedUser.isBanStatus()) {
+            return "banError";
         }
         return friendService.sendInvite(username.get(), where);
     }
@@ -99,6 +109,10 @@ public class UserController {
                                @RequestParam(value="where", required = false) String where) {
         if (authentificatedUser == null && (username.isEmpty()) || Objects.equals(userService.findUserByUsername(username.get()).getUsername(), userService.getUserAuth().getUsername())) {
             return "/error";
+        }
+
+        if (authentificatedUser.isBanStatus()) {
+            return "banError";
         }
         return friendService.deleteFriend(username.get(), where);
     }

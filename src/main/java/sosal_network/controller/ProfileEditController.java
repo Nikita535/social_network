@@ -33,6 +33,11 @@ public class ProfileEditController {
      **/
     @GetMapping("/edit")
     public String getEditProfile(Model model, @AuthenticationPrincipal User userFromSession) {
+
+        if (userFromSession.isBanStatus()) {
+            return "banError";
+        }
+
         model.addAttribute("editedProfileInfo", new ProfileInfo());
         model.addAttribute("user", userService.findUserByUsername(userFromSession.getUsername()));
         model.addAttribute("profileInfo", userService.findProfileInfoByUser(userFromSession));
