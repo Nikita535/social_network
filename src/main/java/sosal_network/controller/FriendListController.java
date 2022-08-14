@@ -33,7 +33,7 @@ public class FriendListController {
     public String getFriendList(Model model, @PathVariable Optional<String> username,
                                 @PathVariable Optional<String> page,
                                 @ModelAttribute("searchLine") String searchLine, @AuthenticationPrincipal User user){
-        if (userService.findUserByUsername(username.toString()).isBanStatus()) {
+        if (userService.findUserByUsername(username.get()).isBanStatus()) {
             return "banError";
         }
 
