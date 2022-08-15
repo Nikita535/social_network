@@ -24,6 +24,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import sosal_network.Enum.Role;
+import sosal_network.aop.LoggableBeforeMethod.LoggableBeforeMethod;
 import sosal_network.entity.ActivationToken;
 import sosal_network.entity.PasswordResetToken;
 import sosal_network.entity.ProfileInfo;
@@ -95,6 +96,7 @@ public class UserService implements UserDetailsService {
      **/
     @Override
     @Transactional
+    @LoggableBeforeMethod
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username);
 

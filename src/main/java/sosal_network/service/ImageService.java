@@ -9,6 +9,8 @@ import sosal_network.entity.PostImage;
 import sosal_network.entity.User;
 import sosal_network.repository.ImageRepository;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -53,5 +55,4 @@ public class ImageService {
             }
         }
     }
-
 }

@@ -63,6 +63,9 @@ dependencies {
 	// websocket
 	implementation 'org.springframework.boot:spring-boot-starter-websocket'
 
+	//aop
+	implementation 'org.springframework:spring-aop:5.3.22'
+
 
 
 }
