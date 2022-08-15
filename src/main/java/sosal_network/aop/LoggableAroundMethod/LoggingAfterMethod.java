@@ -33,7 +33,7 @@ public class LoggingAfterMethod {
     public void logMethodCallAfter(JoinPoint joinPoint,Object returnValue){
         StringBuilder message = new StringBuilder("Method: ");
         message.append(joinPoint.getSignature().getName()).append(" !");
-        message.append("return: ").append(returnValue);
+        message.append("return: ").append(returnValue.toString());
 
         log.info(message.toString());
     }

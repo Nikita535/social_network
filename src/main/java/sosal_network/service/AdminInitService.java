@@ -5,6 +5,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import sosal_network.Enum.Role;
+import sosal_network.aop.LoggableAroundMethod.Loggable;
 import sosal_network.entity.ProfileInfo;
 import sosal_network.entity.User;
 import sosal_network.repository.ProfileInfoRepository;
@@ -25,6 +26,7 @@ public class AdminInitService implements CommandLineRunner {
     @Autowired
     private ProfileInfoRepository profileInfoRepository;
 
+
     public AdminInitService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder,
                             UserService userService, ProfileInfoRepository profileInfoRepository) {
         this.userRepository = userRepository;
@@ -34,6 +36,7 @@ public class AdminInitService implements CommandLineRunner {
     }
 
     @Override
+    @Loggable
     public void run(String... args) throws Exception {
         String password = bCryptPasswordEncoder.encode("ADMIN");
         User admin = new User("ADMIN", password, password, "victor.hodinsciy.com@gmail.com");

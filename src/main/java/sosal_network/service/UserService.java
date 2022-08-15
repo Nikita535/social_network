@@ -24,7 +24,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import sosal_network.Enum.Role;
-import sosal_network.aop.LoggableBeforeMethod.LoggableBeforeMethod;
+import sosal_network.aop.LoggableAroundMethod.Loggable;
 import sosal_network.entity.ActivationToken;
 import sosal_network.entity.PasswordResetToken;
 import sosal_network.entity.ProfileInfo;
@@ -96,7 +96,7 @@ public class UserService implements UserDetailsService {
      **/
     @Override
     @Transactional
-    @LoggableBeforeMethod
+    @Loggable
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username);
 
@@ -114,11 +114,13 @@ public class UserService implements UserDetailsService {
      * author - Nikita
      **/
     @Transactional
+    @Loggable
     public User findUserByUsername(String username) {
         return userRepository.findByUsername(username);
     }
 
     @Transactional
+    @Loggable
     public void save(User user) {
         userRepository.saveAndFlush(user);
     }
@@ -129,16 +131,19 @@ public class UserService implements UserDetailsService {
      * author - Renat
      **/
     @Transactional
+    @Loggable
     public User findUserByEmail(String email) {
         return userRepository.findByUserEmail(email);
     }
 
     @Transactional
+    @Loggable
     public ProfileInfo findProfileInfoByUser(User user) {
         return profileInfoRepository.findProfileInfoByUser(user);
     }
 
     @Transactional
+    @Loggable
     public ProfileInfo findByUser(User user)
     {
         return profileInfoRepository.findProfileInfoByUser(user);
@@ -148,6 +153,7 @@ public class UserService implements UserDetailsService {
      * param User user - пользователь
      * author - Nikita and Nekit
      **/
+    @Loggable
     @Transactional
     public boolean saveUser(User user) throws MessagingException {
         User userFromDB = userRepository.findByUsername(user.getUsername());
@@ -175,6 +181,7 @@ public class UserService implements UserDetailsService {
      * param redirectAttributes - модель для добавления атрибутов на переадресованную страницу
      * author - Nikita, Nekit, Renat
      **/
+    @Loggable
     public String validateRegister(User user, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
 
         if (!Objects.equals(user.getPassword(), user.getPasswordConfirm())) {
@@ -211,6 +218,7 @@ public class UserService implements UserDetailsService {
      * param code - токен активации
      * author - Nikita, Renat
      **/
+    @Loggable
     @Transactional
     public void activateUser(String code){
         User user = activationTokenRepository.findByToken(code).getUser();
@@ -227,6 +235,7 @@ public class UserService implements UserDetailsService {
      * param userEmail - почта пользователя
      * author - Nikita, Renat
      **/
+    @Loggable
     public void createActivationCode(String userEmail) throws MessagingException {
         User user = findUserByEmail(userEmail);
         String token = UUID.randomUUID().toString();
@@ -245,6 +254,7 @@ public class UserService implements UserDetailsService {
      * param userEmail - почта пользователя
      * author - Renat, Nekit
      **/
+    @Loggable
     public void createPasswordResetTokenForUser(String userEmail) throws MessagingException {
         User user = findUserByEmail(userEmail);
         String token = UUID.randomUUID().toString();
@@ -265,6 +275,7 @@ public class UserService implements UserDetailsService {
      * param userPasswordConfirm - подтверждение пароля
      * author - Renat, Nekit
      **/
+    @Loggable
     @Transactional
     public String changePasswordByToken(String token, String userPassword, String userPasswordConfirm,
                                         RedirectAttributes redirectAttributes) {
@@ -302,6 +313,7 @@ public class UserService implements UserDetailsService {
      * param username - имя пользователя
      * author - Nekit
      **/
+    @Loggable
     @Transactional
     public String addProfileInfo(ProfileInfo profileInfo, RedirectAttributes redirectAttributes, User user, String dateOfBirth, SessionStatus status) {
         try {
@@ -323,13 +335,14 @@ public class UserService implements UserDetailsService {
      * Метод для получения информации о пользователе из сессии
      * author - Nekit
      **/
+    @Loggable
     @Transactional
     public User getUserAuth() {
 
         return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
-
+    @Loggable
     public String editProfile(ProfileInfo editedProfile, String dateOfBirth, RedirectAttributes redirectAttributes,
                               User user) {
         ProfileInfo profileSession = findProfileInfoByUser(user);
@@ -345,6 +358,7 @@ public class UserService implements UserDetailsService {
         return "redirect:/edit";
     }
 
+    @Loggable
     public String changePhoto(RedirectAttributes redirectAttributes,
                               MultipartFile file, User user) throws IOException {
         imageService.saveImage(file, user);
@@ -352,6 +366,7 @@ public class UserService implements UserDetailsService {
         return "redirect:/edit";
     }
 
+    @Loggable
     public String changePassword(User user, String currentPassword, String newPassword,
                                  String passwordConfirm, RedirectAttributes redirectAttributes) {
         if (!Objects.equals(currentPassword, "") && !Objects.equals(newPassword, "")
@@ -377,6 +392,7 @@ public class UserService implements UserDetailsService {
     }
 
 
+    @Loggable
     public static boolean verifyReCAPTCHA(String gRecaptchaResponse, String recaptchaSecret, String recaptchaURL, RestTemplate restTemplate) {
         HttpHeaders headers = new org.springframework.http.HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -401,10 +417,12 @@ public class UserService implements UserDetailsService {
         return response.isSuccess();
     }
 
+    @Loggable
     public List<User> showAllUser() {
         return userRepository.findUserBy();
     }
 
+    @Loggable
     public Boolean checkRole(User user){
         return user.getRoles().contains(Role.ROLE_ADMIN);
     }
