@@ -1,4 +1,4 @@
-package sosal_network.aop.LoggableAfterMethod;
+package sosal_network.aop.TrackExecutionTime;
 
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -10,9 +10,9 @@ import org.springframework.stereotype.Component;
 @Aspect
 @Component
 @Slf4j
-public class LoggingAroundMethod {
+public class TrackExecutionTimeImpl {
 
-    @Pointcut("@annotation(LoggableAroundMethod)")
+    @Pointcut("@annotation(sosal_network.aop.TrackExecutionTime.TrackExecutionTime)")
     public void executeLogging(){}
 
 
