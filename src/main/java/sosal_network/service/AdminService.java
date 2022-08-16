@@ -81,13 +81,12 @@ public class AdminService {
     @Loggable
     public void checkBanTime(String banTime,String username) throws MessagingException {
         int timeOfBan =Integer.parseInt(banTime);
-        switch (Integer.parseInt(banTime)){
-            case (0):
-                banUser(username);
-                log.info("ban for inf");
-            default:
-                banUserForTimer(username,timeOfBan);
-                log.info("ban for "+timeOfBan);
+        if (Integer.parseInt(banTime) == 0) {
+            banUser(username);
+            log.info("ban for inf");
+        }else {
+            banUserForTimer(username, timeOfBan);
+            log.info("ban for " + timeOfBan);
         }
     }
 
