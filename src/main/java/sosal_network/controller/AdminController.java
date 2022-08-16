@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import sosal_network.Enum.Role;
 import sosal_network.entity.User;
+import sosal_network.service.AdminService;
 import sosal_network.service.UserService;
 
 import javax.mail.MessagingException;
@@ -24,6 +25,8 @@ public class AdminController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    AdminService adminService;
 
     @GetMapping("/admin")
     public String admin(Model model){
@@ -33,21 +36,15 @@ public class AdminController {
         return "admin";
     }
 
-    @GetMapping("/ban_{username}")
-    public String ban(@PathVariable String username, Model model) throws MessagingException {
-        User user = userService.findUserByUsername(username);
-        if(!user.getRoles().contains(Role.ROLE_ADMIN)) {
-            user.setBanStatus(true);
-            userService.saveUser(user);
-        }
+    @GetMapping("/ban_{username}_{banTime}")
+    public String ban(@PathVariable String username,@PathVariable String banTime, Model model) throws MessagingException {
+        adminService.checkBanTime(banTime,username);
         return "redirect:/admin";
     }
 
     @GetMapping("/unban_{username}")
     public String unban(@PathVariable String username) throws MessagingException {
-        User user = userService.findUserByUsername(username);
-        user.setBanStatus(false);
-        userService.saveUser(user);
+        adminService.unBanUser(username);
         return "redirect:/admin";
     }
 }
