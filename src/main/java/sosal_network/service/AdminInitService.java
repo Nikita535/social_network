@@ -51,15 +51,15 @@ public class AdminInitService implements CommandLineRunner {
         }
 
          //40 пользователей
-        for(int i = 0; i < 40; i++) {
-            User user= new User("renat0" + i, password, password, "victor." + i + "@gmail.com");
-            user.getRoles().add(Role.ROLE_USER);
-            userRepository.save(user);
-            ProfileInfo profileInfo = new ProfileInfo(user, "Ренат" + i, "Хакимов" + i, "город" + i,
-                    LocalDate.of(2020, 1, 8), "das", "Dsa");
-            profileInfoRepository.save(profileInfo);
-        }
-        System.out.println(admin.getRoles().toArray()[0].toString().getClass());
+//        for(int i = 0; i < 40; i++) {
+//            User user= new User("renat0" + i, password, password, "victor." + i + "@gmail.com");
+//            user.getRoles().add(Role.ROLE_USER);
+//            userRepository.save(user);
+//            ProfileInfo profileInfo = new ProfileInfo(user, "Ренат" + i, "Хакимов" + i, "город" + i,
+//                    LocalDate.of(2020, 1, 8), "das", "Dsa");
+//            profileInfoRepository.save(profileInfo);
+//        }
+//        System.out.println(admin.getRoles().toArray()[0].toString().getClass());
     }
 
 
