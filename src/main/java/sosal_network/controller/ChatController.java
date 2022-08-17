@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import sosal_network.Enum.InviteStatus;
 import sosal_network.entity.ChatMessage;
 import sosal_network.entity.User;
 import sosal_network.repository.MessageRepository;
@@ -45,8 +46,6 @@ public class ChatController {
 
     @GetMapping("/messages")
     public String getChat(Model model, @AuthenticationPrincipal User authentificatedUser) {
-
-        List<User> friends = friendService.getAcceptedFriends(authentificatedUser.getUsername());
 
         model.addAttribute("user", userService.findUserByUsername(authentificatedUser.getUsername()));
         model.addAttribute("profileInfo", userService.findProfileInfoByUser(authentificatedUser));

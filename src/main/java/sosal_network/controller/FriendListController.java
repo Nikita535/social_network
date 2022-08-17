@@ -1,6 +1,7 @@
 package sosal_network.controller;
 
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import sosal_network.Enum.InviteStatus;
 import sosal_network.entity.ProfileInfo;
 import sosal_network.entity.User;
 import sosal_network.service.FriendService;
@@ -56,21 +58,15 @@ public class FriendListController {
 
     @RequestMapping(value = "/user/{username}/reloadFriendList/{page}", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<String> processReloadData(@RequestBody String body,
-                                                    @PathVariable Optional<String> username,
-                                                    @PathVariable Optional<String> page) {
+    public List<Object> processReloadData(@RequestBody String body,
+                                          @PathVariable Optional<String> username,
+                                          @PathVariable Optional<Integer> page) {
 
-        int sizeOfPage = 10;
         JSONObject request = new JSONObject(body);
-        String searchLine = friendService.clearSearchLine(request.getString("searchLine"));
+        String searchLine = friendService.clearSearchLine(request.getString("searchLine")).
+                replaceAll("[\s]{2,}", " ").trim();
 
-        JSONObject response = new JSONObject();
-
-        response = friendService.generateModelOfFriendList(response, username.get(), searchLine, page.get(), sizeOfPage);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Type", "application/json; charset=utf-8");
-        return new ResponseEntity<String>(response.toString(),
-                headers, HttpStatus.OK);
+        return friendService.findFriendsAndStrangers(username.get(),
+                searchLine, page.get());
     }
 }

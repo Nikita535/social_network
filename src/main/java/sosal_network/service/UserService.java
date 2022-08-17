@@ -3,6 +3,9 @@ package sosal_network.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -38,10 +41,7 @@ import javax.mail.MessagingException;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 
 /**
@@ -315,8 +315,34 @@ public class UserService implements UserDetailsService {
             status.setComplete();
             return "redirect:/login";
         } catch (Exception e) {
-            return "redirect:/register";
+            log.error(e.toString());
+            redirectAttributes.addFlashAttribute("user", user);
+            return "redirect:/registerContinue";
         }
+    }
+
+    @Transactional
+    public Page<ProfileInfo> findProfileInfosByUsers(List<User> users, int page)
+    {
+        return profileInfoRepository.findProfileInfosByUsers(users, PageRequest.of( page, 5));
+    }
+
+    @Transactional
+    public Page<ProfileInfo> findProfileInfosByUsersWithSearch(List<User> users, String searchLine, int page)
+    {
+        return profileInfoRepository.findProfileInfosByUsersWithSearch(users, searchLine, PageRequest.of( page, 5));
+    }
+
+    @Transactional
+    public List<ProfileInfo> findStrangerProfileInfosByUsers(List<User> users, int page)
+    {
+        return profileInfoRepository.findStrangerProfileInfosByUsers(users, PageRequest.of( page, 5));
+    }
+
+    @Transactional
+    public List<ProfileInfo> findStrangerProfileInfosByUsersWithSearch(List<User> users, String searchLine, int page)
+    {
+        return profileInfoRepository.findStrangerProfileInfosByUsersWithSearch(users, searchLine, PageRequest.of( page, 5));
     }
 
     /**

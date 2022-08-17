@@ -1,26 +1,29 @@
 let $name=document.getElementById("friendLists");
 let $receivedList=document.getElementById("receivedList");
 var currentLocation = document.location.protocol + "//" + document.location.host;
-var userNameOfPage = window.userNameOfPage;
-var searchLine = window.searchLine;
 var jsonDataOfThePage;
 var profilesOfStrangers;
 var friendProfiles;
+var isInviteSendStrangers;
+var maxPages;
+var page = 0;
+var value = ""
+var isLoading = false;
+
+// cut down
 var profilesChecked;
 var showFriends;
 var ShowStrangers;
-var maxPages;
 var errorNoSuchFriends;
 var errorNoSuchStrangers;
 var profilesOfReceivedStrangers;
 var allImages;
-var page = 1;
 
 
 // ПОИСК ПО ПОЛЬЗОВАТЕЛЯМ
 function addSearchButton($mainObj){
     $mainObj.innerHTML += "<div class=\"input-group\">\n" +
-        "                                    <input id=\"searchLine\" class=\"form-control rounded\" placeholder=\"Search\" aria-label=\"Search\" aria-describedby=\"search-addon\" />\n" +
+        "                                    <input id=\"searchLine\" value='" + value + "' class=\"form-control rounded\" placeholder=\"Search\" aria-label=\"Search\" aria-describedby=\"search-addon\" />\n" +
         "                                    <button onclick='toSearch()' class=\"btn btn-outline-primary\">Искать</button>\n" +
         "                                </div>";
 
@@ -28,11 +31,11 @@ function addSearchButton($mainObj){
 }
 
 function toSearch(){
-    const value = document.getElementById("searchLine").value;
+    value = document.getElementById("searchLine").value;
     $name.innerHTML = "";
-    page = 1;
+    page = 0;
     addSearchButton($name);
-    reloadData(page, value);
+    reloadData(page);
 }
 
 
@@ -167,33 +170,33 @@ function addReceivedPerson(person){
 
 // ФУНКЦИЯ ДОБАВЛЕНИЯ 1 БЛОКА USER
 function addPerson(person, isStranger=false, isSend = true, fromRight = false){
-    var source;
+    let source;
     if (fromRight === false)
-        source = allImages[0][person["username"][0]]!==-1 ? '/image/' +
-                allImages[0][person["username"][0]] : 'https://bootdey.com/img/Content/avatar/avatar6.png';
+        source = person["user"]["image"] != null ? '/image/' +
+            person["user"]["image"]["id"] : 'https://bootdey.com/img/Content/avatar/avatar6.png';
     else
         source = person["images"][0];
     const personContainer = document.createElement('div');
     personContainer.classList.add("nearby-user")
-    personContainer.innerHTML += "<div class=\"row " + person["username"][0] + "\">\n" +
+    personContainer.innerHTML += "<div class=\"row " + person["user"]["username"] + "\">\n" +
         "                                        <div class=\"col-md-2 col-sm-2\">\n" +
         "                                            <img src=\"" + source + "\"\n" +
         "                                                 alt=\"user\" class=\"profile-photo-lg\">\n" +
         "                                        </div>\n" +
         "                                        <div class=\"col-md-7 col-sm-7\">\n" +
-        "                                            <h5><a href=\" " + '/user/' + person["username"][0] + " \" class=\"profile-link\">" + person["surname"][0] + " " + person["name"][0] + "</a></h5>\n" +
-        "                                            <p class=\"text-muted\">" + person["city"][0] + "</p>\n" +
+        "                                            <h5><a href=\" " + '/user/' + person["user"]["username"] + " \" class=\"profile-link\">" + person["surname"] + " " + person["name"] + "</a></h5>\n" +
+        "                                            <p class=\"text-muted\">" + person["city"] + "</p>\n" +
         "                                        </div>\n" +
         "                                    </div>\n";
 
     if (isStranger === false) {
-        personContainer.querySelector("." + person["username"][0]).appendChild(deleteButton(person["username"][0]));
-        document.getElementById("friendStatusText").insertAdjacentElement('afterEnd', personContainer);
+        personContainer.querySelector("." + person["user"]["username"]).appendChild(deleteButton(person["user"]["username"]));
+        $name.appendChild(personContainer);
     }else if (isSend === false){
-        personContainer.querySelector("." + person["username"][0]).appendChild(sendButton(person["username"][0]));
+        personContainer.querySelector("." + person["user"]["username"]).appendChild(sendButton(person["user"]["username"]));
         $name.appendChild(personContainer);}
     else {
-        personContainer.querySelector("." + person["username"][0]).appendChild(alreadySendButton(person["username"][0]));
+        personContainer.querySelector("." + person["user"]["username"]).appendChild(alreadySendButton(person["user"]["username"]));
         $name.appendChild(personContainer);
     }
 }
@@ -211,23 +214,13 @@ function createAjaxQuery(url, toFunction)
 }
 
 
-var successHandler = function( data, textStatus, jqXHR ) {
+var successHandler = function( data ) {
     jsonDataOfThePage = data;
-    friendProfiles = data["friendProfiles"];
-    profilesOfStrangers = data["profilesOfStrangers"];
-    allImages = data["allImages"];
-
-    profilesChecked = data["profilesChecked"];
-    showFriends = data["showFriends"];
-    ShowStrangers = data["ShowStrangers"];
-    maxPages = data["pages"];
-    errorNoSuchFriends = data["errorNoSuchFriends"];
-    errorNoSuchStrangers = data["errorNoSuchStrangers"];
+    console.log(data);
+    friendProfiles = data["0"];
+    profilesOfStrangers = data["1"];
+    isInviteSendStrangers = data["2"];
     addAllPeople();
-    if (typeof profilesOfReceivedStrangers === "undefined") {
-        profilesOfReceivedStrangers = data["profilesOfReceivedStrangers"]
-        addAllInvites();
-    }
 };
 
 function addAllInvites(){
@@ -238,30 +231,22 @@ function addAllInvites(){
 
 function addAllPeople(){
 
-    //if (showFriends != null && showFriends[0] === true)
     if (document.getElementById("friendStatusText") === null) {
         $name.appendChild(document.createElement('br'))
         $name.appendChild(createTextUnderPerson("Друзья", "friendStatusText"));
     }
 
-    //if (errorNoSuchFriends != null && errorNoSuchFriends[0] === true)
-    //    $name.appendChild(createErrorUnderPerson("Таких друзей нет"));
-
-    if (friendProfiles != null)
-        for (let i = 0; i < friendProfiles[0].length; i++)
-            addPerson(friendProfiles[0][i]);
+    for (let i = 0; i < friendProfiles.length; i++)
+        addPerson(friendProfiles[i]);
 
 
-
-    //if (ShowStrangers != null && ShowStrangers[0] === true)
-    if (document.getElementById("strangeStatusText") === null)
+    if (profilesOfStrangers.length !== 0 && document.getElementById("strangeStatusText") === null)
         $name.appendChild(createTextUnderPerson("Возможные друзья", "strangeStatusText"));
-    //if (errorNoSuchStrangers != null && errorNoSuchStrangers[0] === true)
-    //    $name.appendChild(createErrorUnderPerson("Таких незнакомцев нет"));
 
-    if (profilesOfStrangers != null)
-        for (let i = 0; i < profilesOfStrangers[0].length; i++)
-            addPerson(profilesOfStrangers[0][i], true, profilesChecked[0][i]);
+    for (let i = 0; i < profilesOfStrangers.length; i++)
+        addPerson(profilesOfStrangers[i], true, isInviteSendStrangers[i]);
+
+    isLoading = false;
 }
 
 function createTextUnderPerson(text, id){
@@ -273,22 +258,13 @@ function createTextUnderPerson(text, id){
     return friendContainer;
 }
 
-function createErrorUnderPerson(text){
-    const friendContainer = document.createElement('div');
-    friendContainer.style.display = "flex";
-    friendContainer.style.justifyContent = "center";
-    friendContainer.style.color = "darkred"
-    friendContainer.innerText = text;
-    return friendContainer;
-}
-
-
-function reloadData(page, searchLine="") {
+function reloadData(page) {
     // Process your request
     var request = new Object();
-    request.searchLine = searchLine; // some data
+    request.searchLine = value; // some data
 
     // Make the AJAX call
+    console.log(value);
     jQuery.ajax({
         type       : 'POST',
         url        : currentLocation + "/user/" + userNameOfPage + "/reloadFriendList/" + page,
@@ -300,14 +276,14 @@ function reloadData(page, searchLine="") {
 
 $(function () {
     addSearchButton($name);
-    reloadData(1);
+    reloadData(page);
 })
 
-$(window).scroll(function()
-{
-    if  ($(window).scrollTop() + 1000 >= $(document).height() - $(window).height() && page <= maxPages)
-    {
+$(window).scroll(function () {
+    if ($(document).height() <= $(window).scrollTop() + $(window).height() + 100 &&
+        friendProfiles.length + profilesOfStrangers.length !== 0 && !isLoading) {
         page++;
+        isLoading = true;
         reloadData(page);
     }
 });

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import sosal_network.Enum.InviteStatus;
 import sosal_network.entity.Post;
 import sosal_network.entity.User;
 import sosal_network.service.FriendService;

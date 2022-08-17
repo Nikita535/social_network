@@ -46,6 +46,7 @@ public class AdminInitService implements CommandLineRunner {
          //40 пользователей
         //for(int i = 0; i < 40; i++) {
         //    User user= new User("renat0" + i, password, password, "victor." + i + "@gmail.com");
+        //    user.setActive(true);
         //    user.getRoles().add(Role.ROLE_USER);
         //    userRepository.save(user);
         //    ProfileInfo profileInfo = new ProfileInfo(user, "Ренат" + i, "Хакимов" + i, "город" + i,

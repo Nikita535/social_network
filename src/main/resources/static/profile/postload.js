@@ -1,9 +1,5 @@
 let posts = document.getElementsByClassName('post')
 
-function addEventListenerToLastPost(posts) {
-    posts[posts.length - 1].addEventListener('mouseover', loadPost)
-}
-
 let page = 1
 
 $(window).scroll(function () {
@@ -20,6 +16,7 @@ function loadPosts() {
     xhr.open("GET", url)
     xhr.onload = function (ev) {
         let jsonResponse = JSON.parse(xhr.responseText);
+        console.log(jsonResponse);
         if (jsonResponse != null && jsonResponse.length > 0) {
             for (let i = 0; i < jsonResponse.length; i++) {
                 let post = document.createElement('div')
