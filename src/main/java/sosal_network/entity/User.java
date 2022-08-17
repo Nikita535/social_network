@@ -70,10 +70,16 @@ public class User implements UserDetails {
     @JsonIgnore
     private Boolean active;
 
+    private boolean banStatus;
+
     /**
      * дата регистрации пользователя
      **/
     private LocalDate registrationDate;
+
+    public boolean isBanStatus() {
+        return banStatus;
+    }
 
     /**
      * Соединение таблиц пользователя с ролями
@@ -130,6 +136,7 @@ public class User implements UserDetails {
     @Override
     @JsonIgnore
     public boolean isAccountNonLocked() {
+
         return true;
     }
 

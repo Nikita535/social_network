@@ -3,12 +3,15 @@ package sosal_network.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import sosal_network.aop.LoggableAroundMethod.Loggable;
 import sosal_network.entity.Image;
 import sosal_network.entity.Post;
 import sosal_network.entity.PostImage;
 import sosal_network.entity.User;
 import sosal_network.repository.ImageRepository;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,6 +24,7 @@ public class ImageService {
     @Autowired
     private ImageRepository imageRepository;
 
+    @Loggable
     public List<PostImage> convertPostImages(List<MultipartFile> files, Post post) {
         return files.stream().map(file -> {
             try {
@@ -33,12 +37,14 @@ public class ImageService {
         }).collect(Collectors.toList());
     }
 
+    @Loggable
     public Image toImageEntity(MultipartFile file )throws IOException {
         return new Image(file.getName(), file.getOriginalFilename(), file.getSize(), file.getContentType(),
                 file.getBytes());
     }
 
 
+    @Loggable
     public void saveImage(MultipartFile file, User user) throws IOException {
         if (file.getSize() != 0) {
             if (user.getImage() != null) {
@@ -53,5 +59,4 @@ public class ImageService {
             }
         }
     }
-
 }

@@ -45,7 +45,7 @@ function createMessageLine(message) {
         source = userFrom["image"] != null ? '/image/' +
             userFrom["image"]["id"] : 'https://bootdey.com/img/Content/avatar/avatar6.png'
     } else {
-        flexBox.classList.add('media')
+        flexBox.classList.add('left')
         avatarContainer.classList.add('pull-left')
         source = userTo["image"] != null ? '/image/' +
             userTo["image"]["id"] : 'https://bootdey.com/img/Content/avatar/avatar6.png'

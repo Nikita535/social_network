@@ -47,6 +47,12 @@ public class ChatController {
     @GetMapping("/messages")
     public String getChat(Model model, @AuthenticationPrincipal User authentificatedUser) {
 
+        if (authentificatedUser.isBanStatus()) {
+            return "banError";
+        }
+
+        List<User> friends = friendService.getAcceptedFriends(authentificatedUser.getUsername());
+
         model.addAttribute("user", userService.findUserByUsername(authentificatedUser.getUsername()));
         model.addAttribute("profileInfo", userService.findProfileInfoByUser(authentificatedUser));
         model.addAttribute("friends", friendService.getAcceptedFriends(authentificatedUser.getUsername()));
@@ -56,6 +62,11 @@ public class ChatController {
 
     @GetMapping("/chat/{username}")
     public String getChat1(Model model, @PathVariable String username, @AuthenticationPrincipal User authenticatedUser) {
+
+        if (authenticatedUser.isBanStatus()) {
+            return "banError";
+        }
+
         model.addAttribute("profileInfo", userService.findProfileInfoByUser(authenticatedUser));
         model.addAttribute("friends", friendService.getAcceptedFriends(authenticatedUser.getUsername()));
         model.addAttribute("userService", userService);

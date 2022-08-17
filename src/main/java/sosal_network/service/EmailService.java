@@ -5,6 +5,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import sosal_network.aop.LoggableAroundMethod.Loggable;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -30,6 +31,7 @@ public class EmailService {
      * author - Nekit,Nikita
      **/
     @Async
+    @Loggable
     public void sendSimpleMessage(String To, String text) throws MessagingException {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
