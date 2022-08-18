@@ -139,6 +139,10 @@ public class UserService implements UserDetailsService {
         return userRepository.findByUserEmail(email);
     }
 
+    public User findUserById(Long id){
+        return userRepository.findUserById(id);
+    }
+
     @Transactional
     @Loggable
     public ProfileInfo findProfileInfoByUser(User user) {
