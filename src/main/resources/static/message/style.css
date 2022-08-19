@@ -19,7 +19,7 @@ body {
     position: absolute;
     left: 0;
     top: 0;
-    border-right: 1px solid #eee;
+    border-right: 1px solid #e0e0e3;
     padding-bottom: 50px;
     height: 100%;
     width: 240px;
@@ -115,7 +115,6 @@ body {
 .msb-reply {
     box-shadow: 0 -20px 20px -5px #fff;
     position: relative;
-    margin-top: 30px;
     border-top: 1px solid #eee;
     background: #f8f8f8;
 }
@@ -146,12 +145,14 @@ body {
     background: #f2f2f2;
 }
 .img-avatar {
-    height: 37px;
+    height: 50px;
     border-radius: 2px;
-    width: 37px;
+    width: 50px;
 }
 .list-group.lg-alt .list-group-item {
-    border: 0;
+    border-bottom: #c7c7cc 1px solid;
+    padding: 0.5rem 0.75rem;
+    height: 80px;
 }
 .p-15 {
     padding: 15px!important;
@@ -209,4 +210,13 @@ body {
 #ms-menu-trigger, .toggle-switch {
     -webkit-user-select: none;
     -moz-user-select: none;
+}
+
+
+.element::-webkit-scrollbar {
+    width: 0;
+}
+
+::-webkit-scrollbar {
+    width: 0;
 }

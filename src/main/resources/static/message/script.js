@@ -56,9 +56,7 @@ function createMessageLine(message) {
     flexBox.appendChild(messageElement)
 
     const chat = document.querySelector('#chat')
-    const textarea = document.querySelector('#message-controls')
     chat.appendChild(flexBox)
-    chat.appendChild(textarea)
     chat.scrollTop = chat.scrollHeight
 }
 

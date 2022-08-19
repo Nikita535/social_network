@@ -29,4 +29,6 @@ public interface FriendRepository extends JpaRepository<Friend, Integer> {
     @Query(value = "SELECT user_id FROM jpa.profile_info, jpa.friends WHERE jpa.friends.second_user_id = ?1 AND CONCAT(jpa.profile_info.surname, ' ', jpa.profile_info.name) LIKE CONCAT('%', ?2,'%') AND jpa.profile_info.user_id = jpa.friends.first_user_id", nativeQuery = true)
     List<Long> findFriendsBySecondUserAndInviteStatusWithSearch(User firstUser, String searchLine, InviteStatus inviteStatus, Pageable pageable);
 
+    @Query("select f from friend f where (f.firstUser = ?1 or f.secondUser = ?1) and f.inviteStatus ='ACCEPTED'")
+    List<Friend> findFriendByFirstUserOrSecondUser(User first, Pageable pageable);
 }

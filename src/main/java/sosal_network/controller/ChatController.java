@@ -1,6 +1,7 @@
 package sosal_network.controller;
 
 
+import org.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -10,14 +11,19 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.ResponseBody;
 import sosal_network.Enum.InviteStatus;
 import sosal_network.entity.ChatMessage;
+import sosal_network.entity.Post;
+import sosal_network.entity.ProfileInfo;
 import sosal_network.entity.User;
 import sosal_network.repository.MessageRepository;
 import sosal_network.repository.UserRepository;
 import sosal_network.service.*;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 public class ChatController {
@@ -85,6 +91,18 @@ public class ChatController {
     public ChatMessage sendMessage(@Payload final ChatMessage chatMessage) {
         messageRepository.save(chatMessage);
         return chatMessage;
+    }
+
+    @GetMapping("/reloadMessageFriends/{page}")
+    @ResponseBody
+    public List<Object> showFriendsMessages(@PathVariable int page, @AuthenticationPrincipal User authenticatedUser)
+    {
+        List<Object> allInfo = new ArrayList<>();
+        List<ProfileInfo> chatFriends = chatMessageService.getChatFriends(authenticatedUser, page);
+        List<ChatMessage> lastMessage = chatFriends.stream().map(friend -> chatMessageService.showLastMessage(friend.getUser(), authenticatedUser)).toList();
+        allInfo.add(chatFriends);
+        allInfo.add(lastMessage);
+        return allInfo;
     }
 
     //@MessageMapping("/chat.newUser")
