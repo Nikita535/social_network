@@ -29,7 +29,7 @@ public interface ProfileInfoRepository extends JpaRepository<ProfileInfo, Intege
     /**
      * Метод findProfileInfosByUsers для поиска профилей друзей
      **/
-    @Query(value = "SELECT * FROM jpa.profile_info WHERE (?1) IS NOT NULL AND user_id in (?1) OR FALSE", nativeQuery = true)
+    @Query(value = "SELECT * FROM jpa.profile_info WHERE user_id in (?1)", nativeQuery = true)
     Page<ProfileInfo> findProfileInfosByUsers(List<User> users, Pageable pageable);
 
     /**
@@ -42,7 +42,7 @@ public interface ProfileInfoRepository extends JpaRepository<ProfileInfo, Intege
     /**
      * Метод findProfileInfosByUsers для поиска профилей незнакомцев
      **/
-    @Query(value = "SELECT * FROM jpa.profile_info WHERE not((?1) IS NOT NULL AND user_id in (?1) OR FALSE)", nativeQuery = true)
+    @Query(value = "SELECT * FROM jpa.profile_info WHERE user_id not in (?1)", nativeQuery = true)
     List<ProfileInfo> findStrangerProfileInfosByUsers(List<User> users, Pageable pageable);
 
     /**

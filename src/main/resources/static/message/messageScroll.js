@@ -23,7 +23,10 @@ function loadFriendMessage() {
         if (jsonResponse != null && jsonResponse[0].length > 0) {
             for (let i = 0; i < jsonResponse[0].length; i++) {
                 let profile = jsonResponse[0][i]
-                let message = jsonResponse[1][i] != null ? jsonResponse[1][i]["content"]: "";
+                let message = jsonResponse[1][i] != null ? jsonResponse[1][i]["userFrom"]["id"] === userFrom["id"] ?
+                        jsonResponse[1][i]["content"].length < 7?"Вы: " + jsonResponse[1][i]["content"] : "Вы: " + jsonResponse[1][i]["content"].substr(0, 7) + "..." :
+                    jsonResponse[1][i]["content"].length < 7?profile["name"] + ": " + jsonResponse[1][i]["content"] :profile["name"] + ": " + jsonResponse[1][i]["content"].substr(0, 7) + "..." : "";
+
                 let source = profile["user"]["image"] != null ? '/image/' +
                     profile["user"]["image"]["id"] : 'https://bootdey.com/img/Content/avatar/avatar6.png'
 

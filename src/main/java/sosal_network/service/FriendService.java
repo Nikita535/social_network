@@ -280,7 +280,8 @@ public class FriendService {
             friends.addAll(profilesReceived);
             friends.add(currentUser);
             if (profilesOfFriends.isLast()) {
-                profilesOfStrangers = userService.findStrangerProfileInfosByUsers(friends,page - profilesOfFriends.getTotalPages() + 1);
+                profilesOfStrangers = userService.findStrangerProfileInfosByUsers(friends,
+                        profilesOfFriends.getTotalPages() == 0 ? page : page - profilesOfFriends.getTotalPages() + 1);
                 isInviteSendStrangers = getInviteSendFriends(profilesOfStrangers.stream().toList());
             }
         }else {
@@ -289,7 +290,8 @@ public class FriendService {
             friends.add(currentUser);
 
             if (profilesOfFriends.isLast()) {
-                profilesOfStrangers = userService.findStrangerProfileInfosByUsersWithSearch(friends, searchLine, page - profilesOfFriends.getTotalPages() + 1);
+                profilesOfStrangers = userService.findStrangerProfileInfosByUsersWithSearch(friends, searchLine,
+                        profilesOfFriends.getTotalPages() == 0 ? page : page - profilesOfFriends.getTotalPages() + 1);
                 isInviteSendStrangers = getInviteSendFriends(profilesOfStrangers.stream().toList());
             }
         }
