@@ -15,6 +15,8 @@ body {
     content: " ";
     display: table;
 }
+
+
 #messages-main .ms-menu {
     position: absolute;
     left: 0;
@@ -190,6 +192,7 @@ body {
     display: block;
     padding: 0 10px;
 }
+
 .ms-body{
     background:#fff;
 }

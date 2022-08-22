@@ -1,5 +1,5 @@
 body{
-    background-color: #f9fafb;
+    background-color: #f2f3f4;
     margin-top:20px;}
 
 .profile-page .profile-header {
@@ -231,10 +231,7 @@ body{
 }
 
 .panel {
-    box-shadow: 0 2px 0 rgba(0,0,0,0.075);
-    border-radius: 0;
     border: 0;
-    margin-bottom: 15px;
 }
 
 .panel .panel-footer, .panel>:last-child {
@@ -285,7 +282,6 @@ body{
     border-radius: 0;
     clear: both;
     margin-bottom: 20px;
-    margin-top: 50px;
     position: relative
 }
 
@@ -379,14 +375,14 @@ body{
 
 .timeline-label:before {
     border-top: 10px solid transparent;
-    border-bottom: 10px solid transparent;
+    /*border-bottom: 10px solid transparent;*/
     border-right: 10px solid #e6e6e6;
     margin: 15px 0 0 -10px
 }
 
 .timeline-label:after {
     border-top: 9px solid transparent;
-    border-bottom: 9px solid transparent;
+    /*border-bottom: 9px solid transparent;*/
     border-right: 9px solid #fff;
     margin: 15px 0 0 -8px
 }
@@ -412,6 +408,10 @@ body{
 
 .panel .timeline-label:after {
     border-right-color: #f7f7f7
+}
+
+.media-body{
+    padding-left:10px;
 }
 
 @media (min-width:768px) {
@@ -461,13 +461,13 @@ body{
     }
     .two-column.timeline .timeline-entry:nth-child(even) .timeline-label:before {
         border-top: 10px solid transparent;
-        border-bottom: 10px solid transparent;
+        /*border-bottom: 10px solid transparent;*/
         border-left: 10px solid #e6e6e6;
         margin: 15px -10px 0 0
     }
     .two-column.timeline .timeline-entry:nth-child(even) .timeline-label:after {
         border-top: 9px solid transparent;
-        border-bottom: 9px solid transparent;
+        /*border-bottom: 9px solid transparent;*/
         border-left: 9px solid #fff;
         margin: 15px -8px 0 0
     }
@@ -556,12 +556,11 @@ body{
     transition: border-color .2s linear
 }
 
-.timeline .timeline-body {
-    margin-left: 23%;
-    margin-right: 17%;
-    background: #fff;
+.timeline-body {
+    background-color: white;
     position: relative;
     padding: 20px 25px;
+    margin-bottom: 15px;
     border-radius: 6px
 }
 
@@ -570,7 +569,7 @@ body{
     display: block;
     position: absolute;
     border: 10px solid transparent;
-    border-right-color: #fff;
+    border-right-color: #f2f3f4;
     left: -20px;
     top: 20px
 }
@@ -633,8 +632,7 @@ body{
 }
 
 .timeline-footer {
-    background: #fff;
-    border-top: 1px solid #e2e7ec;
+    /*border-top: 1px solid #e2e7ec;*/
     padding-top: 15px
 }
 
@@ -652,6 +650,8 @@ body{
     font-weight: 600;
     font-size: 15px;
     margin-bottom: 10px;
+    padding-bottom: 7px;
+    border-bottom: 1px solid #e2e7eb;
 }
 
 .timeline-likes .stats-right {
@@ -682,7 +682,6 @@ body{
 }
 
 .timeline-comment-box {
-    background: #f2f3f4;
     margin-left: -25px;
     margin-right: -25px;
     padding: 20px 25px

@@ -24,40 +24,40 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity5'
 
-//	web
+	//	web
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 
 
-//	db
+	//	db
 	runtimeOnly 'org.postgresql:postgresql'
 
-//	entity
+	//	entity
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 	implementation 'org.hibernate:hibernate-core'
 	implementation 'javax.validation:validation-api'
 
-//	test
+	//	test
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation group: 'org.springframework.security', name: 'spring-security-test', version: '5.6.3'
 	implementation 'junit:junit:4.13.1'
 
-//	security
+	//	security
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 
-//	email
+	//	email
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
 
-//	logback
+	//	logback
 	testImplementation 'ch.qos.logback:logback-classic:1.2.11'
 	implementation 'org.slf4j:slf4j-api:1.7.36'
 	// JSON
 	implementation 'org.json:json:20220320'
 
 
-// swagger
+	// swagger
 	implementation('org.springdoc:springdoc-openapi-ui:1.6.9')
 
 	// websocket
@@ -65,6 +65,10 @@ dependencies {
 
 	//aop
 	implementation 'org.springframework:spring-aop:5.3.22'
+
+	// cache
+	implementation 'org.springframework.boot:spring-boot-starter-cache:2.7.2'
+	implementation 'com.github.ben-manes.caffeine:caffeine:3.1.1'
 
 
 

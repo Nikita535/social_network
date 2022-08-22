@@ -3,6 +3,8 @@ package sosal_network.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -91,6 +93,9 @@ public class UserService implements UserDetailsService {
     @Autowired
     private ImageService imageService;
 
+    @Autowired
+    private CacheManager cacheManager;
+
 
     /**
      * Метод загрузки пользователя, наследованный UserDetailsService
@@ -100,9 +105,9 @@ public class UserService implements UserDetailsService {
     @Override
     @Transactional
     @Loggable
+    @Cacheable("user")
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username);
-
+        User user = findUserByUsername(username);
         if (user == null) {
             log.error("error login");
             throw new UsernameNotFoundException("User not found");

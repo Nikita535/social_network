@@ -65,17 +65,13 @@ function loadPosts() {
                 post.innerHTML +=
                         "                          <div class=\"timeline-likes\">\n" +
                     "                                 <div class=\"stats-right\">\n" +
-                    "                                    <span class=\"stats-text\">259 Shares</span>\n" +
+                    // "                                    <span class=\"stats-text\">259 Shares</span>\n" +
                     "                                    <span class=\"stats-text\">21 Comments</span>\n" +
                     "                                 </div>\n" +
                     "                                 <div class=\"stats\">\n" +
                     "                                    <span class=\"fa-stack fa-fw stats-icon\">\n" +
                     "                                    <i class=\"fa fa-circle fa-stack-2x text-danger\"></i>\n" +
                     "                                    <i class=\"fa fa-heart fa-stack-1x fa-inverse t-plus-1\"></i>\n" +
-                    "                                    </span>\n" +
-                    "                                    <span class=\"fa-stack fa-fw stats-icon\">\n" +
-                    "                                    <i class=\"fa fa-circle fa-stack-2x text-primary\"></i>\n" +
-                    "                                    <i class=\"fa fa-thumbs-up fa-stack-1x fa-inverse\"></i>\n" +
                     "                                    </span>\n" +
                     "                                    <span class=\"stats-total\">4.3k</span>\n" +
                     "                                 </div>\n" +
