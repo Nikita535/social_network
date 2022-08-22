@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import sosal_network.entity.ProfileInfo;
 import sosal_network.entity.User;
+import sosal_network.repository.BanRepository;
 import sosal_network.repository.ProfileInfoRepository;
 import sosal_network.service.ImageService;
 import sosal_network.service.UserService;
@@ -26,6 +27,9 @@ public class ProfileEditController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    BanRepository banRepository;
+
     /**
      * Get контроллер для страницы редактирования профиля пользователя
      * param model - модель для добавления атрибутов на текущую страницу
@@ -34,7 +38,7 @@ public class ProfileEditController {
     @GetMapping("/edit")
     public String getEditProfile(Model model, @AuthenticationPrincipal User userFromSession) {
 
-        if (userFromSession.isBanStatus()) {
+        if (banRepository.findBanInfoById(userFromSession.getBanInfo().getId()).isBanStatus()) {
             return "banError";
         }
 

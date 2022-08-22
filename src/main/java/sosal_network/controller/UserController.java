@@ -12,6 +12,7 @@ import sosal_network.Enum.InviteStatus;
 import sosal_network.Enum.Role;
 import sosal_network.entity.Post;
 import sosal_network.entity.User;
+import sosal_network.repository.BanRepository;
 import sosal_network.service.FriendService;
 import sosal_network.service.ImageService;
 import sosal_network.service.PostService;
@@ -40,6 +41,9 @@ public class UserController {
     @Autowired
     private FriendService friendService;
 
+    @Autowired
+    private BanRepository banRepository;
+
 
     /**
      * Get контроллер для перенаправления пользователя на страницу профиля после авторизации
@@ -66,7 +70,7 @@ public class UserController {
             return "error-404";
         }
 
-        if (authentificatedUser.isBanStatus()) {
+        if (banRepository.findBanInfoById(authentificatedUser.getBanInfo().getId()).isBanStatus()) {
             return "banError";
         }
 
@@ -92,7 +96,7 @@ public class UserController {
         if (authentificatedUser == null && (username.isEmpty()) || Objects.equals(userService.findUserByUsername(username.get()).getUsername(), userService.getUserAuth().getUsername())) {
             return "/error";
         }
-        if (authentificatedUser.isBanStatus()) {
+        if (banRepository.findBanInfoById(authentificatedUser.getBanInfo().getId()).isBanStatus()) {
             return "banError";
         }
         return friendService.sendInvite(username.get(), where);
@@ -114,7 +118,7 @@ public class UserController {
             return "/error";
         }
 
-        if (authentificatedUser.isBanStatus()) {
+        if (banRepository.findBanInfoById(authentificatedUser.getBanInfo().getId()).isBanStatus()) {
             return "banError";
         }
         return friendService.deleteFriend(username.get(), where);

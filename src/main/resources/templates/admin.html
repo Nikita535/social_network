@@ -45,7 +45,7 @@
             <p th:case="true">Пользователь активен</p>
             <p th:case="false">Пользователь не активен</p>
         </td>
-        <td th:switch="${user.isBanStatus()}">
+        <td th:switch="${banRepository.findBanInfoById(user.getBanInfo().getId()).isBanStatus()}">
             <p th:case="true">Пользователь заблокирован</p>
             <p th:case="false">-</p>
         </td>
@@ -58,12 +58,13 @@
                 Действия
             </button>
             <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                <li><a th:if="${user.isBanStatus()==false}"  class="dropdown-item" th:href="@{'/ban_'+${user.getUsername()}+'_'+${0}}">Забанить навсегда</a></li>
-                <li><a  th:if="${user.isBanStatus()==false}" class="dropdown-item" th:href="@{'/ban_'+${user.getUsername()}+'_'+${30}}" >Забанить на 30 минут</a></li>
-                <li><a  th:if="${user.isBanStatus()==false}" class="dropdown-item" th:href="@{'/ban_'+${user.getUsername()}+'_'+${1440}}" >Забанить на 1 день</a></li>
-                <li><a  th:if="${user.isBanStatus()==false}" class="dropdown-item" th:href="@{'/ban_'+${user.getUsername()}+'_'+${10080}}" >Забанить на 1 неделю</a></li>
-                <li><a  th:if="${user.isBanStatus()==false}" class="dropdown-item" th:href="@{'/ban_'+${user.getUsername()}+'_'+${40320}}" >Забанить на 1 месяц</a></li>
-                <li><a th:if="${user.isBanStatus()==true}" class="dropdown-item" th:href="@{'/unban_'+${user.getUsername()}}">Разбанить</a></li>
+                <li class="dropdown-submenu"><a th:if="${banRepository.findBanInfoById(user.getBanInfo().getId()).isBanStatus()==false}" class="dropdown-item" th:href="@{'/ban/'+${user.getUsername()}+'/INF'}">Забанить навсегда</a>
+                </li>
+                <li><a  th:if="${banRepository.findBanInfoById(user.getBanInfo().getId()).isBanStatus()==false}" class="dropdown-item" th:href="@{'/ban/'+${user.getUsername()}+'/HALF_HOUR'}" >Забанить на 30 минут</a></li>
+                <li><a  th:if="${banRepository.findBanInfoById(user.getBanInfo().getId()).isBanStatus()==false}" class="dropdown-item" th:href="@{'/ban/'+${user.getUsername()}+'/HOUR'}" >Забанить на 1 день</a></li>
+                <li><a  th:if="${banRepository.findBanInfoById(user.getBanInfo().getId()).isBanStatus()==false}" class="dropdown-item" th:href="@{'/ban/'+${user.getUsername()}+'/DAY'}" >Забанить на 1 неделю</a></li>
+                <li><a  th:if="${banRepository.findBanInfoById(user.getBanInfo().getId()).isBanStatus()==false}" class="dropdown-item" th:href="@{'/ban/'+${user.getUsername()}+'/WEEK'}" >Забанить на 1 месяц</a></li>
+                <li><a th:if="${banRepository.findBanInfoById(user.getBanInfo().getId()).isBanStatus()==true}" class="dropdown-item" th:href="@{'/unban/'+${user.getUsername()}}">Разбанить</a></li>
             </ul>
         </td>
     </tr>

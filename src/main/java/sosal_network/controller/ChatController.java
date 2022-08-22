@@ -17,6 +17,7 @@ import sosal_network.entity.ChatMessage;
 import sosal_network.entity.Post;
 import sosal_network.entity.ProfileInfo;
 import sosal_network.entity.User;
+import sosal_network.repository.BanRepository;
 import sosal_network.repository.MessageRepository;
 import sosal_network.repository.UserRepository;
 import sosal_network.service.*;
@@ -34,6 +35,9 @@ public class ChatController {
 
     @Autowired
     private MessageRepository messageRepository;
+
+    @Autowired
+    BanRepository banRepository;
     @Autowired
     private ChatMessageService chatMessageService;
 
@@ -53,7 +57,7 @@ public class ChatController {
     @GetMapping("/messages")
     public String getChat(Model model, @AuthenticationPrincipal User authentificatedUser) {
 
-        if (authentificatedUser.isBanStatus()) {
+        if (banRepository.findBanInfoById(authentificatedUser.getBanInfo().getId()).isBanStatus()) {
             return "banError";
         }
 
@@ -69,7 +73,7 @@ public class ChatController {
     @GetMapping("/chat/{username}")
     public String getChat1(Model model, @PathVariable String username, @AuthenticationPrincipal User authenticatedUser) {
 
-        if (authenticatedUser.isBanStatus()) {
+        if (banRepository.findBanInfoById(authenticatedUser.getBanInfo().getId()).isBanStatus()) {
             return "banError";
         }
 

@@ -3,9 +3,12 @@ package sosal_network.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import sosal_network.Enum.BanStatus;
 import sosal_network.Enum.Role;
 import sosal_network.aop.LoggableAroundMethod.Loggable;
+import sosal_network.entity.BanInfo;
 import sosal_network.entity.User;
+import sosal_network.repository.BanRepository;
 
 import javax.mail.MessagingException;
 import java.util.Timer;
@@ -19,58 +22,52 @@ public class AdminService {
     @Autowired
     UserService userService;
 
+    @Autowired
+    BanRepository banRepository;
+
     @Loggable
-    public void banUser(String username) throws MessagingException {
+    public void banUser(String username,BanStatus banType) throws MessagingException {
         User user = userService.findUserByUsername(username);
+        BanInfo banInfo= banRepository.findBanInfoById(user.getBanInfo().getId());
         if(!user.getRoles().contains(Role.ROLE_ADMIN)) {
-            user.setBanStatus(true);
-            userService.saveUser(user);
+            banInfo.setBanStatus(true);
+            banInfo.setBanTime(banType);
+            banRepository.save(banInfo);
         }
     }
 
     @Loggable
     public void unBanUser(String username) throws MessagingException {
         User user = userService.findUserByUsername(username);
+        BanInfo banInfo= banRepository.findBanInfoById(user.getBanInfo().getId());
         if(!user.getRoles().contains(Role.ROLE_ADMIN)) {
-            user.setBanStatus(false);
-            userService.saveUser(user);
+            banInfo.setBanStatus(false);
+            banInfo.setBanTime(BanStatus.NONE);
+            banRepository.save(banInfo);
         }
     }
 
-    @Deprecated
-    @Loggable
-    public void banUserForTime(String username) throws MessagingException {
-        User user = userService.findUserByUsername(username);
-        if(!user.getRoles().contains(Role.ROLE_ADMIN)) {
-            user.setBanStatus(true);
-            userService.saveUser(user);
-
-            try{
-                TimeUnit.MINUTES.sleep(2);
-                user.setBanStatus(false);
-                userService.saveUser(user);
-            }catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
 
     @Loggable
-    public void banUserForTimer(String username,int timeOfBan) throws MessagingException {
+    public void banUserForTimer(String username,int timeOfBan,BanStatus banType) throws MessagingException {
         long ban = timeOfBan * 60000L;
 
         User user = userService.findUserByUsername(username);
+        BanInfo banInfo= banRepository.findBanInfoById(user.getBanInfo().getId());
+
         if(!user.getRoles().contains(Role.ROLE_ADMIN)) {
-            user.setBanStatus(true);
-            userService.saveUser(user);
+            banInfo.setBanStatus(true);
+            banInfo.setBanTime(banType);
+            banRepository.save(banInfo);
 
             Timer timer=new Timer();
                 timer.schedule(
                     new TimerTask() {
                         @Override
                         public void run() {
-                            user.setBanStatus(false);
-                            userService.save(user);
+                            banInfo.setBanStatus(false);
+                            banInfo.setBanTime(BanStatus.NONE);
+                            banRepository.save(banInfo);
                         }
                     }
             ,ban);
@@ -80,13 +77,13 @@ public class AdminService {
 
     @Loggable
     public void checkBanTime(String banTime,String username) throws MessagingException {
-        int timeOfBan =Integer.parseInt(banTime);
-        if (Integer.parseInt(banTime) == 0) {
-            banUser(username);
-            log.info("ban for inf");
-        }else {
-            banUserForTimer(username, timeOfBan);
-            log.info("ban for " + timeOfBan);
+        switch (banTime) {
+            case ("INF") -> banUser(username,BanStatus.INF);
+            case ("HALF_HOUR") -> banUserForTimer(username, 30,BanStatus.HALF_HOUR);
+            case ("HOUR") -> banUserForTimer(username, 60,BanStatus.HOUR);
+            case ("DAY") -> banUserForTimer(username, 1440,BanStatus.DAY);
+            case ("WEEK") -> banUserForTimer(username, 10080,BanStatus.WEEK);
+            case ("MONTH") -> banUserForTimer(username, 43200,BanStatus.MONTH);
         }
     }
 

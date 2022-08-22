@@ -70,16 +70,11 @@ public class User implements UserDetails {
     @JsonIgnore
     private Boolean active;
 
-    private boolean banStatus;
 
     /**
      * дата регистрации пользователя
      **/
     private LocalDate registrationDate;
-
-    public boolean isBanStatus() {
-        return banStatus;
-    }
 
     /**
      * Соединение таблиц пользователя с ролями
@@ -98,15 +93,20 @@ public class User implements UserDetails {
     private Image image;
 
 
+    @OneToOne(targetEntity = BanInfo.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "baninfo_id", referencedColumnName = "id")
+    private BanInfo banInfo;
+
     /**
      * Основной конструктор
      **/
-    public User(String username, String password, String passwordConfirm, String email) {
+    public User(String username, String password, String passwordConfirm, String email,BanInfo banInfo) {
         this.username = username;
         this.password = password;
         this.passwordConfirm = passwordConfirm;
         this.userEmail = email;
         this.registrationDate = LocalDate.now();
+        this.banInfo =banInfo;
     }
 
     public String dateFormat() {

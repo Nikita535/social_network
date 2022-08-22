@@ -15,6 +15,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import sosal_network.Enum.InviteStatus;
 import sosal_network.entity.ProfileInfo;
 import sosal_network.entity.User;
+import sosal_network.repository.BanRepository;
 import sosal_network.service.FriendService;
 import sosal_network.service.ImageService;
 import sosal_network.service.UserService;
@@ -31,11 +32,14 @@ public class FriendListController {
     @Autowired
     private ImageService imageService;
 
+    @Autowired
+    BanRepository banRepository;
+
     @GetMapping("/user/{username}/friendList/{page}")
     public String getFriendList(Model model, @PathVariable Optional<String> username,
                                 @PathVariable Optional<String> page,
                                 @ModelAttribute("searchLine") String searchLine, @AuthenticationPrincipal User user){
-        if (userService.findUserByUsername(username.get()).isBanStatus()) {
+        if (banRepository.findBanInfoById(user.getBanInfo().getId()).isBanStatus()) {
             return "banError";
         }
 

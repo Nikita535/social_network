@@ -4,10 +4,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import sosal_network.Enum.BanStatus;
 import sosal_network.Enum.Role;
 import sosal_network.aop.LoggableAroundMethod.Loggable;
+import sosal_network.entity.BanInfo;
 import sosal_network.entity.ProfileInfo;
 import sosal_network.entity.User;
+import sosal_network.repository.BanRepository;
 import sosal_network.repository.ProfileInfoRepository;
 import sosal_network.repository.UserRepository;
 
@@ -26,23 +29,33 @@ public class AdminInitService implements CommandLineRunner {
     @Autowired
     private ProfileInfoRepository profileInfoRepository;
 
+    @Autowired
+    private BanRepository banRepository;
+
 
     public AdminInitService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder,
-                            UserService userService, ProfileInfoRepository profileInfoRepository) {
+                            UserService userService, ProfileInfoRepository profileInfoRepository,BanRepository banRepository) {
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.userService = userService;
         this.profileInfoRepository = profileInfoRepository;
+        this.banRepository = banRepository;
     }
 
     @Override
     @Loggable
     public void run(String... args) throws Exception {
         String password = bCryptPasswordEncoder.encode("ADMIN");
-        User admin = new User("ADMIN", password, password, "victor.hodinsciy.com@gmail.com");
+
+        BanInfo banInfo = new BanInfo();
+        banInfo.setBanStatus(false);
+        banInfo.setBanTime(BanStatus.NONE);
+
+        User admin = new User("ADMIN", password, password, "victor.hodinsciy.com@gmail.com",banInfo);
         admin.getRoles().add(Role.ROLE_ADMIN);
         admin.setActive(true);
-        admin.setBanStatus(false);
+
+
         if (userRepository.findByUsername("ADMIN") == null) {
             userRepository.save(admin);
             ProfileInfo profileInfoAdmin=new ProfileInfo(admin,"ADMIN","ADMIN","Москва",

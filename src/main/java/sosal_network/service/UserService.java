@@ -28,16 +28,11 @@ import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import sosal_network.Enum.BanStatus;
 import sosal_network.Enum.Role;
 import sosal_network.aop.LoggableAroundMethod.Loggable;
-import sosal_network.entity.ActivationToken;
-import sosal_network.entity.PasswordResetToken;
-import sosal_network.entity.ProfileInfo;
-import sosal_network.entity.User;
-import sosal_network.repository.ActivationTokenRepository;
-import sosal_network.repository.PasswordTokenRepository;
-import sosal_network.repository.ProfileInfoRepository;
-import sosal_network.repository.UserRepository;
+import sosal_network.entity.*;
+import sosal_network.repository.*;
 import sosal_network.utility.ReCaptchaResponse;
 
 import javax.mail.MessagingException;
@@ -92,6 +87,9 @@ public class UserService implements UserDetailsService {
 
     @Autowired
     private ImageService imageService;
+
+    @Autowired
+    private BanRepository banRepository;
 
 
 
@@ -175,7 +173,7 @@ public class UserService implements UserDetailsService {
         user.setRoles(Collections.singleton(Role.ROLE_USER));
         user.setActive(true);
         user.setRegistrationDate(LocalDate.now());
-        user.setBanStatus(false);
+        user.setBanInfo(new BanInfo("", BanStatus.NONE,false));
         save(user);
 
 

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import sosal_network.entity.User;
+import sosal_network.repository.BanRepository;
 import sosal_network.service.FriendService;
 import sosal_network.service.ImageService;
 import sosal_network.service.UserService;
@@ -24,11 +25,15 @@ public class SuggestionListController {
     @Autowired
     private ImageService imageService;
 
+    @Autowired
+    BanRepository banRepository;
+
     @GetMapping("/user/{username}/suggestion/{page}")
     public String getFriendList(Model model, @PathVariable Optional<String> username,
                                 @PathVariable Optional<String> page,
                                 @ModelAttribute("searchLine") String searchLine, @AuthenticationPrincipal User user){
-        if (userService.findUserByUsername(username.get()).isBanStatus()) {
+        if (banRepository.findBanInfoById(userService.findUserByUsername(username.get())
+                .getBanInfo().getId()).isBanStatus()) {
             return "banError";
         }
 

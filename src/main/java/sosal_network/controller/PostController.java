@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import sosal_network.entity.Post;
 import sosal_network.entity.User;
+import sosal_network.repository.BanRepository;
 import sosal_network.service.PostService;
 import sosal_network.service.UserService;
 
@@ -20,10 +21,11 @@ public class PostController {
     @Autowired
     private UserService userService;
 
-
+    @Autowired
+    BanRepository banRepository;
     @PostMapping("/post")
     public String addPost(@RequestParam("imageList") List<MultipartFile> files,@ModelAttribute("post") Post post,   @AuthenticationPrincipal User user) {
-        if (user.isBanStatus()) {
+        if (banRepository.findBanInfoById(user.getBanInfo().getId()).isBanStatus()) {
             return "banError";
         }
 
