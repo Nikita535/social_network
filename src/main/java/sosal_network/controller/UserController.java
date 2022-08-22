@@ -40,6 +40,7 @@ public class UserController {
     @Autowired
     private FriendService friendService;
 
+
     /**
      * Get контроллер для перенаправления пользователя на страницу профиля после авторизации
      * author - Nekit
@@ -71,6 +72,7 @@ public class UserController {
 
         User currentUser=userService.findUserByUsername(username.get());
         model.addAttribute("user", userService.findUserByUsername(username.get()));
+        model.addAttribute("currentUser", userService.findProfileInfoByUser(userService.getUserAuth()));
         model.addAttribute("profileInfo", userService.findProfileInfoByUser(currentUser));
         model.addAttribute("friends",friendService.getAcceptedFriends(username.get()));
         model.addAttribute("isFriend",friendService.isFriends(username.get()));
@@ -78,7 +80,7 @@ public class UserController {
         model.addAttribute("isInviteRecieved",friendService.isInviteRecieved(username.get()));
         model.addAttribute("isInviteSend",friendService.isInviteSend(username.get()));
         model.addAttribute("post",new Post());
-        model.addAttribute("posts",postService.showLastPosts(currentUser,0));
+        //model.addAttribute("posts",postService.showLastPosts(currentUser,0));
         model.addAttribute("ADMIN", Role.ROLE_ADMIN);
         return "index";
 

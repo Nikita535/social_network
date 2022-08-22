@@ -1,95 +1,126 @@
+
+
 let posts = document.getElementsByClassName('post')
 
-let page = 1
+let page = 0
+let isLoading = false
 
 $(window).scroll(function () {
-    if ($(document).height() <= $(window).scrollTop() + $(window).height()) {
+    if ($(document).height() <= $(window).scrollTop() + $(window).height() + 100 && !isLoading) {
+        isLoading = true
         loadPosts()
     }
 });
 
-
+$(function () {
+    loadPosts()
+})
 
 function loadPosts() {
+    console.log("-----")
     let xhr = new XMLHttpRequest()
     let url = "http://localhost:8080/post/" + user.username + "/" + page
     xhr.open("GET", url)
     xhr.onload = function (ev) {
         let jsonResponse = JSON.parse(xhr.responseText);
-        console.log(jsonResponse);
         if (jsonResponse != null && jsonResponse.length > 0) {
             for (let i = 0; i < jsonResponse.length; i++) {
                 let post = document.createElement('div')
-                post.classList.add('row', 'post')
-                let ediv1 = document.createElement('div')
-                ediv1.classList.add("col-md-12", "grid-margin")
-                let ediv2 = document.createElement('div')
-                ediv2.classList.add("card", "rounded")
+                post.classList.add('timeline-body', 'post')
+                let images_post = document.createElement('div')
+                images_post.classList.add("timeline-footer")
+                images_post.addEventListener('click', sendComment);
+
+                let comments_post = document.createElement('div')
+                comments_post.classList.add("timeline-footer")
+                comments_post.id = "comment-" + jsonResponse[i]["id"]
+
                 let source = user["image"] != null ? '/image/' +
                     user["image"]["id"] : 'https://bootdey.com/img/Content/avatar/avatar6.png'
+
+                let currentSource = currentUser["image"] != null ? '/image/' +
+                    currentUser["image"]["id"] : 'https://bootdey.com/img/Content/avatar/avatar6.png'
+
                 let images = jsonResponse[i].images
-                ediv2.innerHTML =
-                    "                            <div class=\"card-header\">\n" +
-                    "                                <div class=\"d-flex align-items-center justify-content-between\">\n" +
-                    "                                    <div class=\"d-flex align-items-center\">\n" +
-                    "                                        <img src=\"" + source + "\" class=\"img-xs rounded-circle\"\n" +
-                    "                                             alt=\"\">\n" +
-                    "                                        <div class=\"ml-2\">\n" +
-                    "                                            <p>" + profileInfo.name + " " + profileInfo.surname + "</p>\n" +
-                    "                                            <p class=\"tx-11 text-muted\">" + jsonResponse[i].fromNow +
-                    "                                                </p>\n" +
-                    "                                        </div>\n" +
-                    "                                    </div>\n" +
-                    "                                </div>\n" +
-                    "                            </div>" +
-                    "                            <div class=\"card-body\">\n" +
-                    "                                <p class=\"mb-3 tx-14\">" + jsonResponse[i].full_text + "</p>\n" +
-                    "                            </div>"
+                let comments = jsonResponse[i].comments
+                post.innerHTML =
+                    "                              <div class=\"timeline-header\">\n" +
+                    "                                 <span class=\"userimage\"><img src=\""+source +"\" alt=\"\"></span>\n" +
+                    "                                 <span class=\"username\">" + profileInfo.name + " " + profileInfo.surname + "<small></small></span>\n" +
+                    "                                 <span class=\"pull-right text-muted\">" + jsonResponse[i].fromNow + "</span>" +
+                    "                              </div>\n" +
+                    "                              <div class=\"timeline-content\">\n" +
+                    "                                 <p>\n" + jsonResponse[i].full_text +
+                    "                                 </p>\n" +
+                    "                              </div>\n"
                 for (let j = 0; j < images.length; j++) {
                     let imgcontainer = document.createElement('div')
                     imgcontainer.classList.add("card-body")
                     let postsource = images[j].image != null ? '/image/' +
                         images[j].image.id : 'https://bootdey.com/img/Content/avatar/avatar6.png'
                     imgcontainer.innerHTML = "<img src=\"" + postsource + "\" alt=\"\">"
-                    ediv2.innerHTML += imgcontainer.outerHTML
+                    images_post.innerHTML += imgcontainer.outerHTML
                 }
-                ediv2.innerHTML += "<div class=\"card-footer\">\n" +
-                    "                                <div class=\"d-flex post-actions\">\n" +
-                    "                                    <a href=\"javascript:\" class=\"d-flex align-items-center text-muted mr-4\">\n" +
-                    "                                        <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\"\n" +
-                    "                                             viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"\n" +
-                    "                                             stroke-linecap=\"round\" stroke-linejoin=\"round\"\n" +
-                    "                                             class=\"feather feather-heart icon-md\">\n" +
-                    "                                            <path d=\"M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z\"></path>\n" +
-                    "                                        </svg>\n" +
-                    "                                        <p class=\"d-none d-md-block ml-2\">Like</p>\n" +
-                    "                                    </a>\n" +
-                    "                                    <a href=\"javascript:\" class=\"d-flex align-items-center text-muted mr-4\">\n" +
-                    "                                        <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\"\n" +
-                    "                                             viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"\n" +
-                    "                                             stroke-linecap=\"round\" stroke-linejoin=\"round\"\n" +
-                    "                                             class=\"feather feather-message-square icon-md\">\n" +
-                    "                                            <path d=\"M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z\"></path>\n" +
-                    "                                        </svg>\n" +
-                    "                                        <p class=\"d-none d-md-block ml-2\">Comment</p>\n" +
-                    "                                    </a>\n" +
-                    "                                    <a href=\"javascript:\" class=\"d-flex align-items-center text-muted\">\n" +
-                    "                                        <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\"\n" +
-                    "                                             viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"\n" +
-                    "                                             stroke-linecap=\"round\" stroke-linejoin=\"round\"\n" +
-                    "                                             class=\"feather feather-share icon-md\">\n" +
-                    "                                            <path d=\"M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8\"></path>\n" +
-                    "                                            <polyline points=\"16 6 12 2 8 6\"></polyline>\n" +
-                    "                                            <line x1=\"12\" y1=\"2\" x2=\"12\" y2=\"15\"></line>\n" +
-                    "                                        </svg>\n" +
-                    "                                        <p class=\"d-none d-md-block ml-2\">Share</p>\n" +
-                    "                                    </a>\n" +
-                    "                                </div>\n" +
-                    "                            </div>\n"
-                ediv1.appendChild(ediv2)
-                post.appendChild(ediv1)
+                post.appendChild(images_post)
+                post.innerHTML +=
+                        "                          <div class=\"timeline-likes\">\n" +
+                    "                                 <div class=\"stats-right\">\n" +
+                    "                                    <span class=\"stats-text\">259 Shares</span>\n" +
+                    "                                    <span class=\"stats-text\">21 Comments</span>\n" +
+                    "                                 </div>\n" +
+                    "                                 <div class=\"stats\">\n" +
+                    "                                    <span class=\"fa-stack fa-fw stats-icon\">\n" +
+                    "                                    <i class=\"fa fa-circle fa-stack-2x text-danger\"></i>\n" +
+                    "                                    <i class=\"fa fa-heart fa-stack-1x fa-inverse t-plus-1\"></i>\n" +
+                    "                                    </span>\n" +
+                    "                                    <span class=\"fa-stack fa-fw stats-icon\">\n" +
+                    "                                    <i class=\"fa fa-circle fa-stack-2x text-primary\"></i>\n" +
+                    "                                    <i class=\"fa fa-thumbs-up fa-stack-1x fa-inverse\"></i>\n" +
+                    "                                    </span>\n" +
+                    "                                    <span class=\"stats-total\">4.3k</span>\n" +
+                    "                                 </div>\n" +
+                    "                              </div>\n"
+
+                for (let j = 0; j < comments.length; j++) {
+                    let commentsContainer = document.createElement('li')
+                    commentsContainer.classList.add("media")
+                    let userImage = comments[j]["user"].image != null ? '/image/' +
+                        comments[j]["user"].image.id : 'https://bootdey.com/img/Content/avatar/avatar6.png'
+                    commentsContainer.innerHTML +=
+                        "                                <div class=\"profile-picture bg-gradient bg-primary mb-4\">\n" +
+                        "                                    <img src=\"" + userImage + "\" width=\"44\" height=\"44\">\n" +
+                        "                                </div>\n" +
+                        "                                <div class=\"media-body\">\n" +
+                        "                                    <div class=\"media-title mt-0 mb-1\">\n" +
+                        "                                        <a href=\"#\">" + comments[j]["user"]["username"] + "</a> <small>" + comments[j]["time"] + "</small>\n" +
+                        "                                    </div>\n" +
+                                                            comments[j]["content"] +
+                        "                                 </div> "
+                    comments_post.appendChild(commentsContainer)
+                }
+
+                post.appendChild(comments_post)
+
+                post.innerHTML +=    "               <div class=\"timeline-comment-box\">\n" +
+                    "                                 <div class=\"user\"><img src=\"" + currentSource + "\"></div>\n" +
+                    "                                 <div class=\"input\">\n" +
+                    "                                    <form class=\"commentForm\" id=\"" + jsonResponse[i]["id"]+ "\">\n" +
+                    "                                       <div class=\"input-group\">\n" +
+                    "                                          <input type=\"text\" class=\"form-control rounded-corner\" placeholder=\"Write a comment...\">\n" +
+                    "                                          <span class=\"input-group-btn p-l-10\">\n" +
+                    "                                          <button class=\"btn btn-primary f-s-12 rounded-corner\" type=\"submit\">Comment</button>\n" +
+                    "                                          </span>\n" +
+                    "                                       </div>\n" +
+                    "                                    </form>\n" +
+                    "                                 </div>\n" +
+                    "                              </div>"
+
                 document.getElementById("postLine").appendChild(post)
+
+                const messageControls = post.querySelector(".commentForm")
+                messageControls.addEventListener('submit', sendComment, true)
             }
+            isLoading = false
             posts = document.getElementsByClassName('post')
             page += 1
         }
@@ -98,3 +129,7 @@ function loadPosts() {
     xhr.send()
 
 }
+
+
+
+

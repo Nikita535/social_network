@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -34,6 +36,10 @@ public class Post {
 
     @OneToMany(mappedBy = "post", fetch = FetchType.EAGER, orphanRemoval = true)
     List<PostImage> images = new ArrayList<>();
+
+
+    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, orphanRemoval = true)
+    List<Comment> comments = new ArrayList<>();
 
     @Transient
     private String fromNow;

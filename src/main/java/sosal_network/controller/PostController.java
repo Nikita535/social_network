@@ -40,4 +40,11 @@ public class PostController {
         return postService.showLastPosts(user,page);
     }
 
+    @GetMapping("/post/{idPost}")
+    @ResponseBody
+    public Post showPosts(@PathVariable Long idPost)
+    {
+        return postService.findPostById(idPost);
+    }
+
 }

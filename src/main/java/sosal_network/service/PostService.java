@@ -59,6 +59,10 @@ public class PostService {
         return postRepository.findAllByUserOrderByIdDesc(user,pageable).stream().peek(p->p.setFromNow(showTimeAgo(p))).collect(Collectors.toList());
     }
 
+    public Post findPostById(Long id){
+        return postRepository.findPostById(id);
+    }
+
     public String showTimeAgo(Post post) {
         long seconds = ChronoUnit.SECONDS.between(post.getDateOfCreate(), LocalDateTime.now());
         long minutes = ChronoUnit.MINUTES.between(post.getDateOfCreate(), LocalDateTime.now());
