@@ -93,8 +93,6 @@ public class UserService implements UserDetailsService {
     @Autowired
     private ImageService imageService;
 
-    @Autowired
-    private CacheManager cacheManager;
 
 
     /**
@@ -105,7 +103,6 @@ public class UserService implements UserDetailsService {
     @Override
     @Transactional
     @Loggable
-    @Cacheable("user")
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = findUserByUsername(username);
         if (user == null) {

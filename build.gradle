@@ -66,9 +66,6 @@ dependencies {
 	//aop
 	implementation 'org.springframework:spring-aop:5.3.22'
 
-	// cache
-	implementation 'org.springframework.boot:spring-boot-starter-cache:2.7.2'
-	implementation 'com.github.ben-manes.caffeine:caffeine:3.1.1'
 
 
 
