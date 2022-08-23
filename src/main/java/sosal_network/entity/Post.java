@@ -11,7 +11,9 @@ import org.hibernate.annotations.LazyCollectionOption;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity(name = "post")
 @Getter
@@ -40,6 +42,14 @@ public class Post {
 
     @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, orphanRemoval = true)
     List<Comment> comments = new ArrayList<>();
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name="post_likes",
+            joinColumns = {@JoinColumn(name="post_id")},
+            inverseJoinColumns = {@JoinColumn(name="user_id")}
+    )
+    private Set<User> likes = new HashSet<>();
 
     @Transient
     private String fromNow;

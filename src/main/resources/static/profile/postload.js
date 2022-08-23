@@ -3,7 +3,7 @@
 let posts = document.getElementsByClassName('post')
 
 let page = 0
-let isLoading = false
+let isLoading = true
 
 $(window).scroll(function () {
     if ($(document).height() <= $(window).scrollTop() + $(window).height() + 100 && !isLoading) {
@@ -16,6 +16,29 @@ $(function () {
     loadPosts()
 })
 
+const setLike = (event) => {
+    let likeButton = event.target
+
+    let id = likeButton.parentNode.parentNode.id.split("-")[1]
+
+    jQuery.ajax({
+        type       : 'POST',
+        url        : currentLocation + "/postLike/" + id + "/like",
+        contentType: 'application/json'
+    });
+
+    let countLikes = likeButton.parentNode.parentNode.querySelector(".stats-total")
+    if (likeButton.classList.contains("text-danger")) {
+        likeButton.classList.remove("text-danger")
+        likeButton.classList.add("text-black-50")
+        countLikes.innerHTML = parseInt(countLikes.innerHTML) - 1
+    }else {
+        likeButton.classList.remove("text-black-50")
+        likeButton.classList.add("text-danger")
+        countLikes.innerHTML = parseInt(countLikes.innerHTML) + 1
+    }
+
+}
 function loadPosts() {
     console.log("-----")
     let xhr = new XMLHttpRequest()
@@ -66,16 +89,32 @@ function loadPosts() {
                         "                          <div class=\"timeline-likes\">\n" +
                     "                                 <div class=\"stats-right\">\n" +
                     // "                                    <span class=\"stats-text\">259 Shares</span>\n" +
-                    "                                    <span class=\"stats-text\">21 Comments</span>\n" +
+                    "                                    <span class=\"stats-text\">" + comments.length + " Comments</span>\n" +
                     "                                 </div>\n" +
-                    "                                 <div class=\"stats\">\n" +
+                    "                                 <div class=\"stats\" id=\"likes-" + jsonResponse[i]["id"]+ "\">\n" +
                     "                                    <span class=\"fa-stack fa-fw stats-icon\">\n" +
-                    "                                    <i class=\"fa fa-circle fa-stack-2x text-danger\"></i>\n" +
-                    "                                    <i class=\"fa fa-heart fa-stack-1x fa-inverse t-plus-1\"></i>\n" +
+                    "                                    <a class=\"fa fa-heart fa-stack-2x fa-inverse\"></a>\n" +
                     "                                    </span>\n" +
-                    "                                    <span class=\"stats-total\">4.3k</span>\n" +
+                    "                                    <span class=\"stats-total\">" + jsonResponse[i]["likes"].length + "</span>\n" +
                     "                                 </div>\n" +
                     "                              </div>\n"
+
+
+                let like = post.querySelector(".fa-heart")
+                let flag = false
+                for (let j = 0; j < jsonResponse[i]["likes"].length; j++)
+                {
+                    if (jsonResponse[i]["likes"][j]["id"] === currentUser["user"]["id"]){
+                        flag = true
+                        break
+                    }
+                }
+                if (flag)
+                    like.classList.add("text-danger")
+                else
+                    like.classList.add("text-black-50")
+
+
 
                 for (let j = 0; j < comments.length; j++) {
                     let commentsContainer = document.createElement('li')
@@ -115,6 +154,7 @@ function loadPosts() {
 
                 const messageControls = post.querySelector(".commentForm")
                 messageControls.addEventListener('submit', sendComment, true)
+                post.querySelector(".fa-heart").addEventListener('click', setLike, true)
             }
             isLoading = false
             posts = document.getElementsByClassName('post')

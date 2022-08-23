@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,6 +43,22 @@ public class PostService {
             List<PostImage> postImages = imageService.convertPostImages(files, post);
             postImageRepository.saveAll(postImages);
         }
+    }
+
+    public void save(Post post){
+        postRepository.save(post);
+    }
+
+    public void setLike(Long postId, User currentUser){
+        Post post = findPostById(postId);
+        Set<User> likes = post.getLikes();
+
+        if (likes.contains(currentUser))
+            likes.remove(currentUser);
+        else
+            likes.add(currentUser);
+        post.setLikes(likes);
+        save(post);
     }
 
     public List<Post> showPost(User user) {
