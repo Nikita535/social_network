@@ -1,6 +1,7 @@
 package sosal_network.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -41,6 +42,7 @@ public class Post {
 
 
     @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, orphanRemoval = true)
+    @JsonIgnoreProperties(value = {"post"}, allowSetters = true)
     List<Comment> comments = new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
