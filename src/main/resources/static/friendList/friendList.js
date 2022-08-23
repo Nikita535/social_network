@@ -150,7 +150,7 @@ var successHandler = function( data ) {
 
 function addAllPeople(){
 
-    if (document.getElementById("friendStatusText") === null) {
+    if (document.getElementById("friendStatusText") === null && friendProfiles.length!==0) {
         $name.appendChild(document.createElement('br'))
         $name.appendChild(createTextUnderPerson("Друзья", "friendStatusText"));
     }

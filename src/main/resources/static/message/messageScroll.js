@@ -42,6 +42,7 @@ function loadFriendMessage() {
                     "                                </div>\n" +
                     "                            </a>\n" +
                     "                        </div>"
+
             }
             console.log(page)
             isLoading = false;
