@@ -23,16 +23,15 @@ public class AdminInitService implements CommandLineRunner {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private ProfileInfoRepository profileInfoRepository;
+    private final ProfileInfoRepository profileInfoRepository;
 
 
     public AdminInitService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder,
                             UserService userService, ProfileInfoRepository profileInfoRepository) {
-        this.userRepository = userRepository;
-        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-        this.userService = userService;
         this.profileInfoRepository = profileInfoRepository;
+        this.userService = userService;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.userRepository = userRepository;
     }
 
     @Override

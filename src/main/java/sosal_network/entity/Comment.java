@@ -3,6 +3,8 @@ package sosal_network.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import lombok.*;
 
 import javax.persistence.*;
@@ -22,7 +24,6 @@ public class Comment {
 
     @ManyToOne( targetEntity = Post.class,fetch = FetchType.EAGER)
     @JoinColumn(name = "post_id")
-    @JsonIgnore
     private Post post;
 
     @OneToOne(targetEntity = User.class, fetch = FetchType.EAGER)

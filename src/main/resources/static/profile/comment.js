@@ -16,13 +16,13 @@ function createMessageLine(comment) {
         "                                </div>\n" +
         "                                <div class=\"media-body\">\n" +
         "                                    <div class=\"media-title mt-0 mb-1\">\n" +
-        "                                        <a href=\"/user/" + comment["user"]["username"] +"\">" + currentUser["name"] + " " + currentUser["surname"] + "</a> <small>" + comment["time"] + "</small>\n" +
+        "                                        <a href=\"/user/" + comment["user"]["username"] + "\">" + currentUser["name"] + " " + currentUser["surname"] + "</a> <small>" + comment["time"] + "</small>\n" +
         "                                    </div>\n" +
-                                comment["content"] +
+        comment["content"] +
         "                                 </div> "
-
+    console.log(commentsContainer)
     // commentId должен передаваться как comment["post"]["id"]
-    document.getElementById("comment-" + commentId ).appendChild(commentsContainer)
+    document.getElementById("comment-" + comment["post"]["id"]).appendChild(commentsContainer)
 }
 
 
@@ -54,38 +54,36 @@ const sendComment = (event) => {
 
     const messageContent = messageInput.value.trim();
     let d = new Date();
-    let ye = new Intl.DateTimeFormat('ru', { year: 'numeric' }).format(d);
-    let mo = new Intl.DateTimeFormat('ru', { month: '2-digit' }).format(d);
-    let da = new Intl.DateTimeFormat('ru', { day: '2-digit' }).format(d);
+    let ye = new Intl.DateTimeFormat('ru', {year: 'numeric'}).format(d);
+    let mo = new Intl.DateTimeFormat('ru', {month: '2-digit'}).format(d);
+    let da = new Intl.DateTimeFormat('ru', {day: '2-digit'}).format(d);
     let time = new Intl.DateTimeFormat('ru',
-        {hour: "numeric",
-            minute:"numeric",
+        {
+            hour: "numeric",
+            minute: "numeric",
         }).format(d)
 
     console.log(`${da}/${mo}/${ye} ${time}`)
 
     if (messageContent && stompClient) {
-       // let xhr = new XMLHttpRequest()
-       // let url = "http://localhost:8080/post/" + form.id
-       // xhr.open("GET", url)
-       // xhr.onload = function (ev) {
-       //     let jsonResponse = JSON.parse(xhr.responseText);
-       //     console.log(jsonResponse)
-       //
-       //
-
-        // jsonResponse возвращает кривой post, и получается запрос выше и не нужен
-        const postComment = {
-            post: null,
-            user: currentUser["user"],
-            content: messageInput.value,
-            time: `${da}/${mo}/${ye} ${time}`
+        let xhr = new XMLHttpRequest()
+        let url = "http://localhost:8080/post/" + form.id
+        xhr.open("GET", url)
+        xhr.onload = function (ev) {
+            let jsonResponse = JSON.parse(xhr.responseText);
+            const postComment = {
+                post: jsonResponse,
+                user: currentUser["user"],
+                content: messageInput.value,
+                time: `${da}/${mo}/${ye} ${time}`
+            }
+            console.log(jsonResponse)
+            console.log(postComment)
+            console.log(JSON.stringify(postComment))
+            stompClient.send("/app/comment.send/" + username, {}, JSON.stringify(postComment))
+            messageInput.value = ''
         }
-        commentId = form.id
-        stompClient.send("/app/comment.send/" + username + "/" + form.id , {}, JSON.stringify(postComment))
-        messageInput.value = ''
-        //}
-        //xhr.send()
+        xhr.send()
     }
     event.preventDefault();
 }

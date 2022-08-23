@@ -17,7 +17,6 @@ $(function () {
 })
 
 function loadPosts() {
-    console.log("-----")
     let xhr = new XMLHttpRequest()
     let url = "http://localhost:8080/post/" + user.username + "/" + page
     xhr.open("GET", url)
