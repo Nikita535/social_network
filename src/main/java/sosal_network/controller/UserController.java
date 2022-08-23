@@ -13,10 +13,7 @@ import sosal_network.Enum.Role;
 import sosal_network.entity.Post;
 import sosal_network.entity.User;
 import sosal_network.repository.BanRepository;
-import sosal_network.service.FriendService;
-import sosal_network.service.ImageService;
-import sosal_network.service.PostService;
-import sosal_network.service.UserService;
+import sosal_network.service.*;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -43,6 +40,9 @@ public class UserController {
 
     @Autowired
     private BanRepository banRepository;
+
+    @Autowired
+    AdminService adminService;
 
 
     /**
@@ -71,6 +71,9 @@ public class UserController {
         }
 
         if (banRepository.findBanInfoById(authentificatedUser.getBanInfo().getId()).isBanStatus()) {
+            model.addAttribute("banRepository",banRepository);
+            model.addAttribute("userFromSession",authentificatedUser);
+            model.addAttribute("adminService",adminService);
             return "banError";
         }
 

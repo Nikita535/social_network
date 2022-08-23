@@ -52,7 +52,8 @@
             <!-- Info -->
             <div class="info">
                 <img src="/banError/images/404.gif" alt="404 error" />
-                <h4>Вы были заблокированы. Обратитесь к администратору.</h4>
+                <h4 th:text="'Вы были заблокированы на '+${adminService.translateBanTime(banRepository.findBanInfoById(userFromSession.getBanInfo().getId()).getBanTime())}
+                + ' за '+${banRepository.findBanInfoById(userFromSession.getBanInfo().getId()).getBanCause()} + ' Обратитесь к Администратору!'"></h4>
                 <a href="javascript:history.go(-1)" class="theme-btn">Вернуться назад</a>
             </div>
             <!-- end Info -->

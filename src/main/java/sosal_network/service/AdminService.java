@@ -26,12 +26,13 @@ public class AdminService {
     BanRepository banRepository;
 
     @Loggable
-    public void banUser(String username,BanStatus banType) throws MessagingException {
+    public void banUser(String username,BanStatus banType,String banCause) throws MessagingException {
         User user = userService.findUserByUsername(username);
         BanInfo banInfo= banRepository.findBanInfoById(user.getBanInfo().getId());
         if(!user.getRoles().contains(Role.ROLE_ADMIN)) {
             banInfo.setBanStatus(true);
             banInfo.setBanTime(banType);
+            banInfo.setBanCause(banCause);
             banRepository.save(banInfo);
         }
     }
@@ -43,13 +44,14 @@ public class AdminService {
         if(!user.getRoles().contains(Role.ROLE_ADMIN)) {
             banInfo.setBanStatus(false);
             banInfo.setBanTime(BanStatus.NONE);
+            banInfo.setBanCause("");
             banRepository.save(banInfo);
         }
     }
 
 
     @Loggable
-    public void banUserForTimer(String username,int timeOfBan,BanStatus banType) throws MessagingException {
+    public void banUserForTimer(String username,int timeOfBan,BanStatus banType,String banCause) throws MessagingException {
         long ban = timeOfBan * 60000L;
 
         User user = userService.findUserByUsername(username);
@@ -58,6 +60,7 @@ public class AdminService {
         if(!user.getRoles().contains(Role.ROLE_ADMIN)) {
             banInfo.setBanStatus(true);
             banInfo.setBanTime(banType);
+            banInfo.setBanCause(banCause);
             banRepository.save(banInfo);
 
             Timer timer=new Timer();
@@ -67,6 +70,7 @@ public class AdminService {
                         public void run() {
                             banInfo.setBanStatus(false);
                             banInfo.setBanTime(BanStatus.NONE);
+                            banInfo.setBanCause("");
                             banRepository.save(banInfo);
                         }
                     }
@@ -78,13 +82,25 @@ public class AdminService {
     @Loggable
     public void checkBanTime(String banTime,String username) throws MessagingException {
         switch (banTime) {
-            case ("INF") -> banUser(username,BanStatus.INF);
-            case ("HALF_HOUR") -> banUserForTimer(username, 30,BanStatus.HALF_HOUR);
-            case ("HOUR") -> banUserForTimer(username, 60,BanStatus.HOUR);
-            case ("DAY") -> banUserForTimer(username, 1440,BanStatus.DAY);
-            case ("WEEK") -> banUserForTimer(username, 10080,BanStatus.WEEK);
-            case ("MONTH") -> banUserForTimer(username, 43200,BanStatus.MONTH);
+            case ("INF") -> banUser(username,BanStatus.INF,"Серьезное нарушение!");
+            case ("HALF_HOUR") -> banUserForTimer(username, 30,BanStatus.HALF_HOUR,"Мелкое нарушение");
+            case ("HOUR") -> banUserForTimer(username, 60,BanStatus.HOUR,"Говна поел");
+            case ("DAY") -> banUserForTimer(username, 1440,BanStatus.DAY,"Оскорбление личности");
+            case ("WEEK") -> banUserForTimer(username, 10080,BanStatus.WEEK,"Распостранение эротического контента");
+            case ("MONTH") -> banUserForTimer(username, 43200,BanStatus.MONTH,"Если ты Ренат");
         }
+    }
+
+    @Loggable
+    public String translateBanTime(BanStatus banStatus){
+        return switch (banStatus.toString()) {
+            case "HALF_HOUR" -> "пол часа";
+            case "HOUR" -> "1 час";
+            case "DAY" -> "1 день";
+            case "WEEK" -> "1 неделю";
+            case "MONTH" -> "1 месяц";
+            default -> "бесконечность";
+        };
     }
 
 }
