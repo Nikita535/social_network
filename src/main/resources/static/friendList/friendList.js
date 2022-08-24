@@ -1,5 +1,5 @@
-let $name=document.getElementById("friendLists");
-let $receivedList=document.getElementById("receivedList");
+let $name = document.getElementById("friendLists");
+let $receivedList = document.getElementById("receivedList");
 var currentLocation = document.location.protocol + "//" + document.location.host;
 var jsonDataOfThePage;
 var profilesOfStrangers;
@@ -11,7 +11,7 @@ var isLoading = false;
 
 
 // ПОИСК ПО ПОЛЬЗОВАТЕЛЯМ
-function addSearchButton($mainObj){
+function addSearchButton($mainObj) {
     $mainObj.innerHTML += "<div class=\"input-group\">\n" +
         "                                    <input id=\"searchLine\" value='" + value + "' class=\"form-control rounded\" placeholder=\"Search\" aria-label=\"Search\" aria-describedby=\"search-addon\" />\n" +
         "                                    <button onclick='toSearch()' class=\"btn btn-outline-primary\">Искать</button>\n" +
@@ -20,7 +20,7 @@ function addSearchButton($mainObj){
 
 }
 
-function toSearch(){
+function toSearch() {
     value = document.getElementById("searchLine").value;
     $name.innerHTML = "";
     page = 0;
@@ -30,24 +30,26 @@ function toSearch(){
 
 
 // КНОПКА УДАЛЕНИЯ ДРУГА
-function deleteButton($name){
+function deleteButton($name) {
     const buttonContainer = document.createElement('div');
     buttonContainer.classList.add("ol-md-3", "col-sm-3")
     const $friendButton = document.createElement('button');
     $friendButton.classList.add("btn", "btn-danger", "pull-right");
     $friendButton.innerHTML += "Удалить из друзей";
     $friendButton.id = $name;
-    $friendButton.onclick=function(){deleteFriend($name)};
+    $friendButton.onclick = function () {
+        deleteFriend($name)
+    };
     buttonContainer.appendChild($friendButton)
     return buttonContainer;
 }
 
-function deleteFriend($name){
+function deleteFriend($name) {
     createAjaxQuery('/user/' + $name + '/unfriend', successDeleteFriendHandler($name))
 }
 
-function successDeleteFriendHandler($username){
-    let obj=document.querySelector("." + $username).parentNode;
+function successDeleteFriendHandler($username) {
+    let obj = document.querySelector("." + $username).parentNode;
     document.getElementById($username).parentNode.parentNode.appendChild(sendButton($username));
     document.getElementById($username).parentNode.parentNode.removeChild(document.getElementById($username).parentNode);
     $name.removeChild(obj);
@@ -55,24 +57,26 @@ function successDeleteFriendHandler($username){
 }
 
 // КНОПКА ОТПРАВКИ ЗАПРОСА В ДРУЗЬЯ
-function  sendButton($name){
+function sendButton($name) {
     const buttonContainer = document.createElement('div');
     buttonContainer.classList.add("ol-md-3", "col-sm-3");
     const $friendButton = document.createElement('button');
     $friendButton.classList.add("btn", "btn-primary", "pull-right");
     $friendButton.innerHTML += "Добавить в друзья";
     $friendButton.id = $name;
-    $friendButton.onclick=function(){sendFriend($name)};
+    $friendButton.onclick = function () {
+        sendFriend($name)
+    };
     buttonContainer.appendChild($friendButton);
     return buttonContainer;
 }
 
-function sendFriend($name){
+function sendFriend($name) {
     createAjaxQuery('/user/' + $name + '/friend', successSendFriendHandler($name))
 }
 
-function successSendFriendHandler($name){
-    let obj=document.getElementById($name);
+function successSendFriendHandler($name) {
+    let obj = document.getElementById($name);
     let $mainObj = obj.parentNode;
     let parent = $mainObj.parentNode;
     parent.removeChild($mainObj);
@@ -81,7 +85,7 @@ function successSendFriendHandler($name){
 }
 
 // КНОПКА ЗАЯВКА ОТПРАВЛЕНА
-function alreadySendButton($name){
+function alreadySendButton($name) {
     const buttonContainer = document.createElement('div');
     buttonContainer.classList.add("ol-md-3", "col-sm-3");
     const $friendButton = document.createElement('div');
@@ -94,52 +98,51 @@ function alreadySendButton($name){
 
 
 // ФУНКЦИЯ ДОБАВЛЕНИЯ 1 БЛОКА USER
-function addPerson(person, isStranger=false, isSend = true, fromRight = false){
+function addPerson(person, isStranger = false, isSend = true, fromRight = false) {
     let source;
     if (fromRight === false)
-        source = person["user"]["image"] != null ? '/image/' +
-            person["user"]["image"]["id"] : 'https://bootdey.com/img/Content/avatar/avatar6.png';
+        source = person["image"] != null ? '/image/' +
+            person["image"]["id"] : 'https://bootdey.com/img/Content/avatar/avatar6.png';
     else
         source = person["images"][0];
     const personContainer = document.createElement('div');
     personContainer.classList.add("nearby-user")
-    personContainer.innerHTML += "<div class=\"row " + person["user"]["username"] + "\">\n" +
+    personContainer.innerHTML += "<div class=\"row " + person["username"] + "\">\n" +
         "                                        <div class=\"col-md-2 col-sm-2\">\n" +
         "                                            <img src=\"" + source + "\"\n" +
         "                                                 alt=\"user\" class=\"profile-photo-lg\">\n" +
         "                                        </div>\n" +
         "                                        <div class=\"col-md-7 col-sm-7\">\n" +
-        "                                            <h5><a href=\" " + '/user/' + person["user"]["username"] + " \" class=\"profile-link\">" + person["surname"] + " " + person["name"] + "</a></h5>\n" +
-        "                                            <p class=\"text-muted\">" + person["city"] + "</p>\n" +
+        "                                            <h5><a href=\" " + '/user/' + person["username"] + " \" class=\"profile-link\">" + person["profileInfo"]["surname"] + " " + person["profileInfo"]["name"] + "</a></h5>\n" +
+        "                                            <p class=\"text-muted\">" + person["profileInfo"]["city"] + "</p>\n" +
         "                                        </div>\n" +
         "                                    </div>\n";
 
     if (isStranger === false) {
-        personContainer.querySelector("." + person["user"]["username"]).appendChild(deleteButton(person["user"]["username"]));
+        personContainer.querySelector("." + person["username"]).appendChild(deleteButton(person["username"]));
         $name.appendChild(personContainer);
-    }else if (isSend === false){
-        personContainer.querySelector("." + person["user"]["username"]).appendChild(sendButton(person["user"]["username"]));
-        $name.appendChild(personContainer);}
-    else {
-        personContainer.querySelector("." + person["user"]["username"]).appendChild(alreadySendButton(person["user"]["username"]));
+    } else if (isSend === false) {
+        personContainer.querySelector("." + person["username"]).appendChild(sendButton(person["username"]));
+        $name.appendChild(personContainer);
+    } else {
+        personContainer.querySelector("." + person["username"]).appendChild(alreadySendButton(person["username"]));
         $name.appendChild(personContainer);
     }
 }
 
 //Создание запросов
-function createAjaxQuery(url, toFunction)
-{
+function createAjaxQuery(url, toFunction) {
     console.log(currentLocation + url);
     jQuery.ajax({
-        type       : 'GET',
-        url        : currentLocation + url,
+        type: 'GET',
+        url: currentLocation + url,
         contentType: 'application/json',
-        success    : toFunction
+        success: toFunction
     });
 }
 
 
-var successHandler = function( data ) {
+var successHandler = function (data) {
     jsonDataOfThePage = data;
     console.log(data);
     friendProfiles = data["0"];
@@ -148,7 +151,7 @@ var successHandler = function( data ) {
     addAllPeople();
 };
 
-function addAllPeople(){
+function addAllPeople() {
 
     if (document.getElementById("friendStatusText") === null) {
         $name.appendChild(document.createElement('br'))
@@ -168,7 +171,7 @@ function addAllPeople(){
     isLoading = false;
 }
 
-function createTextUnderPerson(text, id){
+function createTextUnderPerson(text, id) {
     const friendContainer = document.createElement('span');
     friendContainer.style.display = "flex";
     friendContainer.id = id;
@@ -179,17 +182,17 @@ function createTextUnderPerson(text, id){
 
 function reloadData(page) {
     // Process your request
-    var request = new Object();
+    var request = {};
     request.searchLine = value; // some data
 
     // Make the AJAX call
     console.log(value);
     jQuery.ajax({
-        type       : 'POST',
-        url        : currentLocation + "/user/" + userNameOfPage + "/reloadFriendList/" + page,
+        type: 'POST',
+        url: currentLocation + "/user/" + userNameOfPage + "/reloadFriendList/" + page,
         contentType: 'application/json',
-        data       : JSON.stringify(request),
-        success    : successHandler
+        data: JSON.stringify(request),
+        success: successHandler
     });
 }
 

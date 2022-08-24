@@ -15,7 +15,6 @@ import sosal_network.repository.PostRepository;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -45,11 +44,11 @@ public class PostService {
         }
     }
 
-    public void save(Post post){
+    public void save(Post post) {
         postRepository.save(post);
     }
 
-    public void setLike(Long postId, User currentUser){
+    public void setLike(Long postId, User currentUser) {
         Post post = findPostById(postId);
         Set<User> likes = post.getLikes();
 
@@ -61,22 +60,13 @@ public class PostService {
         save(post);
     }
 
-    public List<Post> showPost(User user) {
-        return postRepository.findPostsByUser(user).stream().sorted(Comparator.comparing(Post::getDateOfCreate).reversed()).collect(Collectors.toList());
+
+    public List<Post> showLastPosts(User user, int page) {
+        Pageable pageable = PageRequest.of(page, 5);
+        return postRepository.findAllByUserOrderByIdDesc(user, pageable).stream().peek(p -> p.setFromNow(showTimeAgo(p))).collect(Collectors.toList());
     }
 
-    public List<Post> showLast5Posts(User user)
-    {
-        return postRepository.findLast5ByUser(user);
-    }
-
-    public List<Post> showLastPosts(User user,int page)
-    {
-        Pageable pageable=PageRequest.of(page,5);
-        return postRepository.findAllByUserOrderByIdDesc(user,pageable).stream().peek(p->p.setFromNow(showTimeAgo(p))).collect(Collectors.toList());
-    }
-
-    public Post findPostById(Long id){
+    public Post findPostById(Long id) {
         return postRepository.findPostById(id);
     }
 

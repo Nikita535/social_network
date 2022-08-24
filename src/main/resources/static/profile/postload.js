@@ -1,9 +1,8 @@
-
-
 let posts = document.getElementsByClassName('post')
 
 let page = 0
 let isLoading = true
+console.log(user)
 
 $(window).scroll(function () {
     if ($(document).height() <= $(window).scrollTop() + $(window).height() + 100 && !isLoading) {
@@ -22,8 +21,8 @@ const setLike = (event) => {
     let id = likeButton.parentNode.parentNode.id.split("-")[1]
 
     jQuery.ajax({
-        type       : 'POST',
-        url        : currentLocation + "/postLike/" + id + "/like",
+        type: 'POST',
+        url: currentLocation + "/postLike/" + id + "/like",
         contentType: 'application/json'
     });
 
@@ -32,13 +31,14 @@ const setLike = (event) => {
         likeButton.classList.remove("text-danger")
         likeButton.classList.add("text-black-50")
         countLikes.innerHTML = parseInt(countLikes.innerHTML) - 1
-    }else {
+    } else {
         likeButton.classList.remove("text-black-50")
         likeButton.classList.add("text-danger")
         countLikes.innerHTML = parseInt(countLikes.innerHTML) + 1
     }
 
 }
+
 function loadPosts() {
     let xhr = new XMLHttpRequest()
     let url = "http://localhost:8080/post/" + user.username + "/" + page
@@ -67,8 +67,8 @@ function loadPosts() {
                 let comments = jsonResponse[i].comments
                 post.innerHTML =
                     "                              <div class=\"timeline-header\">\n" +
-                    "                                 <span class=\"userimage\"><img src=\""+source +"\" alt=\"\"></span>\n" +
-                    "                                 <span class=\"username\">" + profileInfo.name + " " + profileInfo.surname + "<small></small></span>\n" +
+                    "                                 <span class=\"userimage\"><img src=\"" + source + "\" alt=\"\"></span>\n" +
+                    "                                 <span class=\"username\">" + user.profileInfo.name + " " + user.profileInfo.surname + "<small></small></span>\n" +
                     "                                 <span class=\"pull-right text-muted\">" + jsonResponse[i].fromNow + "</span>" +
                     "                              </div>\n" +
                     "                              <div class=\"timeline-content\">\n" +
@@ -85,12 +85,12 @@ function loadPosts() {
                 }
                 post.appendChild(images_post)
                 post.innerHTML +=
-                        "                          <div class=\"timeline-likes\">\n" +
+                    "                          <div class=\"timeline-likes\">\n" +
                     "                                 <div class=\"stats-right\">\n" +
                     // "                                    <span class=\"stats-text\">259 Shares</span>\n" +
                     "                                    <span class=\"stats-text\">" + comments.length + " Comments</span>\n" +
                     "                                 </div>\n" +
-                    "                                 <div class=\"stats\" id=\"likes-" + jsonResponse[i]["id"]+ "\">\n" +
+                    "                                 <div class=\"stats\" id=\"likes-" + jsonResponse[i]["id"] + "\">\n" +
                     "                                    <span class=\"fa-stack fa-fw stats-icon\">\n" +
                     "                                    <a class=\"fa fa-heart fa-stack-2x fa-inverse\"></a>\n" +
                     "                                    </span>\n" +
@@ -101,9 +101,8 @@ function loadPosts() {
 
                 let like = post.querySelector(".fa-heart")
                 let flag = false
-                for (let j = 0; j < jsonResponse[i]["likes"].length; j++)
-                {
-                    if (jsonResponse[i]["likes"][j]["id"] === currentUser["user"]["id"]){
+                for (let j = 0; j < jsonResponse[i]["likes"].length; j++) {
+                    if (jsonResponse[i]["likes"][j]["id"] === currentUser["id"]) {
                         flag = true
                         break
                     }
@@ -112,7 +111,6 @@ function loadPosts() {
                     like.classList.add("text-danger")
                 else
                     like.classList.add("text-black-50")
-
 
 
                 for (let j = 0; j < comments.length; j++) {
@@ -128,21 +126,21 @@ function loadPosts() {
                         "                                    <div class=\"media-title mt-0 mb-1\">\n" +
                         "                                        <a href=\"#\">" + comments[j]["user"]["username"] + "</a> <small>" + comments[j]["time"] + "</small>\n" +
                         "                                    </div>\n" +
-                                                            comments[j]["content"] +
+                        comments[j]["content"] +
                         "                                 </div> "
                     comments_post.appendChild(commentsContainer)
                 }
 
                 post.appendChild(comments_post)
 
-                post.innerHTML +=    "               <div class=\"timeline-comment-box\">\n" +
+                post.innerHTML += "               <div class=\"timeline-comment-box\">\n" +
                     "                                 <div class=\"user\"><img src=\"" + currentSource + "\"></div>\n" +
                     "                                 <div class=\"input\">\n" +
-                    "                                    <form class=\"commentForm\" id=\"" + jsonResponse[i]["id"]+ "\">\n" +
+                    "                                    <form class=\"commentForm\" id=\"" + jsonResponse[i]["id"] + "\">\n" +
                     "                                       <div class=\"input-group\">\n" +
                     "                                          <input type=\"text\" class=\"form-control rounded-corner\" placeholder=\"Write a comment...\">\n" +
                     "                                          <span class=\"input-group-btn p-l-10\">\n" +
-                    "                                          <button class=\"btn btn-primary f-s-12 rounded-corner\" type=\"submit\">Comment</button>\n" +
+                    "                                          <button class=\"btn btn-primary f-s-12 rounded-corner\" type=\"submit\">Отправить</button>\n" +
                     "                                          </span>\n" +
                     "                                       </div>\n" +
                     "                                    </form>\n" +

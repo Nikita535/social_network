@@ -16,12 +16,10 @@ function createMessageLine(comment) {
         "                                </div>\n" +
         "                                <div class=\"media-body\">\n" +
         "                                    <div class=\"media-title mt-0 mb-1\">\n" +
-        "                                        <a href=\"/user/" + comment["user"]["username"] + "\">" + currentUser["name"] + " " + currentUser["surname"] + "</a> <small>" + comment["time"] + "</small>\n" +
+        "                                        <a href=\"/user/" + comment["user"]["username"] + "\">" + currentUser["profileInfo"]["name"] + " " + currentUser["profileInfo"]["surname"] + "</a> <small>" + comment["time"] + "</small>\n" +
         "                                    </div>\n" +
         comment["content"] +
         "                                 </div> "
-    console.log(commentsContainer)
-    // commentId должен передаваться как comment["post"]["id"]
     document.getElementById("comment-" + comment["post"]["id"]).appendChild(commentsContainer)
 }
 
@@ -73,7 +71,7 @@ const sendComment = (event) => {
             let jsonResponse = JSON.parse(xhr.responseText);
             const postComment = {
                 post: jsonResponse,
-                user: currentUser["user"],
+                user: currentUser,
                 content: messageInput.value,
                 time: `${da}/${mo}/${ye} ${time}`
             }
@@ -95,3 +93,4 @@ const onMessageReceived = (payload) => {
 }
 
 document.addEventListener('DOMContentLoaded', connect, true)
+

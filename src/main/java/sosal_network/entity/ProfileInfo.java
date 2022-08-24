@@ -4,9 +4,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
@@ -16,7 +18,8 @@ import java.util.Locale;
 /**
  * Class ProfileInfo - класс информации о пользователе
  **/
-@Entity
+@Table(name = "profile_info")
+@Entity(name = "profile_info")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -26,33 +29,26 @@ public class ProfileInfo {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    /**
-     * Соединение с пользователем в БД
-     **/
-    @OneToOne(targetEntity = User.class, fetch = FetchType.EAGER)
-    @JoinColumn(nullable = false, name = "user_id")
-    private User user;
 
     /**
      * имя пользователя
      **/
     @NotBlank(message = "Поле не может быть пустым")
-    //@Pattern(regexp = "^([А-Я]{1}[а-яё]{1,23}|[A-Z]{1}[a-z]{1,23})$" ,message = "Неправильный формат имени")
+    @Pattern(regexp = "^([А-Я]{1}[а-яё]{1,23}|[A-Z]{1}[a-z]{1,23})$", message = "Неправильный формат имени")
     private String name;
     /**
      * фамилия пользователя
      **/
     @NotBlank(message = "Поле не может быть пустым")
-    //@Pattern(regexp = "^([А-Я]{1}[а-яё]{1,23}|[A-Z]{1}[a-z]{1,23})$" ,message = "Неправильный формат фамилии")
+    @Pattern(regexp = "^([А-Я]{1}[а-яё]{1,23}|[A-Z]{1}[a-z]{1,23})$", message = "Неправильный формат фамилии")
     private String surname;
     /**
      * город пользователя
      **/
     @NotBlank(message = "Поле не может быть пустым")
     private String city;
-    /**
-     * описание пользователя
-     **/
+
+    @DateTimeFormat(pattern = "dd/MM/yyyy")
     private LocalDate dateOfBirth;
     private String description;
     /**
@@ -81,8 +77,7 @@ public class ProfileInfo {
 
     }
 
-    public ProfileInfo(User user, String name, String surname, String city, LocalDate dateOfBirth, String description, String website) {
-        this.user = user;
+    public ProfileInfo(String name, String surname, String city, LocalDate dateOfBirth, String description, String website) {
         this.name = name;
         this.surname = surname;
         this.city = city;

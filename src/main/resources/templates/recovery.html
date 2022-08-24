@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="utf-8">
@@ -23,10 +23,12 @@
                     <img src="https://bootdey.com/img/Content/avatar/avatar1.png" class="img-circle img-login">
                     <form class="panel-body" th:action="@{/recovery}" th:method="POST">
                         <div class="alert alert-success">
-                            <span >На вашу почту отправиться ссылка для восстановления аккаунта</span>
+                            <span>На вашу почту отправиться ссылка для восстановления аккаунта</span>
                         </div>
-                        <input class="form-control" id="email" name="email" type="email" required="true" placeholder="Почта">
-                        <button type="submit" class="btn btn-success">Отправить<i class="fa fa-fw fa-unlock-alt"></i></button>
+                        <input class="form-control" id="email" name="email" type="email" required="true"
+                               placeholder="Почта">
+                        <button type="submit" class="btn btn-success">Отправить<i class="fa fa-fw fa-unlock-alt"></i>
+                        </button>
                     </form>
                 </div>
             </div>

@@ -2,9 +2,11 @@ package sosal_network.entity;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Cascade;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import sosal_network.Enum.Role;
@@ -74,6 +76,7 @@ public class User implements UserDetails {
     /**
      * дата регистрации пользователя
      **/
+
     private LocalDate registrationDate;
 
     /**
@@ -87,26 +90,30 @@ public class User implements UserDetails {
     private Set<Role> roles = new HashSet<>();
 
 
-
     @OneToOne(targetEntity = Image.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "image_id", referencedColumnName = "id")
     private Image image;
-
 
     @OneToOne(targetEntity = BanInfo.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "baninfo_id", referencedColumnName = "id")
     private BanInfo banInfo;
 
+    @Cascade({org.hibernate.annotations.CascadeType.SAVE_UPDATE, org.hibernate.annotations.CascadeType.MERGE, org.hibernate.annotations.CascadeType.PERSIST})
+    @OneToOne(targetEntity = ProfileInfo.class, fetch = FetchType.EAGER)
+    @JoinColumn(name = "profile_info_id")
+    @JsonIgnoreProperties(value = "user", allowSetters = true)
+    private ProfileInfo profileInfo;
+
     /**
      * Основной конструктор
      **/
-    public User(String username, String password, String passwordConfirm, String email,BanInfo banInfo) {
+    public User(String username, String password, String passwordConfirm, String email, BanInfo banInfo) {
         this.username = username;
         this.password = password;
         this.passwordConfirm = passwordConfirm;
         this.userEmail = email;
         this.registrationDate = LocalDate.now();
-        this.banInfo =banInfo;
+        this.banInfo = banInfo;
     }
 
     public String dateFormat() {

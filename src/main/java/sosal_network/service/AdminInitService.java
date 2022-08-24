@@ -34,7 +34,7 @@ public class AdminInitService implements CommandLineRunner {
 
 
     public AdminInitService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder,
-                            UserService userService, ProfileInfoRepository profileInfoRepository,BanRepository banRepository) {
+                            UserService userService, ProfileInfoRepository profileInfoRepository, BanRepository banRepository) {
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.userService = userService;
@@ -51,19 +51,22 @@ public class AdminInitService implements CommandLineRunner {
         banInfo.setBanStatus(false);
         banInfo.setBanTime(BanStatus.NONE);
 
-        User admin = new User("ADMIN", password, password, "victor.hodinsciy.com@gmail.com",banInfo);
+        User admin = new User("ADMIN", password, password, "victor.hodinsciy.com@gmail.com", banInfo);
         admin.getRoles().add(Role.ROLE_ADMIN);
         admin.setActive(true);
 
 
         if (userRepository.findByUsername("ADMIN") == null) {
+
+            ProfileInfo profileInfoAdmin = new ProfileInfo("ADMIN", "ADMIN", "Москва",
+                    LocalDate.now(), "", "");
+            admin.setProfileInfo(profileInfoAdmin);
             userRepository.save(admin);
-            ProfileInfo profileInfoAdmin=new ProfileInfo(admin,"ADMIN","ADMIN","Москва",
-                    LocalDate.now(),"","");
-            profileInfoRepository.save(profileInfoAdmin);
+
+
         }
 
-         //40 пользователей
+        //40 пользователей
         //for(int i = 0; i < 40; i++) {
         //    User user= new User("renat0" + i, password, password, "victor." + i + "@gmail.com");
         //    user.setActive(true);

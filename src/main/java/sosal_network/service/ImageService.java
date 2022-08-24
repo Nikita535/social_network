@@ -10,8 +10,6 @@ import sosal_network.entity.PostImage;
 import sosal_network.entity.User;
 import sosal_network.repository.ImageRepository;
 
-import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,7 +36,7 @@ public class ImageService {
     }
 
     @Loggable
-    public Image toImageEntity(MultipartFile file )throws IOException {
+    public Image toImageEntity(MultipartFile file) throws IOException {
         return new Image(file.getName(), file.getOriginalFilename(), file.getSize(), file.getContentType(),
                 file.getBytes());
     }
@@ -48,7 +46,7 @@ public class ImageService {
     public void saveImage(MultipartFile file, User user) throws IOException {
         if (file.getSize() != 0) {
             if (user.getImage() != null) {
-                Image oldImage =user.getImage();
+                Image oldImage = user.getImage();
                 Image img = toImageEntity(file);
                 user.setImage(img);
                 userService.save(user);

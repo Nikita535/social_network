@@ -7,13 +7,14 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import sosal_network.Enum.InviteStatus;
 import sosal_network.Enum.Role;
 import sosal_network.entity.Post;
 import sosal_network.entity.User;
 import sosal_network.repository.BanRepository;
-import sosal_network.service.*;
+import sosal_network.service.AdminService;
+import sosal_network.service.FriendService;
+import sosal_network.service.PostService;
+import sosal_network.service.UserService;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -33,9 +34,6 @@ public class UserController {
     private UserService userService;
 
     @Autowired
-    private ImageService imageService;
-
-    @Autowired
     private FriendService friendService;
 
     @Autowired
@@ -49,9 +47,9 @@ public class UserController {
      * Get контроллер для перенаправления пользователя на страницу профиля после авторизации
      * author - Nekit
      **/
-    @GetMapping("/")
-    public String getUser(@AuthenticationPrincipal User authentificatedUser) {
-        return "redirect:/user/" + authentificatedUser.getUsername();
+    @GetMapping({"/", "/user"})
+    public String getUser(@AuthenticationPrincipal User authenticatedUser) {
+        return "redirect:/user/" + authenticatedUser.getUsername();
     }
 
     /**
@@ -61,8 +59,8 @@ public class UserController {
      * author - Nekit
      **/
     @GetMapping("/user/{username}")
-    public String getHome(@PathVariable Optional<String> username, Model model, @AuthenticationPrincipal User authentificatedUser) {
-        if (authentificatedUser == null && (username.isEmpty())) {
+    public String getHome(@PathVariable Optional<String> username, Model model, @AuthenticationPrincipal User authenticatedUser) {
+        if (authenticatedUser == null && (username.isEmpty())) {
             return "/error";
         }
         model.addAttribute("postService", postService);
@@ -70,58 +68,58 @@ public class UserController {
             return "error-404";
         }
 
-        if (banRepository.findBanInfoById(authentificatedUser.getBanInfo().getId()).isBanStatus()) {
-            model.addAttribute("banRepository",banRepository);
-            model.addAttribute("userFromSession",authentificatedUser);
-            model.addAttribute("adminService",adminService);
+        assert authenticatedUser != null;
+        if (banRepository.findBanInfoById(authenticatedUser.getBanInfo().getId()).isBanStatus()) {
+            model.addAttribute("banRepository", banRepository);
+            model.addAttribute("userFromSession", authenticatedUser);
+            model.addAttribute("adminService", adminService);
             return "banError";
         }
 
-        User currentUser=userService.findUserByUsername(username.get());
+
         model.addAttribute("user", userService.findUserByUsername(username.get()));
-        model.addAttribute("currentUser", userService.findProfileInfoByUser(userService.getUserAuth()));
-        model.addAttribute("profileInfo", userService.findProfileInfoByUser(currentUser));
-        model.addAttribute("friends",friendService.getAcceptedFriends(username.get()));
-        model.addAttribute("isFriend",friendService.isFriends(username.get()));
-        model.addAttribute("friendAccepted",friendService.checkFriendStatus(username.get()));
-        model.addAttribute("isInviteRecieved",friendService.isInviteRecieved(username.get()));
-        model.addAttribute("isInviteSend",friendService.isInviteSend(username.get()));
-        model.addAttribute("post",new Post());
-        //model.addAttribute("posts",postService.showLastPosts(currentUser,0));
+        model.addAttribute("currentUser", userService.findUserByUsername(authenticatedUser.getUsername()));
+        model.addAttribute("friends", friendService.getAcceptedFriends(username.get()));
+        model.addAttribute("isFriend", friendService.isFriends(username.get()));
+        model.addAttribute("friendAccepted", friendService.checkFriendStatus(username.get()));
+        model.addAttribute("isInviteReceived", friendService.isInviteReceived(username.get()));
+        model.addAttribute("isInviteSend", friendService.isInviteSend(username.get()));
+        model.addAttribute("post", new Post());
         model.addAttribute("ADMIN", Role.ROLE_ADMIN);
         return "index";
 
     }
 
     @GetMapping("/user/{username}/friend")
-    public String sendInvite(@PathVariable Optional<String> username, Model model, @AuthenticationPrincipal User authentificatedUser,
+    public String sendInvite(@PathVariable Optional<String> username, Model model, @AuthenticationPrincipal User authenticatedUser,
                              @RequestParam(value = "where", required = false) String where) {
-        if (authentificatedUser == null && (username.isEmpty()) || Objects.equals(userService.findUserByUsername(username.get()).getUsername(), userService.getUserAuth().getUsername())) {
+        if (authenticatedUser == null && (username.isEmpty()) || Objects.equals(userService.findUserByUsername(username.get()).getUsername(), userService.getUserAuth().getUsername())) {
             return "/error";
         }
-        if (banRepository.findBanInfoById(authentificatedUser.getBanInfo().getId()).isBanStatus()) {
+        if (banRepository.findBanInfoById(authenticatedUser.getBanInfo().getId()).isBanStatus()) {
             return "banError";
         }
         return friendService.sendInvite(username.get(), where);
     }
 
     @GetMapping("/user/{username}/friend/{result}")
-    public String acceptInvite(@PathVariable Optional<String> username, Model model, @AuthenticationPrincipal User authentificatedUser,@PathVariable int result,
-                               @RequestParam(value = "where", required = false) String where)
-    {
-        if (authentificatedUser == null && (username.isEmpty())||(result>2) || Objects.equals(userService.findUserByUsername(username.get()).getUsername(), userService.getUserAuth().getUsername())) {
+    public String acceptInvite(@PathVariable Optional<String> username, @AuthenticationPrincipal User authenticatedUser, @PathVariable int result,
+                               @RequestParam(value = "where", required = false) String where) {
+        if (authenticatedUser == null && (username.isEmpty()) || (result > 2) || Objects.equals(userService.findUserByUsername(username.get()).getUsername(), userService.getUserAuth().getUsername())) {
             return "/error";
         }
         return friendService.resultInvite(username.get(), result, where);
     }
+
     @GetMapping("/user/{username}/unfriend")
-    public String deleteFriend(@PathVariable Optional<String> username, Model model, @AuthenticationPrincipal User authentificatedUser,
-                               @RequestParam(value="where", required = false) String where) {
-        if (authentificatedUser == null && (username.isEmpty()) || Objects.equals(userService.findUserByUsername(username.get()).getUsername(), userService.getUserAuth().getUsername())) {
+    public String deleteFriend(@PathVariable Optional<String> username, @AuthenticationPrincipal User authenticatedUser,
+                               @RequestParam(value = "where", required = false) String where) {
+        if (authenticatedUser == null && (username.isEmpty()) || Objects.equals(userService.findUserByUsername(username.get()).getUsername(), userService.getUserAuth().getUsername())) {
             return "/error";
         }
 
-        if (banRepository.findBanInfoById(authentificatedUser.getBanInfo().getId()).isBanStatus()) {
+        assert authenticatedUser != null;
+        if (banRepository.findBanInfoById(authenticatedUser.getBanInfo().getId()).isBanStatus()) {
             return "banError";
         }
         return friendService.deleteFriend(username.get(), where);

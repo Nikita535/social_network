@@ -8,9 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import sosal_network.Enum.BanStatus;
 import sosal_network.Enum.Role;
-import sosal_network.entity.User;
 import sosal_network.repository.BanRepository;
 import sosal_network.service.AdminService;
 import sosal_network.service.UserService;
@@ -34,17 +32,17 @@ public class AdminController {
     BanRepository banRepository;
 
     @GetMapping("/admin")
-    public String admin(Model model){
-        model.addAttribute("users",userService.showAllUser());
-        model.addAttribute("userService",userService);
-        model.addAttribute("ADMIN",Role.ROLE_ADMIN);
-        model.addAttribute("banRepository",banRepository);
+    public String admin(Model model) {
+        model.addAttribute("users", userService.showAllUser());
+        model.addAttribute("userService", userService);
+        model.addAttribute("ADMIN", Role.ROLE_ADMIN);
+        model.addAttribute("banRepository", banRepository);
         return "admin";
     }
 
     @GetMapping("/ban/{username}/{banTime}")
-    public String ban(@PathVariable String username,@PathVariable String banTime, Model model) throws MessagingException {
-        adminService.checkBanTime(banTime,username);
+    public String ban(@PathVariable String username, @PathVariable String banTime, Model model) throws MessagingException {
+        adminService.checkBanTime(banTime, username);
         return "redirect:/admin";
     }
 

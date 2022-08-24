@@ -1,7 +1,6 @@
 package sosal_network.controller;
 
 
-import org.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -12,19 +11,17 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
-import sosal_network.Enum.InviteStatus;
 import sosal_network.entity.ChatMessage;
-import sosal_network.entity.Post;
-import sosal_network.entity.ProfileInfo;
 import sosal_network.entity.User;
 import sosal_network.repository.BanRepository;
 import sosal_network.repository.MessageRepository;
 import sosal_network.repository.UserRepository;
-import sosal_network.service.*;
+import sosal_network.service.ChatMessageService;
+import sosal_network.service.FriendService;
+import sosal_network.service.UserService;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Controller
 public class ChatController {
@@ -47,25 +44,17 @@ public class ChatController {
     @Autowired
     private FriendService friendService;
 
-    @Autowired
-    private ImageService imageService;
-
-    @Autowired
-    private PostService postService;
-
 
     @GetMapping("/messages")
-    public String getChat(Model model, @AuthenticationPrincipal User authentificatedUser) {
+    public String getChat(Model model, @AuthenticationPrincipal User authenticatedUser) {
 
-        if (banRepository.findBanInfoById(authentificatedUser.getBanInfo().getId()).isBanStatus()) {
+        if (banRepository.findBanInfoById(authenticatedUser.getBanInfo().getId()).isBanStatus()) {
             return "banError";
         }
 
-        List<User> friends = friendService.getAcceptedFriends(authentificatedUser.getUsername());
 
-        model.addAttribute("user", userService.findUserByUsername(authentificatedUser.getUsername()));
-        model.addAttribute("profileInfo", userService.findProfileInfoByUser(authentificatedUser));
-        model.addAttribute("friends", friendService.getAcceptedFriends(authentificatedUser.getUsername()));
+        model.addAttribute("user", userService.findUserByUsername(authenticatedUser.getUsername()));
+        model.addAttribute("friends", friendService.getAcceptedFriends(authenticatedUser.getUsername()));
         model.addAttribute("userService", userService);
         return "messages";
     }
@@ -77,14 +66,12 @@ public class ChatController {
             return "banError";
         }
 
-        model.addAttribute("profileInfo", userService.findProfileInfoByUser(authenticatedUser));
         model.addAttribute("friends", friendService.getAcceptedFriends(authenticatedUser.getUsername()));
         model.addAttribute("userService", userService);
 
         User friend = userRepository.findByUsername(username);
         model.addAttribute("user", userService.findUserByUsername(authenticatedUser.getUsername()));
         model.addAttribute("userTo", friend);
-        model.addAttribute("userToProfile", userService.findProfileInfoByUser(friend));
         model.addAttribute("allMessages", chatMessageService.showAllMessages(authenticatedUser, friend));
         return "messages";
     }
@@ -99,22 +86,13 @@ public class ChatController {
 
     @GetMapping("/reloadMessageFriends/{page}")
     @ResponseBody
-    public List<Object> showFriendsMessages(@PathVariable int page, @AuthenticationPrincipal User authenticatedUser)
-    {
+    public List<Object> showFriendsMessages(@PathVariable int page, @AuthenticationPrincipal User authenticatedUser) {
         List<Object> allInfo = new ArrayList<>();
-        List<ProfileInfo> chatFriends = chatMessageService.getChatFriends(authenticatedUser, page);
-        List<ChatMessage> lastMessage = chatFriends.stream().map(friend -> chatMessageService.showLastMessage(friend.getUser(), authenticatedUser)).toList();
+        List<User> chatFriends = chatMessageService.getChatFriends(authenticatedUser, page);
+        List<ChatMessage> lastMessages = chatFriends.stream().map(friend -> chatMessageService.showLastMessage(friend, authenticatedUser)).toList();
         allInfo.add(chatFriends);
-        allInfo.add(lastMessage);
+        allInfo.add(lastMessages);
         return allInfo;
     }
 
-    //@MessageMapping("/chat.newUser")
-    //@SendTo("/topic/1")
-    //public ChatMessage newUser(@Payload final ChatMessage chatMessage,
-    //                           SimpMessageHeaderAccessor headerAccessor){
-    //
-    //    headerAccessor.getSessionAttributes().put("username", chatMessage.getUserFrom().getUsername());
-    //    return chatMessage;
-    //}
 }

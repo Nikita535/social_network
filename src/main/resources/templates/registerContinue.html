@@ -50,7 +50,7 @@
                             </div>
                         </div>
                         <input class="form-control mb-3" type="text"
-                               th:value="${user.username}" placeholder="Введите имя" disabled >
+                               th:value="${user.username}" placeholder="Введите имя" disabled>
                         <input class="form-control" type="text"
                                th:classappend=" ${#fields.hasErrors('name')} ? 'is-invalid' : 'mb-3'"
                                th:field="*{name}" placeholder="Введите имя">
@@ -59,7 +59,7 @@
                              th:text=" ${#fields.errors('name').get(0) }">
 
                         </div>
-                        <input class="form-control" type="text"  th:field="*{surname}"
+                        <input class="form-control" type="text" th:field="*{surname}"
                                th:classappend=" ${#fields.hasErrors('surname')} ? 'is-invalid' : 'mb-3'"
                                placeholder="Введите фамилию">
                         <div class="invalid-feedback text-left mb-3 fs-5"
@@ -401,14 +401,20 @@
                         </div>
                         <input class="form-control" id="date" placeholder="Введите дату рождения (необязательно)"
                                th:classappend=" ${#fields.hasErrors('dateOfBirth')} ? 'is-invalid' : 'mb-3'"
-                               type="text" name="date" pattern="\d{2}(/)\d{2}(/)\d{4}">
+                               th:field="*{dateOfBirth}"
+                               type="text" pattern="\d{2}(/)\d{2}(/)\d{4}">
+                        <div class="invalid-feedback text-left mb-3 fs-5"
+                             th:if="${#fields.hasErrors('dateOfBirth')}"
+                             th:text=" ${#fields.errors('dateOfBirth').get(0) }">
+                        </div>
                         <input class="form-control" type="text"
                                th:classappend=" ${#fields.hasErrors('description')} ? 'is-invalid' : 'mb-3'"
                                th:field="*{description}"
                                placeholder="Расскажите о себе (необязательно)"
                         >
                         <input class="form-control" type="text"
-                               th:classappend=" ${#fields.hasErrors('website')} ? 'is-invalid' : 'mb-3'"th:field="*{website}"
+                               th:classappend=" ${#fields.hasErrors('website')} ? 'is-invalid' : 'mb-3'"
+                               th:field="*{website}"
                                pattern="[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)"
                                placeholder="Ваш сайт (необязательно)">
                         <button type="submit" class="btn btn-success fs-4">Завершить регистрацию <i
@@ -428,7 +434,7 @@
 
 <script>
     $(document).ready(function () {
-        var date_input = $('input[name="date"]'); //our date input has the name "date"
+        var date_input = $('input[name="dateOfBirth"]'); //our date input has the name "date"
         var container = $('.bootstrap-iso form').length > 0 ? $('.bootstrap-iso form').parent() : "body";
         date_input.datepicker({
             format: 'dd/mm/yyyy',

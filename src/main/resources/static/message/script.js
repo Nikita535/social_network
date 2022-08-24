@@ -91,13 +91,14 @@ const sendMessage = (event) => {
     const messageInput = document.querySelector('#message')
     const messageContent = messageInput.value.trim();
     let d = new Date();
-    let ye = new Intl.DateTimeFormat('ru', { year: 'numeric' }).format(d);
-    let mo = new Intl.DateTimeFormat('ru', { month: '2-digit' }).format(d);
-    let da = new Intl.DateTimeFormat('ru', { day: '2-digit' }).format(d);
+    let ye = new Intl.DateTimeFormat('ru', {year: 'numeric'}).format(d);
+    let mo = new Intl.DateTimeFormat('ru', {month: '2-digit'}).format(d);
+    let da = new Intl.DateTimeFormat('ru', {day: '2-digit'}).format(d);
     let time = new Intl.DateTimeFormat('ru',
-        {hour: "numeric",
-                minute:"numeric",
-    }).format(d)
+        {
+            hour: "numeric",
+            minute: "numeric",
+        }).format(d)
 
     console.log(`${da}/${mo}/${ye} ${time}`)
 
@@ -126,3 +127,18 @@ const onMessageReceived = (payload) => {
 document.addEventListener('DOMContentLoaded', connect, true)
 const messageControls = document.querySelector('#message-controls')
 messageControls.addEventListener('submit', sendMessage, true)
+
+function pressed(e) {
+    // Has the enter key been pressed?
+    if ((window.event ? event.keyCode : e.which) === 13) {
+        // If it has been so, manually submit the <form>
+        messageControls.submit();
+    }
+}
+
+document.getElementsByTagName('textarea')[0].addEventListener("keydown", function (event) {
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        sendMessage();
+    }
+});

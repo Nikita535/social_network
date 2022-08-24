@@ -1,7 +1,6 @@
 package sosal_network.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,34 +11,29 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Getter
 @Setter
-@Table(name="images")
+@Table(name = "images")
 public class Image {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name="id")
+    @Column(name = "id")
     private Long id;
 
-    @Column(name="name")
+    @Column(name = "name")
     private String name;
 
-    @Column(name="originalFileName")
+    @Column(name = "originalFileName")
     private String originalFileName;
 
-    @Column(name="size")
+    @Column(name = "size")
     private Long size;
 
-    @Column(name="contentType")
+    @Column(name = "contentType")
     private String contentType;
 
     @Lob
     @JsonIgnore
     private byte[] bytes;
 
-
-
-//    @OneToOne(targetEntity = User.class, cascade = {CascadeType.MERGE}, fetch = FetchType.EAGER,orphanRemoval = false)
-//    @JoinColumn(name = "user_id", referencedColumnName = "id")
-//    private User user;
 
     public Image(String name, String originalFileName, Long size, String contentType, byte[] bytes) {
         this.name = name;

@@ -60,13 +60,13 @@
                         <hr class="half-margins">
 
                         <!-- About -->
-                        <h3 class="text-black" th:text="${profileInfo.name}+ ' '+ ${profileInfo.surname}">
+                        <h3 class="text-black" th:text="${user.profileInfo.name}+ ' '+ ${user.profileInfo.surname}">
 
                         </h3>
                         <p class="size-12"
-                           th:text="${profileInfo.dateOfBirth!=null} ? ${profileInfo.getAge()} : 'Дата рождения не указана'"></p>
+                           th:text="${user.profileInfo.dateOfBirth!=null} ? ${user.profileInfo.getAge()} : 'Дата рождения не указана'"></p>
                         <p class="size-12"
-                           th:text="${profileInfo.description!='' and profileInfo.description!=null} ? *{profileInfo.description} : 'Нет описания'"></p>
+                           th:text="${user.profileInfo.description!='' and user.profileInfo.description!=null} ? *{user.profileInfo.description} : 'Нет описания'"></p>
                         <!-- /About -->
 
                         <!-- /About -->
@@ -148,7 +148,7 @@
                                             <input type="text" class="form-control profileFirstName"
                                                    id="profileFirstName"
                                                    th:classappend=" ${#fields.hasErrors('name')} ? 'is-invalid' : ''"
-                                                   name="name" th:value="${profileInfo.name}" >
+                                                   name="name" th:value="${user.profileInfo.name}">
                                             <div class="invalid-feedback text-left mb-3"
                                                  th:if="${#fields.hasErrors('name')}"
                                                  th:text=" ${#fields.errors('name').get(0) }">
@@ -160,7 +160,7 @@
                                         <div class="col-md-8">
                                             <input type="text" class="form-control" id="profileLastName"
                                                    th:classappend=" ${#fields.hasErrors('surname')} ? 'is-invalid' : 'mb-3'"
-                                                   name="surname" th:value="${profileInfo.surname}" >
+                                                   name="surname" th:value="${user.profileInfo.surname}">
                                             <div class="invalid-feedback text-left mb-3"
                                                  th:if="${#fields.hasErrors('surname')}"
                                                  th:text=" ${#fields.errors('surname').get(0) }">
@@ -175,7 +175,7 @@
                                             <input class="form-control" list="datalistOptions" id="exampleDataList"
                                                    th:classappend=" ${#fields.hasErrors('city')} ? 'is-invalid' : 'mb-3'"
                                                    name="city" placeholder="Введите город"
-                                                   th:value="${profileInfo.city}">
+                                                   th:value="${user.profileInfo.city}">
                                             <datalist id="datalistOptions">
                                                 <option value="Москва">Москва</option>
                                                 <option value="Санкт-Петербург">Санкт-Петербург</option>
@@ -527,16 +527,20 @@
                                             рождения</label>
                                         <div class="col-md-8">
                                             <input type="text" class="form-control" id="profileDateOfBirth"
-                                                   name="profileDateOfBirth" placeholder="Добавьте дату рождения"
-                                                   th:value="${profileInfo.dateOfBirth!=null ?  profileInfo.toTextDate() : ''}"
+                                                   name="dateOfBirth" placeholder="Добавьте дату рождения"
+                                                   th:value="${user.profileInfo.dateOfBirth!=null ?  #temporals.format(user.profileInfo.dateOfBirth,'dd/MM/yyyy')  : ''}"
                                                    pattern="\d{2}(-|\/)\d{2}(-|\/)\d{4}">
+                                            <div class="invalid-feedback text-left mb-3 fs-5"
+                                                 th:if="${#fields.hasErrors('dateOfBirth')}"
+                                                 th:text=" ${#fields.errors('dateOfBirth').get(0) }">
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="col-xs-3 control-label" for="profileCompany">Описание</label>
                                         <div class="col-md-8">
                                             <input type="text" class="form-control" id="profileDescription"
-                                                   name="description" th:value="${profileInfo.description}"
+                                                   name="description" th:value="${user.profileInfo.description}"
                                                    placeholder="Добавьте описание">
                                         </div>
                                     </div>
@@ -545,7 +549,7 @@
                                                id="website">Веб-сайт</label>
                                         <div class="col-md-8">
                                             <input type="text" class="form-control" id="profileCompany"
-                                                   name="website" th:value="${profileInfo.website}"
+                                                   name="website" th:value="${user.profileInfo.website}"
                                                    placeholder="Добавьте ваш веб-сайт">
                                         </div>
                                     </div>
@@ -768,7 +772,7 @@
 
 <script>
     $(document).ready(function () {
-        var date_input = $('input[name="profileDateOfBirth"]'); //our date input has the name "date"
+        var date_input = $('input[name="dateOfBirth"]'); //our date input has the name "date"
         var container = $('.bootstrap-iso form').length > 0 ? $('.bootstrap-iso form').parent() : "body";
         date_input.datepicker({
             format: 'dd/mm/yyyy',

@@ -3,11 +3,8 @@ package sosal_network.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.CacheManager;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -21,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.util.StringUtils;
+import org.springframework.util.ObjectUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.support.SessionStatus;
@@ -38,7 +35,6 @@ import sosal_network.utility.ReCaptchaResponse;
 import javax.mail.MessagingException;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 
@@ -92,7 +88,6 @@ public class UserService implements UserDetailsService {
     private BanRepository banRepository;
 
 
-
     /**
      * Метод загрузки пользователя, наследованный UserDetailsService
      * param username - имя пользователя
@@ -139,22 +134,38 @@ public class UserService implements UserDetailsService {
         return userRepository.findByUserEmail(email);
     }
 
-    public User findUserById(Long id){
-        return userRepository.findUserById(id);
+
+    @Transactional
+    public Page<User> findFriendUsers(User user, int page) {
+        return userRepository.findFriendUsers(user, PageRequest.of(page, 10));
     }
 
     @Transactional
-    @Loggable
-    public ProfileInfo findProfileInfoByUser(User user) {
-        return profileInfoRepository.findProfileInfoByUser(user);
+    public Page<User> findFriendUsersWithSearch(User user, String searchLine, int page) {
+        return userRepository.findFriendUsersWithSearch(user, searchLine, PageRequest.of(page, 10));
     }
 
     @Transactional
-    @Loggable
-    public ProfileInfo findByUser(User user)
-    {
-        return profileInfoRepository.findProfileInfoByUser(user);
+    public List<User> findStrangers(User user, int page) {
+        return userRepository.findStrangers(user, PageRequest.of(page, 10));
     }
+
+    @Transactional
+    public List<User> findStrangersWithSearch(User user, String searchLine, int page) {
+        return userRepository.findStrangersWithSearch(user, searchLine, PageRequest.of(page, 10));
+    }
+
+    @Transactional
+    public List<User> fiendReceivedInvites(User user, int page) {
+        return userRepository.fiendReceivedInvites(user, PageRequest.of(page, 5));
+    }
+
+    @Transactional
+    public List<User> fiendReceivedInvitesWithSearch(User user, String searchLine, int page) {
+        return userRepository.fiendReceivedInvitesWithSearch(user, searchLine, PageRequest.of(page, 5));
+    }
+
+
     /**
      * Метод сохранения пользователя в БД
      * param User user - пользователь
@@ -173,7 +184,7 @@ public class UserService implements UserDetailsService {
         user.setRoles(Collections.singleton(Role.ROLE_USER));
         user.setActive(true);
         user.setRegistrationDate(LocalDate.now());
-        user.setBanInfo(new BanInfo("", BanStatus.NONE,false));
+        user.setBanInfo(new BanInfo("", BanStatus.NONE, false));
         save(user);
 
 
@@ -192,22 +203,18 @@ public class UserService implements UserDetailsService {
     public String validateRegister(User user, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
 
         if (!Objects.equals(user.getPassword(), user.getPasswordConfirm())) {
-//            model.addAttribute("passwordConfirmError", "Пароли не совпадают");
             bindingResult.addError(new FieldError("user", "passwordConfirm", "Пароли не совпадают"));
             log.warn("error confirm pass");
         }
-        if (findUserByUsername(user.getUsername())!= null) {
-//            model.addAttribute("usernameError", "Пользователь с таким никнеймом уже существует");
+        if (findUserByUsername(user.getUsername()) != null) {
             bindingResult.addError(new FieldError("user", "username", "Пользователь с таким никнеймом уже существует"));
             log.warn("error user already exists");
         }
         if (findUserByEmail(user.getUserEmail()) != null) {
-//            model.addAttribute("userEmailError", "Пользователь с такой почтой уже существует");
             bindingResult.addError(new FieldError("user", "userEmail", "Пользователь с такой почтой уже существует"));
             log.warn("mail already exists");
         }
-        if (bindingResult.hasErrors())
-        {
+        if (bindingResult.hasErrors()) {
             return "/register";
         }
         try {
@@ -227,7 +234,7 @@ public class UserService implements UserDetailsService {
      **/
     @Loggable
     @Transactional
-    public void activateUser(String code){
+    public void activateUser(String code) {
         User user = activationTokenRepository.findByToken(code).getUser();
         if (user == null) {
             return;
@@ -249,7 +256,7 @@ public class UserService implements UserDetailsService {
         ActivationToken myToken = new ActivationToken(token, user, new Date());
         activationTokenRepository.save(myToken);
 
-        if (!StringUtils.isEmpty(user.getUserEmail())) {
+        if (!ObjectUtils.isEmpty(user.getUserEmail())) {
             String message = "Привет, " + user.getUsername() + "!" +
                     " для активации аккаунта перейдите <a href='http://localhost:8080/activate/" + token + "'>по ссылке</a>";
             emailService.sendSimpleMessage(user.getUserEmail(), message);
@@ -268,7 +275,7 @@ public class UserService implements UserDetailsService {
         PasswordResetToken myToken = new PasswordResetToken(token, user, new Date());
         passwordTokenRepository.save(myToken);
 
-        if (!StringUtils.isEmpty(user.getUserEmail())) {
+        if (!ObjectUtils.isEmpty(user.getUserEmail())) {
             String message = "Привет, " + user.getUsername() + "!" +
                     " для восстановление аккаунта перейдите <a href='http://localhost:8080/recover/" + token + "'>по ссылке</a>";
             emailService.sendSimpleMessage(user.getUserEmail(), message);
@@ -322,13 +329,10 @@ public class UserService implements UserDetailsService {
      **/
     @Loggable
     @Transactional
-    public String addProfileInfo(ProfileInfo profileInfo, RedirectAttributes redirectAttributes, User user, String dateOfBirth, SessionStatus status) {
+    public String addProfileInfo(ProfileInfo profileInfo, RedirectAttributes redirectAttributes, User user, SessionStatus status) {
         try {
-            if (!Objects.equals(dateOfBirth, "")) {
-                profileInfo.setDateOfBirth(LocalDate.parse(dateOfBirth, DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-            }
-            profileInfo.setUser(user);
-            profileInfoRepository.save(profileInfo);
+            user.setProfileInfo(profileInfo);
+            save(user);
             createActivationCode(user.getUserEmail());
             redirectAttributes.addFlashAttribute("registerSuccess", true);
             status.setComplete();
@@ -340,29 +344,6 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    @Transactional
-    public Page<ProfileInfo> findProfileInfosByUsers(List<User> users, int page)
-    {
-        return profileInfoRepository.findProfileInfosByUsers(users, PageRequest.of( page, 5));
-    }
-
-    @Transactional
-    public Page<ProfileInfo> findProfileInfosByUsersWithSearch(List<User> users, String searchLine, int page)
-    {
-        return profileInfoRepository.findProfileInfosByUsersWithSearch(users, searchLine, PageRequest.of( page, 5));
-    }
-
-    @Transactional
-    public List<ProfileInfo> findStrangerProfileInfosByUsers(List<User> users, int page)
-    {
-        return profileInfoRepository.findStrangerProfileInfosByUsers(users, PageRequest.of( page, 5));
-    }
-
-    @Transactional
-    public List<ProfileInfo> findStrangerProfileInfosByUsersWithSearch(List<User> users, String searchLine, int page)
-    {
-        return profileInfoRepository.findStrangerProfileInfosByUsersWithSearch(users, searchLine, PageRequest.of( page, 5));
-    }
 
     /**
      * Метод для получения информации о пользователе из сессии
@@ -376,18 +357,14 @@ public class UserService implements UserDetailsService {
     }
 
     @Loggable
-    public String editProfile(ProfileInfo editedProfile, String dateOfBirth, RedirectAttributes redirectAttributes,
+    public String editProfile(ProfileInfo editedProfile, RedirectAttributes redirectAttributes,
                               User user) {
-        ProfileInfo profileSession = findProfileInfoByUser(user);
-        if (!dateOfBirth.isEmpty()) {
-            LocalDate changedDate = LocalDate.parse(dateOfBirth, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-            editedProfile.setDateOfBirth(changedDate);
-        }
+
+        ProfileInfo profileSession = user.getProfileInfo();
+        user.setProfileInfo(editedProfile);
+        save(user);
+        profileInfoRepository.deleteById(profileSession.getId());
         redirectAttributes.addFlashAttribute("profileChanged", true);
-        editedProfile.setUser(user);
-        editedProfile.setId(profileSession.getId());
-        profileSession = editedProfile;
-        profileInfoRepository.save(profileSession);
         return "redirect:/edit";
     }
 
@@ -452,11 +429,11 @@ public class UserService implements UserDetailsService {
 
     @Loggable
     public List<User> showAllUser() {
-        return userRepository.findUserBy();
+        return userRepository.findAll();
     }
 
     @Loggable
-    public Boolean checkRole(User user){
+    public Boolean checkRole(User user) {
         return user.getRoles().contains(Role.ROLE_ADMIN);
     }
 }

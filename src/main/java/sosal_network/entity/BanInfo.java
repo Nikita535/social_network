@@ -7,7 +7,6 @@ import lombok.Setter;
 import sosal_network.Enum.BanStatus;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -22,14 +21,14 @@ public class BanInfo {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
-    @Column(name="banCause")
+    @Column(name = "banCause")
     private String banCause;
 
-    @Column(name="banTime")
+    @Column(name = "banTime")
     @Enumerated(EnumType.STRING)
     private BanStatus banTime;
 
-    @Column(name="banStatus")
+    @Column(name = "banStatus")
     private boolean banStatus;
 
     public BanInfo(String banCause, BanStatus banTime, boolean banStatus) {

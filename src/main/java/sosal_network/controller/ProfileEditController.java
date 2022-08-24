@@ -5,6 +5,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,12 +15,12 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import sosal_network.entity.ProfileInfo;
 import sosal_network.entity.User;
 import sosal_network.repository.BanRepository;
-import sosal_network.repository.ProfileInfoRepository;
-import sosal_network.service.ImageService;
 import sosal_network.service.UserService;
 
 import javax.validation.Valid;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 @Controller
 public class ProfileEditController {
@@ -44,7 +45,6 @@ public class ProfileEditController {
 
         model.addAttribute("editedProfileInfo", new ProfileInfo());
         model.addAttribute("user", userService.findUserByUsername(userFromSession.getUsername()));
-        model.addAttribute("profileInfo", userService.findProfileInfoByUser(userFromSession));
         return "profileEdit";
     }
 
@@ -54,16 +54,19 @@ public class ProfileEditController {
      * author - Renat
      **/
     @PostMapping("/edit/profile")
-    public String changeProfileInfo(RedirectAttributes redirectAttributes, @ModelAttribute("editedProfileInfo") @Valid ProfileInfo editedProfile, BindingResult bindingResult,Model model,
-                                    @RequestParam("profileDateOfBirth") String dateOfBirth,
-                                    @AuthenticationPrincipal User user){
-        if (bindingResult.hasErrors())
-        {
+    public String changeProfileInfo(RedirectAttributes redirectAttributes, @ModelAttribute("editedProfileInfo") @Valid ProfileInfo editedProfile, BindingResult bindingResult, Model model,
+
+                                    @AuthenticationPrincipal User user) {
+        if (editedProfile.getDateOfBirth() != null) {
+            if (ChronoUnit.YEARS.between(editedProfile.getDateOfBirth(), LocalDate.now()) < 14) {
+                bindingResult.addError(new FieldError("profileInfo", "dateOfBirth", "Вы не можете указать возраст меньше 14-ти лет"));
+            }
+        }
+        if (bindingResult.hasErrors()) {
             model.addAttribute("user", userService.findUserByUsername(user.getUsername()));
-            model.addAttribute("profileInfo", userService.findProfileInfoByUser(user));
             return "profileEdit";
         }
-        return userService.editProfile(editedProfile, dateOfBirth, redirectAttributes, user);
+        return userService.editProfile(editedProfile, redirectAttributes, userService.findUserByUsername(user.getUsername()));
     }
 
     @PostMapping("/edit/photo")

@@ -2,7 +2,6 @@ package sosal_network.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import sosal_network.entity.PasswordResetToken;
@@ -40,38 +39,33 @@ public class RecoveryController {
 
 
     @GetMapping("/recovery")
-    public String getRecoveryForm(Model model) {
+    public String getRecoveryForm() {
         return "recovery";
     }
 
     @PostMapping("/recovery")
-    public String sendRecoveryToken(@RequestParam("email") String userEmail,
-                                    Model model) throws MessagingException {
+    public String sendRecoveryToken(@RequestParam("email") String userEmail) throws MessagingException {
         userService.createPasswordResetTokenForUser(userEmail);
         return "login";
     }
 
     @GetMapping("/recover/{token}")
-    public String getRecoveryToken(Model model, @PathVariable String token, RedirectAttributes redirectAttributes) {
+    public String getRecoveryToken(@PathVariable String token, RedirectAttributes redirectAttributes) {
         PasswordResetToken resetToken = passwordTokenRepository.findByToken(token);
         if (resetToken != null && resetToken.compareDate()) {
             redirectAttributes.addFlashAttribute("token", resetToken.getToken());
             redirectAttributes.addFlashAttribute("username", resetToken.getUser().getUsername());
             return "redirect:/recoveryPage";
-        } else
-            return "invalidToken";
+        } else return "invalidToken";
     }
 
     @GetMapping("/recoveryPage")
-    public String getRecoveryByPassword(Model model, @ModelAttribute("token") String token) {
+    public String getRecoveryByPassword(@ModelAttribute("token") String token) {
         return "recoveryPage";
     }
 
     @PostMapping("/recoveryPage/{token}")
-    public String getRecoveryByPassword(Model model, @PathVariable String token,
-                                        @RequestParam("password") String userPassword,
-                                        @RequestParam("passwordConfirm") String passwordConfirm,
-                                        RedirectAttributes redirectAttributes) {
+    public String getRecoveryByPassword(@PathVariable String token, @RequestParam("password") String userPassword, @RequestParam("passwordConfirm") String passwordConfirm, RedirectAttributes redirectAttributes) {
         return userService.changePasswordByToken(token, userPassword, passwordConfirm, redirectAttributes);
     }
 

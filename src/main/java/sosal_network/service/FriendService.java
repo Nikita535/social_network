@@ -1,32 +1,18 @@
 package sosal_network.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.support.PagedListHolder;
-import org.springframework.boot.Banner;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.ui.Model;
 import sosal_network.Enum.InviteStatus;
 import sosal_network.entity.Friend;
-import sosal_network.entity.Image;
-import sosal_network.entity.ProfileInfo;
 import sosal_network.entity.User;
 import sosal_network.repository.FriendRepository;
-import sosal_network.repository.ImageRepository;
-import sosal_network.repository.ProfileInfoRepository;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.swing.text.StyledEditorKit;
-import java.util.*;
-import java.util.regex.Pattern;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -41,11 +27,8 @@ public class FriendService {
     @Autowired
     private FriendRepository friendRepository;
 
-    @Autowired
-    private ProfileInfoRepository profileInfoRepository;
 
-
-    public String redirectToFriendListOrToProfile(String username, String where){
+    public String redirectToFriendListOrToProfile(String username, String where) {
         if (where != null)
             return "redirect:/" + where + "/friendList/1";
         return "redirect:/user/" + username;
@@ -83,17 +66,13 @@ public class FriendService {
         Friend friend = findLinkedFriends(userFromSession, friendUser);
 
         switch (result) {
-            case 1: {
+            case 1 -> {
                 friend.setInviteStatus(InviteStatus.ACCEPTED);
                 save(friend);
-                break;
             }
-            case 2: {
-                friendRepository.delete(friend);
-                break;
+            case 2 -> friendRepository.delete(friend);
+            default -> {
             }
-            default:
-                break;
         }
         return redirectToFriendListOrToProfile(username, where);
     }
@@ -141,10 +120,11 @@ public class FriendService {
         }
         return friends;
     }
+
     public List<User> getAcceptedFriends(String username) {
         User userFromSession = userService.findUserByUsername(username);
-        List<Friend> friendsByFirstUser = findFriendsByFirstUser(userFromSession).stream().filter(x->x.getInviteStatus()==InviteStatus.ACCEPTED).toList();
-        List<Friend> friendsBySecondUser = findFriendsBySecondUser(userFromSession).stream().filter(x->x.getInviteStatus()==InviteStatus.ACCEPTED).toList();
+        List<Friend> friendsByFirstUser = findFriendsByFirstUser(userFromSession).stream().filter(x -> x.getInviteStatus() == InviteStatus.ACCEPTED).toList();
+        List<Friend> friendsBySecondUser = findFriendsBySecondUser(userFromSession).stream().filter(x -> x.getInviteStatus() == InviteStatus.ACCEPTED).toList();
         List<User> friends = new ArrayList<>();
         for (Friend friend : friendsByFirstUser) {
             friends.add(userService.findUserByUsername(friend.getSecondUser().getUsername()));
@@ -152,24 +132,11 @@ public class FriendService {
         for (Friend friend : friendsBySecondUser) {
             friends.add(userService.findUserByUsername(friend.getFirstUser().getUsername()));
         }
-        return friends.stream().sorted(Comparator.comparing(User::getId)).collect(Collectors.toList());
-    }
-
-    public List<User> getReceivedInvitesUsers(String username){
-        User userFromSession = userService.findUserByUsername(username);
-        return findFriendsBySecondUser(userFromSession).stream().
-                filter(x->x.getInviteStatus()==InviteStatus.PENDING).map(Friend::getFirstUser).toList();
-    }
-
-    public List<ProfileInfo> getReceivedInvitesProfiles(String username){
-        User userFromSession = userService.findUserByUsername(username);
-        return findFriendsBySecondUser(userFromSession).stream().
-                filter(x->x.getInviteStatus()==InviteStatus.PENDING).map(i->profileInfoRepository.findProfileInfoByUser(i.getFirstUser())).toList();
+        return friends;
     }
 
     @Transactional
     public boolean isFriends(String username) {
-        User user = userService.getUserAuth();
         List<User> friends = getFriends(userService.getUserAuth().getUsername());
         for (User friendUser : friends) {
             if (friendUser.getUsername().equals(username)) {
@@ -191,7 +158,7 @@ public class FriendService {
     }
 
     @Transactional
-    public boolean isInviteRecieved(String username) {
+    public boolean isInviteReceived(String username) {
         User userFromSession = userService.getUserAuth();
         User friendUser = userService.findUserByUsername(username);
         Friend friend = findLinkedFriends(userFromSession, friendUser);
@@ -237,84 +204,58 @@ public class FriendService {
         return friendRepository.findFriendsBySecondUser(secondUser);
     }
 
-    @Transactional
-    public List<ProfileInfo> findFriendsBySecondUserAndInviteStatus(User user, int page)
-    {
-        return friendRepository.findFriendsBySecondUserAndInviteStatus(user,
-                InviteStatus.PENDING, PageRequest.of( page, 5)).stream().map(friend ->
-                profileInfoRepository.findProfileInfoByUser(friend.getFirstUser())).collect(Collectors.toList());
-    }
-
-    @Transactional
-    public List<ProfileInfo> findFriendsBySecondUserAndInviteStatusWithSearch(User user, String searchLine, int page){
-        return friendRepository.findFriendsBySecondUserAndInviteStatusWithSearch(user, searchLine,
-                InviteStatus.PENDING, PageRequest.of( page, 5)).stream().
-                map(name -> profileInfoRepository.findProfileInfoByUser(userService.findUserById(name))).collect(Collectors.toList());
-    }
-
 
     @Transactional
     public void save(Friend friend) {
         friendRepository.save(friend);
     }
 
-    public List<Boolean> getInviteSendFriends(List<ProfileInfo> friends){
-        return friends.stream().map(friend -> isInviteSend(friend.getUser().getUsername())).collect(Collectors.toList());
+    public List<Boolean> getInviteSendFriends(List<User> friends) {
+        return friends.stream().map(friend -> isInviteSend(friend.getUsername())).collect(Collectors.toList());
     }
 
+
     @Transactional
-    public List<Object> findFriendsAndStrangers(String username, String searchLine, int page){
+    public List<Object> findFriendsAndStrangers(String username, String searchLine, int page) {
 
         User currentUser = userService.findUserByUsername(username);
         List<Object> response = new ArrayList<>();
-        List<User> friends = new LinkedList<>(getAcceptedFriends(username));
-
         List<Boolean> isInviteSendStrangers = new ArrayList<>();
-        Page<ProfileInfo> profilesOfFriends;
-        List<ProfileInfo> profilesOfStrangers = new ArrayList<>();
-        List<User> profilesReceived = getReceivedInvitesUsers(username);
+        Page<User> friendUsers;
+        List<User> profilesOfStrangers = new ArrayList<>();
 
-
-        if (Objects.equals(searchLine, "")){
-            profilesOfFriends = userService.findProfileInfosByUsers(friends, page);
-            friends.addAll(profilesReceived);
-            friends.add(currentUser);
-            if (profilesOfFriends.isLast()) {
-                profilesOfStrangers = userService.findStrangerProfileInfosByUsers(friends,
-                        profilesOfFriends.getTotalPages() == 0 ? page : page - profilesOfFriends.getTotalPages() + 1);
-                isInviteSendStrangers = getInviteSendFriends(profilesOfStrangers.stream().toList());
+        if (Objects.equals(searchLine, "")) {
+            friendUsers = userService.findFriendUsers(currentUser, page);
+            if (friendUsers.isLast()) {
+                profilesOfStrangers = userService.findStrangers(currentUser, friendUsers.getTotalPages() == 0 ? page : page - friendUsers.getTotalPages() + 1);
+                isInviteSendStrangers = getInviteSendFriends(profilesOfStrangers);
             }
-        }else {
-            profilesOfFriends = userService.findProfileInfosByUsersWithSearch(friends, searchLine, page);
-            friends.addAll(profilesReceived);
-            friends.add(currentUser);
+        } else {
+            friendUsers = userService.findFriendUsersWithSearch(currentUser, searchLine, page);
 
-            if (profilesOfFriends.isLast()) {
-                profilesOfStrangers = userService.findStrangerProfileInfosByUsersWithSearch(friends, searchLine,
-                        profilesOfFriends.getTotalPages() == 0 ? page : page - profilesOfFriends.getTotalPages() + 1);
-                isInviteSendStrangers = getInviteSendFriends(profilesOfStrangers.stream().toList());
+            if (friendUsers.isLast()) {
+                profilesOfStrangers = userService.findStrangersWithSearch(currentUser, searchLine,
+                        friendUsers.getTotalPages() == 0 ? page : page - friendUsers.getTotalPages() + 1);
+                isInviteSendStrangers = getInviteSendFriends(profilesOfStrangers);
             }
         }
-
-        response.add(profilesOfFriends.stream().toList());
+        response.add(friendUsers.toList());
         response.add(profilesOfStrangers);
         response.add(isInviteSendStrangers);
-        response.add(profilesReceived);
         return response;
     }
 
-    public List<Object> findSuggestions(String username, String searchLine, int page){
-        List<Object> response = new ArrayList<>();
-        List<ProfileInfo> profilesReceived;
+    public List<User> findSuggestions(String username, String searchLine, int page) {
+        List<User> usersReceived;
+        User currentUser = userService.findUserByUsername(username);
         if (Objects.equals(searchLine, ""))
-            profilesReceived = findFriendsBySecondUserAndInviteStatus(userService.findUserByUsername(username), page);
+            usersReceived = userService.fiendReceivedInvites(currentUser, page);
         else
-            profilesReceived = findFriendsBySecondUserAndInviteStatusWithSearch(userService.findUserByUsername(username), searchLine, page);
-        response.add(profilesReceived);
-        return response;
+            usersReceived = userService.fiendReceivedInvitesWithSearch(currentUser, searchLine, page);
+        return usersReceived;
     }
 
-    public String clearSearchLine(String searchLine){
+    public String clearSearchLine(String searchLine) {
         return searchLine.replaceAll("[^A-Za-zА-Яа-я0-9 ]", "");
     }
 
