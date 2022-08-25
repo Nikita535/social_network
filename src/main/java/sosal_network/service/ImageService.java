@@ -5,14 +5,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import sosal_network.aop.LoggableAroundMethod.Loggable;
 import sosal_network.entity.Image;
-import sosal_network.entity.Post;
-import sosal_network.entity.PostImage;
 import sosal_network.entity.User;
 import sosal_network.repository.ImageRepository;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class ImageService {
@@ -21,19 +17,6 @@ public class ImageService {
 
     @Autowired
     private ImageRepository imageRepository;
-
-    @Loggable
-    public List<PostImage> convertPostImages(List<MultipartFile> files, Post post) {
-        return files.stream().map(file -> {
-            try {
-                Image image = toImageEntity(file);
-                imageRepository.save(image);
-                return new PostImage(post, image);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }).collect(Collectors.toList());
-    }
 
     @Loggable
     public Image toImageEntity(MultipartFile file) throws IOException {
@@ -56,5 +39,9 @@ public class ImageService {
                 userService.save(user);
             }
         }
+    }
+
+    public void save(Image image) {
+        imageRepository.save(image);
     }
 }

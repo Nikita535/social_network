@@ -431,9 +431,4 @@ public class UserService implements UserDetailsService {
     public List<User> showAllUser() {
         return userRepository.findAll();
     }
-
-    @Loggable
-    public Boolean checkRole(User user) {
-        return user.getRoles().contains(Role.ROLE_ADMIN);
-    }
 }

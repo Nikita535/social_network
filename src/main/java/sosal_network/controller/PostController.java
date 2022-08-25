@@ -1,17 +1,29 @@
 package sosal_network.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.tomcat.util.json.ParseException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import sosal_network.entity.Post;
-import sosal_network.entity.User;
+import sosal_network.entity.*;
 import sosal_network.repository.BanRepository;
+import sosal_network.service.ImageService;
 import sosal_network.service.PostService;
 import sosal_network.service.UserService;
 
-import java.util.List;
+import java.io.File;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 @Controller
 public class PostController {
@@ -23,14 +35,28 @@ public class PostController {
 
     @Autowired
     BanRepository banRepository;
-    @PostMapping("/post")
-    public String addPost(@RequestParam("imageList") List<MultipartFile> files,@ModelAttribute("post") Post post,   @AuthenticationPrincipal User user) {
-        if (banRepository.findBanInfoById(user.getBanInfo().getId()).isBanStatus()) {
-            return "banError";
-        }
 
-        postService.savePost(files,post, user);
-        return "redirect:/";
+    @Autowired
+    ImageService imageService;
+    @MessageMapping("/post.send/{username}")
+    @SendTo("/topic/post/{username}")
+    public Post addPost(@Payload final Post post) {
+        postService.savePost(post);
+        return post;
+    }
+
+    @RequestMapping(value = "/post/create", method = RequestMethod.POST)
+    @ResponseBody
+    public List<Image> processReloadData(@RequestParam("file") List<MultipartFile> files) {
+        return files.stream().map(file -> {
+            try {
+                Image image = imageService.toImageEntity(file);
+                imageService.save(image);
+                return image;
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }).toList();
     }
 
 

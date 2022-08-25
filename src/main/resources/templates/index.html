@@ -297,24 +297,34 @@
             </div>
             <!-- left wrapper end -->
             <!-- middle wrapper start -->
+            <script src="/profile/postAdding.js"></script>
             <div class="col-md-8 col-xl-6 middle-wrapper postTimeline" id="postLine">
                 <div th:if="${#authentication.getPrincipal().username}==${user.username}" class="col-md-12">
                     <div class="panel">
-                        <form class="panel-body" th:method="POST" th:object="${post}" enctype="multipart/form-data"
-                              th:action="@{/post}">
-                            <textarea class="form-control" rows="2" th:field="*{full_text}" required
+                        <form class="panel-body" enctype="multipart/form-data">
+                            <textarea class="form-control" rows="2"
                                       placeholder="Что у вас нового, Ренатий?"></textarea>
                             <div class="mar-top clearfix">
-                                <input id="imageList" name="imageList" type="file" multiple>
-                                <script>
-                                    $(document).ready(function () {
-                                        $("#imageList").fileinput({showCaption: false, dropZoneEnabled: false});
-                                        let shareButton = document.querySelector('.fileinput-upload').querySelector('.hidden-xs')
-                                        shareButton.textContent = "Поделиться"
-                                        let minusButtonDelete = document.querySelector('.fileinput-remove')
-                                        minusButtonDelete.parentNode.removeChild(minusButtonDelete)
-                                    });
-                                </script>
+                                <a id="postAdd" class="btn btn-sm btn-primary pull-right"><i
+                                        class="fa fa-pencil fa-fw"></i> Share
+                                </a>
+                                <label class="btn btn-default">
+                                    <div class="btn btn-trans btn-icon fa fa-camera add-tooltip"
+                                         data-original-title="Add Photo" data-toggle="tooltip"></div>
+                                    <input type="file" id="imageList" name="imageList" multiple accept="image/*" hidden>
+                                </label>
+<!--                                <script>-->
+<!--                                    $(document).ready(function () {-->
+<!--                                        $("#imageList").fileinput({showCaption: false, dropZoneEnabled: false});-->
+<!--                                        let shareButton = document.querySelector('.fileinput-upload').querySelector('.hidden-xs')-->
+<!--                                        shareButton.textContent = "Поделиться"-->
+
+<!--                                        shareButton.addEventListener('click', sendPost, true)-->
+
+<!--                                        let minusButtonDelete = document.querySelector('.fileinput-remove')-->
+<!--                                        minusButtonDelete.parentNode.removeChild(minusButtonDelete)-->
+<!--                                    });-->
+<!--                                </script>-->
                             </div>
                         </form>
                     </div>
@@ -540,9 +550,14 @@
 <script th:inline="javascript">
     var user = [[${user}]];
     var currentUser = [[${currentUser}]];
+    if ([[${#authentication.getPrincipal().username}]]===[[${user.username}]]) {
+        document.getElementById("postAdd").addEventListener("click", sendPost, true)
+    }
 </script>
 <script src="/profile/postload.js"></script>
 <script src="/profile/comment.js"></script>
+
+
 <section class="error-404-section section-padding"
          th:if="${#authentication.getPrincipal().getActive()==false or user.profileInfo==null }">
     <div class="error">

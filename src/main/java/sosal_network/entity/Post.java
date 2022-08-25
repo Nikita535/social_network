@@ -1,13 +1,11 @@
 package sosal_network.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -27,7 +25,7 @@ public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-
+    @JsonFormat(pattern = "dd/MM/yyyy HH:mm", shape = JsonFormat.Shape.STRING)
     private LocalDateTime dateOfCreate;
     private String full_text;
 
@@ -36,10 +34,13 @@ public class Post {
     @JoinColumn(nullable = false, name = "user_id")
     private User user;
 
-
-    @OneToMany(mappedBy = "post", fetch = FetchType.EAGER, orphanRemoval = true)
-    List<PostImage> images = new ArrayList<>();
-
+    @OneToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name="post_images",
+            joinColumns = {@JoinColumn(name="post_id")},
+            inverseJoinColumns = {@JoinColumn(name="image_id")}
+    )
+    private List<Image> images = new ArrayList<>();
 
     @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, orphanRemoval = true)
     @JsonIgnoreProperties(value = {"post"}, allowSetters = true)

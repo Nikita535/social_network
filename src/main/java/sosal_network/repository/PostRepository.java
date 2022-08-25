@@ -12,12 +12,6 @@ import java.util.List;
 @Repository
 public interface PostRepository extends JpaRepository<Post,Integer> {
 
-    List<Post> findPostsByUser(User user);
-
-    @Query(value = "select * from (select * from jpa.posts  where user_id=2 order by id desc limit 5) t order by id desc", nativeQuery = true)
-    List<Post> findLast5ByUser(User user);
-
-
     List<Post> findAllByUserOrderByIdDesc(User user, Pageable pageable);
 
 

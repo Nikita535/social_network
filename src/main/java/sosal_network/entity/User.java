@@ -92,6 +92,7 @@ public class User implements UserDetails {
 
     @OneToOne(targetEntity = Image.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "image_id", referencedColumnName = "id")
+    @JsonIgnoreProperties(value = "bytes", allowSetters = true)
     private Image image;
 
     @OneToOne(targetEntity = BanInfo.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
@@ -101,7 +102,6 @@ public class User implements UserDetails {
     @Cascade({org.hibernate.annotations.CascadeType.SAVE_UPDATE, org.hibernate.annotations.CascadeType.MERGE, org.hibernate.annotations.CascadeType.PERSIST})
     @OneToOne(targetEntity = ProfileInfo.class, fetch = FetchType.EAGER)
     @JoinColumn(name = "profile_info_id")
-    @JsonIgnoreProperties(value = "user", allowSetters = true)
     private ProfileInfo profileInfo;
 
     /**

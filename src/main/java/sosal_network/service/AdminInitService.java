@@ -45,26 +45,24 @@ public class AdminInitService implements CommandLineRunner {
     @Override
     @Loggable
     public void run(String... args) throws Exception {
-        String password = bCryptPasswordEncoder.encode("ADMIN");
-
-        BanInfo banInfo = new BanInfo();
-        banInfo.setBanStatus(false);
-        banInfo.setBanTime(BanStatus.NONE);
-
-        User admin = new User("ADMIN", password, password, "victor.hodinsciy.com@gmail.com", banInfo);
-        admin.getRoles().add(Role.ROLE_ADMIN);
-        admin.setActive(true);
-
-
-        if (userRepository.findByUsername("ADMIN") == null) {
-
-            ProfileInfo profileInfoAdmin = new ProfileInfo("ADMIN", "ADMIN", "Москва",
-                    LocalDate.now(), "", "");
-            admin.setProfileInfo(profileInfoAdmin);
-            userRepository.save(admin);
-
-
-        }
+        //String password = bCryptPasswordEncoder.encode("ADMIN");
+//
+        //BanInfo banInfo = new BanInfo();
+        //banInfo.setBanStatus(false);
+        //banInfo.setBanTime(BanStatus.NONE);
+//
+        //User admin = new User("ADMIN", password, password, "victor.hodinsciy.com@gmail.com", banInfo);
+        //admin.getRoles().add(Role.ROLE_ADMIN);
+        //admin.setActive(true);
+//
+//
+        //if (userRepository.findByUsername("ADMIN") == null) {
+//
+        //    ProfileInfo profileInfoAdmin = new ProfileInfo("ADMIN", "ADMIN", "Москва",
+        //            LocalDate.now(), "", "");
+        //    admin.setProfileInfo(profileInfoAdmin);
+        //    userRepository.save(admin);
+        //}
 
         //40 пользователей
         //for(int i = 0; i < 40; i++) {

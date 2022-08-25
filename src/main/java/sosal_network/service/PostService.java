@@ -6,11 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 import sosal_network.entity.Post;
-import sosal_network.entity.PostImage;
 import sosal_network.entity.User;
-import sosal_network.repository.PostImageRepository;
 import sosal_network.repository.PostRepository;
 
 import java.time.LocalDateTime;
@@ -28,20 +25,12 @@ public class PostService {
     private PostRepository postRepository;
 
     @Autowired
-    private ImageService imageService;
+    UserService userService;
 
-    @Autowired
-    private PostImageRepository postImageRepository;
-
-    public void savePost(List<MultipartFile> files, Post post, User user) {
-
+    public void savePost(Post post) {
         post.setDateOfCreate(LocalDateTime.now());
-        post.setUser(user);
+        post.setFromNow(showTimeAgo(post));
         postRepository.save(post);
-        if (!files.isEmpty() && !files.get(0).isEmpty()) {
-            List<PostImage> postImages = imageService.convertPostImages(files, post);
-            postImageRepository.saveAll(postImages);
-        }
     }
 
     public void save(Post post) {

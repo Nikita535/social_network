@@ -35,11 +35,7 @@ const connect = (event) => {
 }
 
 const onConnected = () => {
-    stompClient.subscribe('/topic/post/' + username, onMessageReceived)
-    //stompClient.send("/app/chat.newUser",
-    //    {},
-    //    JSON.stringify({sender: username})
-    //)
+    stompClient.subscribe('/topic/post/comment/' + username, onMessageReceived)
 }
 
 const onError = (error) => {
@@ -75,9 +71,6 @@ const sendComment = (event) => {
                 content: messageInput.value,
                 time: `${da}/${mo}/${ye} ${time}`
             }
-            console.log(jsonResponse)
-            console.log(postComment)
-            console.log(JSON.stringify(postComment))
             stompClient.send("/app/comment.send/" + username, {}, JSON.stringify(postComment))
             messageInput.value = ''
         }

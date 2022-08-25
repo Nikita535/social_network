@@ -39,6 +39,8 @@ const setLike = (event) => {
 
 }
 
+
+
 function loadPosts() {
     let xhr = new XMLHttpRequest()
     let url = "http://localhost:8080/post/" + user.username + "/" + page
@@ -78,8 +80,8 @@ function loadPosts() {
                 for (let j = 0; j < images.length; j++) {
                     let imgcontainer = document.createElement('div')
                     imgcontainer.classList.add("card-body")
-                    let postsource = images[j].image != null ? '/image/' +
-                        images[j].image.id : 'https://bootdey.com/img/Content/avatar/avatar6.png'
+                    let postsource = images[j] != null ? '/image/' +
+                        images[j].id : 'https://bootdey.com/img/Content/avatar/avatar6.png'
                     imgcontainer.innerHTML = "<img src=\"" + postsource + "\" alt=\"\">"
                     images_post.innerHTML += imgcontainer.outerHTML
                 }
