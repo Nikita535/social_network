@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import sosal_network.Enum.Role;
 import sosal_network.entity.Post;
 import sosal_network.entity.User;
+import sosal_network.exception.BadRequestException;
+import sosal_network.exception.UserWasBanedException;
 import sosal_network.repository.BanRepository;
 import sosal_network.service.AdminService;
 import sosal_network.service.FriendService;
@@ -59,21 +61,20 @@ public class UserController {
      * author - Nekit
      **/
     @GetMapping("/user/{username}")
-    public String getHome(@PathVariable Optional<String> username, Model model, @AuthenticationPrincipal User authenticatedUser) {
+    public String getHome(@PathVariable Optional<String> username, Model model, @AuthenticationPrincipal User authenticatedUser){
         if (authenticatedUser == null && (username.isEmpty())) {
             return "/error";
         }
         model.addAttribute("postService", postService);
-        if (userService.findUserByUsername(username.get()) == null) {
-            return "error-404";
+
+        try {
+            userService.findUserByUsername(username.get());
+        }catch (Exception e){
+            throw new BadRequestException("username = null",e);
         }
 
-        assert authenticatedUser != null;
         if (banRepository.findBanInfoById(authenticatedUser.getBanInfo().getId()).isBanStatus()) {
-            model.addAttribute("banRepository", banRepository);
-            model.addAttribute("userFromSession", authenticatedUser);
-            model.addAttribute("adminService", adminService);
-            return "banError";
+            throw new UserWasBanedException("user was banned");
         }
 
 
@@ -97,7 +98,7 @@ public class UserController {
             return "/error";
         }
         if (banRepository.findBanInfoById(authenticatedUser.getBanInfo().getId()).isBanStatus()) {
-            return "banError";
+            throw new UserWasBanedException();
         }
         return friendService.sendInvite(username.get(), where);
     }
@@ -118,9 +119,8 @@ public class UserController {
             return "/error";
         }
 
-        assert authenticatedUser != null;
-        if (banRepository.findBanInfoById(authenticatedUser.getBanInfo().getId()).isBanStatus()) {
-            return "banError";
+        if (banRepository.findBanInfoById(Objects.requireNonNull(authenticatedUser).getBanInfo().getId()).isBanStatus()) {
+            throw new UserWasBanedException();
         }
         return friendService.deleteFriend(username.get(), where);
     }

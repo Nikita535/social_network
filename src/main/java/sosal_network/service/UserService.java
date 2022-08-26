@@ -173,11 +173,11 @@ public class UserService implements UserDetailsService {
      **/
     @Loggable
     @Transactional
-    public boolean saveUser(User user) throws MessagingException {
+    public void saveUser(User user) throws MessagingException {
         User userFromDB = userRepository.findByUsername(user.getUsername());
 
         if (userFromDB != null) {
-            return false;
+            return;
         }
 
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
@@ -186,9 +186,6 @@ public class UserService implements UserDetailsService {
         user.setRegistrationDate(LocalDate.now());
         user.setBanInfo(new BanInfo("", BanStatus.NONE, false));
         save(user);
-
-
-        return true;
     }
 
 
@@ -420,7 +417,7 @@ public class UserService implements UserDetailsService {
         assert response != null;
         if (response.getErrorCodes() != null) {
             for (String error : response.getErrorCodes()) {
-                log.error("responseCaptchaERROR", error);
+                log.error(error);
             }
         }
 
@@ -430,5 +427,11 @@ public class UserService implements UserDetailsService {
     @Loggable
     public List<User> showAllUser() {
         return userRepository.findAll();
+    }
+
+
+    @Loggable
+    public Boolean checkRole(User user) {
+        return user.getRoles().contains(Role.ROLE_ADMIN);
     }
 }

@@ -1,14 +1,9 @@
 package sosal_network.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.tomcat.util.json.ParseException;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,11 +13,7 @@ import sosal_network.service.ImageService;
 import sosal_network.service.PostService;
 import sosal_network.service.UserService;
 
-import java.io.File;
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Controller

@@ -19,6 +19,7 @@ public class CommentController {
     @MessageMapping("/comment.send/{username}")
     @SendTo("/topic/post/comment/{username}")
     public Comment sendMessage(@Payload final Comment comment) {
+
         commentService.save(comment);
         return comment;
     }

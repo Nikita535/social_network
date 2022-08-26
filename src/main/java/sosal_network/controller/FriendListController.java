@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import sosal_network.entity.User;
+import sosal_network.exception.UserWasBanedException;
 import sosal_network.repository.BanRepository;
 import sosal_network.service.FriendService;
 import sosal_network.service.ImageService;
@@ -35,7 +36,7 @@ public class FriendListController {
                                 @PathVariable Optional<String> page,
                                 @ModelAttribute("searchLine") String searchLine, @AuthenticationPrincipal User user) {
         if (banRepository.findBanInfoById(user.getBanInfo().getId()).isBanStatus()) {
-            return "banError";
+            throw new UserWasBanedException();
         }
 
         if (username.isEmpty()) {
@@ -53,6 +54,7 @@ public class FriendListController {
         model.addAttribute("isInviteRecieved", friendService.isInviteReceived(username.get()));
         model.addAttribute("isInviteSend", friendService.isInviteSend(username.get()));
         model.addAttribute("imageService", imageService);
+
         return "friendList";
     }
 

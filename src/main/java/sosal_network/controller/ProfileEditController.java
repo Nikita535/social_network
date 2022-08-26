@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import sosal_network.entity.ProfileInfo;
 import sosal_network.entity.User;
+import sosal_network.exception.UserWasBanedException;
 import sosal_network.repository.BanRepository;
 import sosal_network.service.UserService;
 
@@ -40,7 +41,7 @@ public class ProfileEditController {
     public String getEditProfile(Model model, @AuthenticationPrincipal User userFromSession) {
 
         if (banRepository.findBanInfoById(userFromSession.getBanInfo().getId()).isBanStatus()) {
-            return "banError";
+            throw new UserWasBanedException();
         }
 
         model.addAttribute("editedProfileInfo", new ProfileInfo());

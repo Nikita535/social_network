@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -15,6 +15,7 @@
     </div>
     <div class="error-message">
         <h3>Ой! Страница не найдена!</h3>
+        <h3 hidden th:text="${e}"></h3>
         <p>К сожалению мы не можем найти запрошенную вами страницу. Возможно, вы неправильно ввели адрес.</p>
         <a href="javascript:history.go(-1)" class="theme-btn">Вернуться назад</a>
     </div>

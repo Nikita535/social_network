@@ -21,14 +21,14 @@ public class BanInfo {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
-    @Column(name = "banCause")
+    @Column(name = "ban_cause")
     private String banCause;
 
-    @Column(name = "banTime")
+    @Column(name = "ban_time")
     @Enumerated(EnumType.STRING)
     private BanStatus banTime;
 
-    @Column(name = "banStatus")
+    @Column(name = "ban_status")
     private boolean banStatus;
 
     public BanInfo(String banCause, BanStatus banTime, boolean banStatus) {

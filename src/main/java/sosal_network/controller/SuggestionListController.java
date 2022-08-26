@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import sosal_network.entity.User;
+import sosal_network.exception.UserWasBanedException;
 import sosal_network.repository.BanRepository;
 import sosal_network.service.FriendService;
 import sosal_network.service.ImageService;
@@ -34,9 +35,9 @@ public class SuggestionListController {
     public String getFriendList(Model model, @PathVariable Optional<String> username,
                                 @PathVariable Optional<String> page,
                                 @ModelAttribute("searchLine") String searchLine, @AuthenticationPrincipal User user) {
-        if (banRepository.findBanInfoById(userService.findUserByUsername(username.get())
-                .getBanInfo().getId()).isBanStatus()) {
-            return "banError";
+        if (banRepository.findBanInfoById(userService.findUserByUsername(username.get()).
+                getBanInfo().getId()).isBanStatus()) {
+            throw new UserWasBanedException();
         }
 
         if (username.get().isEmpty()) {

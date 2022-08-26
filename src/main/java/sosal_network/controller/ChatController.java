@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
 import sosal_network.entity.ChatMessage;
 import sosal_network.entity.User;
+import sosal_network.exception.UserWasBanedException;
 import sosal_network.repository.BanRepository;
 import sosal_network.repository.MessageRepository;
 import sosal_network.repository.UserRepository;
@@ -49,7 +50,7 @@ public class ChatController {
     public String getChat(Model model, @AuthenticationPrincipal User authenticatedUser) {
 
         if (banRepository.findBanInfoById(authenticatedUser.getBanInfo().getId()).isBanStatus()) {
-            return "banError";
+            throw new UserWasBanedException();
         }
 
 
@@ -63,7 +64,7 @@ public class ChatController {
     public String getChat1(Model model, @PathVariable String username, @AuthenticationPrincipal User authenticatedUser) {
 
         if (banRepository.findBanInfoById(authenticatedUser.getBanInfo().getId()).isBanStatus()) {
-            return "banError";
+            throw new UserWasBanedException();
         }
 
         model.addAttribute("friends", friendService.getAcceptedFriends(authenticatedUser.getUsername()));
