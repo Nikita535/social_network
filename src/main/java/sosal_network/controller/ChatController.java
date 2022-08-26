@@ -8,9 +8,7 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import sosal_network.entity.ChatMessage;
 import sosal_network.entity.User;
 import sosal_network.repository.BanRepository;
@@ -59,21 +57,16 @@ public class ChatController {
         return "messages";
     }
 
-    @GetMapping("/chat/{username}")
-    public String getChat1(Model model, @PathVariable String username, @AuthenticationPrincipal User authenticatedUser) {
-
-        if (banRepository.findBanInfoById(authenticatedUser.getBanInfo().getId()).isBanStatus()) {
-            return "banError";
-        }
-
-        model.addAttribute("friends", friendService.getAcceptedFriends(authenticatedUser.getUsername()));
-        model.addAttribute("userService", userService);
-
+    @RequestMapping(value = "/chat/{username}", method = RequestMethod.GET)
+    @ResponseBody
+    public List<Object> getChat1(@PathVariable String username, @AuthenticationPrincipal User authenticatedUser) {
         User friend = userRepository.findByUsername(username);
-        model.addAttribute("user", userService.findUserByUsername(authenticatedUser.getUsername()));
-        model.addAttribute("userTo", friend);
-        model.addAttribute("allMessages", chatMessageService.showAllMessages(authenticatedUser, friend));
-        return "messages";
+
+        List<Object> response = new ArrayList<>();
+
+        response.add(friend);
+        response.add(chatMessageService.showAllMessages(authenticatedUser, friend));
+        return response;
     }
 
 
