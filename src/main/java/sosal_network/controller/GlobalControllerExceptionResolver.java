@@ -29,9 +29,13 @@ public class GlobalControllerExceptionResolver {
     }
 
     @ExceptionHandler(BadRequestException.class)
-    public String handlerBadRequestException(BadRequestException e, Model model) {
-        return "error-404";
+    public String handlerBadRequestException404() {
+        return "/error";
     }
+
+
+
+
 
 }
 

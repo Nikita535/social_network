@@ -61,23 +61,22 @@ public class UserController {
      * author - Nekit
      **/
     @GetMapping("/user/{username}")
-    public String getHome(@PathVariable Optional<String> username, Model model, @AuthenticationPrincipal User authenticatedUser){
-        if (authenticatedUser == null && (username.isEmpty())) {
-            return "/error";
-        }
-        model.addAttribute("postService", postService);
+    public String getHome(@PathVariable Optional<String> username, Model model, @AuthenticationPrincipal User authenticatedUser) {
 
         try {
+            if (authenticatedUser == null && (username.isEmpty())) {
+                throw new BadRequestException();
+            }
             userService.findUserByUsername(username.get());
-        }catch (Exception e){
-            throw new BadRequestException("username = null",e);
+        } catch (Exception e) {
+            throw new BadRequestException("username = null", e);
         }
 
         if (banRepository.findBanInfoById(authenticatedUser.getBanInfo().getId()).isBanStatus()) {
             throw new UserWasBanedException("user was banned");
         }
 
-
+        model.addAttribute("postService", postService);
         model.addAttribute("user", userService.findUserByUsername(username.get()));
         model.addAttribute("currentUser", userService.findUserByUsername(authenticatedUser.getUsername()));
         model.addAttribute("friends", friendService.getAcceptedFriends(username.get()));
@@ -94,9 +93,11 @@ public class UserController {
     @GetMapping("/user/{username}/friend")
     public String sendInvite(@PathVariable Optional<String> username, Model model, @AuthenticationPrincipal User authenticatedUser,
                              @RequestParam(value = "where", required = false) String where) {
-        if (authenticatedUser == null && (username.isEmpty()) || Objects.equals(userService.findUserByUsername(username.get()).getUsername(), userService.getUserAuth().getUsername())) {
-            return "/error";
+        if (authenticatedUser == null && (username.isEmpty()) || Objects.equals(userService.
+                findUserByUsername(username.get()).getUsername(), userService.getUserAuth().getUsername())) {
+            throw new BadRequestException();
         }
+
         if (banRepository.findBanInfoById(authenticatedUser.getBanInfo().getId()).isBanStatus()) {
             throw new UserWasBanedException();
         }
@@ -106,8 +107,9 @@ public class UserController {
     @GetMapping("/user/{username}/friend/{result}")
     public String acceptInvite(@PathVariable Optional<String> username, @AuthenticationPrincipal User authenticatedUser, @PathVariable int result,
                                @RequestParam(value = "where", required = false) String where) {
-        if (authenticatedUser == null && (username.isEmpty()) || (result > 2) || Objects.equals(userService.findUserByUsername(username.get()).getUsername(), userService.getUserAuth().getUsername())) {
-            return "/error";
+        if (authenticatedUser == null && (username.isEmpty()) || (result > 2) || Objects.equals(
+                userService.findUserByUsername(username.get()).getUsername(), userService.getUserAuth().getUsername())) {
+            throw new BadRequestException();
         }
         return friendService.resultInvite(username.get(), result, where);
     }
@@ -115,8 +117,9 @@ public class UserController {
     @GetMapping("/user/{username}/unfriend")
     public String deleteFriend(@PathVariable Optional<String> username, @AuthenticationPrincipal User authenticatedUser,
                                @RequestParam(value = "where", required = false) String where) {
-        if (authenticatedUser == null && (username.isEmpty()) || Objects.equals(userService.findUserByUsername(username.get()).getUsername(), userService.getUserAuth().getUsername())) {
-            return "/error";
+        if (authenticatedUser == null && (username.isEmpty()) || Objects.equals(userService.
+                findUserByUsername(username.get()).getUsername(), userService.getUserAuth().getUsername())) {
+            throw new BadRequestException();
         }
 
         if (banRepository.findBanInfoById(Objects.requireNonNull(authenticatedUser).getBanInfo().getId()).isBanStatus()) {
