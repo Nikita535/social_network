@@ -1,5 +1,4 @@
 let $name = document.getElementById("friendLists");
-let $receivedList = document.getElementById("receivedList");
 var currentLocation = document.location.protocol + "//" + document.location.host;
 var jsonDataOfThePage;
 var profilesOfStrangers;

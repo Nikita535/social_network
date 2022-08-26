@@ -122,20 +122,18 @@
 
                     </div>
 
-                    <div th:if="${userTo} != null" class="ms-body">
+                    <div id="userToInformation" style="display: none" class="ms-body">
                         <div class="action-header clearfix">
                             <!--                            <div class="visible-xs" id="ms-menu-trigger">-->
                             <!--                                <i class="fa fa-bars"></i>-->
                             <!--                            </div>-->
 
                             <div class="pull-left hidden-xs">
-                                <img th:src="${userTo.image!=null ?
-                                     '/image/' +  userTo.image.getId():
-                                'https://bootdey.com/img/Content/avatar/avatar6.png'}" alt="" class="img-avatar m-r-10">
+                                <img id="userToAvatar" alt="" class="img-avatar m-r-10">
                                 <div class="lv-avatar pull-left">
 
                                 </div>
-                                <span th:text="${userTo.profileInfo.name + ' '+userTo.profileInfo.surname }">David Parbell</span>
+                                <span id="userToName">David Parbell</span>
                             </div>
 
                             <ul class="ah-actions actions">
@@ -194,7 +192,7 @@
                         </form>
 
                     </div>
-                    <div class="ms-body" th:if="${userTo} == null" style="height: 500px; display: flex; flex-direction: column;
+                    <div class="ms-body" id="userToNoneInformation" style="height: 500px; display: flex; flex-direction: column;
                     justify-content: center; align-items: center">
                         <i class="fa fa-weixin fa-5x" aria-hidden="true"></i>
                         <div>
@@ -219,6 +217,7 @@
 <script src="/message/script.js"></script>
 <script src="/message/message.js"></script>
 <script src="/message/messageScroll.js"></script>
+<script src="/message/chat.js"></script>
 
 <section class="error-404-section section-padding"
          th:if="${#authentication.getPrincipal().getActive()==false or user.profileInfo==null }">

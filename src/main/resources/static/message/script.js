@@ -2,11 +2,7 @@
 
 let stompClient
 let username
-
-$(function () {
-    for (let i = 0; i < allMessages.length; i++)
-        createMessageLine(allMessages[i]);
-})
+let allUsersToMessage = []
 
 
 function createMessageLine(message) {
@@ -72,15 +68,16 @@ const connect = (event) => {
 }
 
 const onConnected = () => {
+    if (allUsersToMessage.indexOf(userTo["id"]) !== -1)
+        return
+    allUsersToMessage.push(userTo["id"])
+
     if (userFrom["id"] < userTo["id"])
         stompClient.subscribe('/topic/' + userFrom["id"] + "/" + userTo["id"], onMessageReceived)
 
     else
         stompClient.subscribe('/topic/' + userTo["id"] + "/" + userFrom["id"], onMessageReceived)
-    //stompClient.send("/app/chat.newUser",
-    //    {},
-    //    JSON.stringify({sender: username})
-    //)
+
 }
 
 const onError = (error) => {
@@ -124,7 +121,7 @@ const onMessageReceived = (payload) => {
     createMessageLine(message);
 }
 
-document.addEventListener('DOMContentLoaded', connect, true)
+//document.addEventListener('DOMContentLoaded', connect, true)
 const messageControls = document.querySelector('#message-controls')
 messageControls.addEventListener('submit', sendMessage, true)
 
