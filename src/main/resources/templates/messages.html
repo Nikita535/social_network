@@ -136,6 +136,10 @@
                                 <span id="userToName">David Parbell</span>
                             </div>
 
+                            <div class="pull-left hidden-xs">
+                                <span id="onlineStatus"></span>
+                            </div>
+
                             <ul class="ah-actions actions">
                                 <li>
                                     <a href="">
@@ -211,8 +215,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
 <script th:inline="javascript">
     var userFrom = [[${user}]];
-    var userTo = [[${userTo}]];
-    var allMessages = [[${allMessages}]];
+    var userTo = null;
 </script>
 <script src="/message/script.js"></script>
 <script src="/message/message.js"></script>

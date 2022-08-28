@@ -11,6 +11,14 @@ const getChatMessages = async (event) => {
     userToNoneInformation.style = "display: none"
     deletingPreviousChat.innerHTML = ""
 
+    if (userTo !== null){
+        if (userFrom["id"] < userTo["id"])
+            stompClient.unsubscribe('/topic/' + userFrom["id"] + "/" + userTo["id"])
+        else
+            stompClient.unsubscribe('/topic/' + userTo["id"] + "/" + userFrom["id"])
+    }
+
+
     jQuery.ajax({
         type: 'GET',
         url: currentLocationOfHtml + "/chat/" + username,
@@ -23,6 +31,7 @@ function creatingTheChat(data){
     userTo = data[0]
     setName(data[0])
     createMessages(data[1])
+
     connect()
 }
 

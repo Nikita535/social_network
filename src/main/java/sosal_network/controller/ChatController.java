@@ -1,10 +1,14 @@
 package sosal_network.controller;
 
 
+import netscape.javascript.JSObject;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.messaging.simp.user.SimpUserRegistry;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,7 +24,9 @@ import sosal_network.service.FriendService;
 import sosal_network.service.UserService;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 public class ChatController {
@@ -28,6 +34,8 @@ public class ChatController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private SimpUserRegistry userRegistry;
 
     @Autowired
     private MessageRepository messageRepository;
@@ -42,6 +50,7 @@ public class ChatController {
 
     @Autowired
     private FriendService friendService;
+
 
 
     @GetMapping("/messages")
@@ -78,7 +87,25 @@ public class ChatController {
         return chatMessage;
     }
 
-    @GetMapping("/reloadMessageFriends/{page}")
+    @RequestMapping(value = "/isUserInChat/{userTo}/{userFromId}/{userToId}", method = RequestMethod.POST)
+    @ResponseBody
+    public boolean newUser(@PathVariable String userTo, @PathVariable long userFromId,
+                           @PathVariable long userToId){
+
+        boolean isConnected = false;
+        String topic;
+
+        if (userFromId > userToId)
+            topic = "/" + userToId+ "/" + userFromId + "}";
+        else
+            topic = "/" + userFromId + "/" + userToId + "}";
+
+        if (userRegistry.getUser(userTo.replace("\"", "")) != null)
+            isConnected = userRegistry.getUser(userTo).getSessions().toString().contains(topic);
+
+        return isConnected;
+    }
+    @RequestMapping(value ="/reloadMessageFriends/{page}", method = RequestMethod.GET)
     @ResponseBody
     public List<Object> showFriendsMessages(@PathVariable int page, @AuthenticationPrincipal User authenticatedUser) {
         List<Object> allInfo = new ArrayList<>();

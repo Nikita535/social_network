@@ -2,7 +2,7 @@
 
 let stompClient
 let username
-let allUsersToMessage = []
+var currentLocation = document.location.protocol + "//" + document.location.host;
 
 
 function createMessageLine(message) {
@@ -57,34 +57,43 @@ function createMessageLine(message) {
 }
 
 
-const connect = (event) => {
+const connect = () => {
     username = userFrom["username"];
     if (username) {
         const socket = new SockJS('/chat-example')
         stompClient = Stomp.over(socket)
         stompClient.connect({}, onConnected, onError)
     }
-    event.preventDefault()
 }
 
-const onConnected = () => {
-    if (allUsersToMessage.indexOf(userTo["id"]) !== -1)
-        return
-    allUsersToMessage.push(userTo["id"])
 
+const onConnected = () => {
     if (userFrom["id"] < userTo["id"])
-        stompClient.subscribe('/topic/' + userFrom["id"] + "/" + userTo["id"], onMessageReceived)
+        stompClient.subscribe('/topic/' + userFrom["id"] + "/" + userTo["id"], onMessageReceived,
+             { id: '/topic/' + userFrom["id"] + "/" + userTo["id"]})
 
     else
-        stompClient.subscribe('/topic/' + userTo["id"] + "/" + userFrom["id"], onMessageReceived)
+        stompClient.subscribe('/topic/' + userTo["id"] + "/" + userFrom["id"], onMessageReceived,
+            { id: '/topic/' + userTo["id"] + "/" + userFrom["id"]})
 
+    jQuery.ajax({
+        type: 'POST',
+        url: currentLocation + "/isUserInChat/" + userTo["username"] + "/" + userFrom["id"] + "/" + userTo["id"],
+        contentType: 'application/json',
+        success: isUserInChatHandler
+    });
+}
+
+
+function isUserInChatHandler(data){
+    console.log(data)
 }
 
 const onError = (error) => {
     console.log(error)
 }
 
-const sendMessage = (event) => {
+const sendMessage = () => {
     const messageInput = document.querySelector('#message')
     const messageContent = messageInput.value.trim();
     let d = new Date();
@@ -112,7 +121,6 @@ const sendMessage = (event) => {
             stompClient.send("/app/chat.send/" + userTo["id"] + "/" + userFrom["id"], {}, JSON.stringify(chatMessage))
         messageInput.value = ''
     }
-    event.preventDefault();
 }
 
 
@@ -125,13 +133,7 @@ const onMessageReceived = (payload) => {
 const messageControls = document.querySelector('#message-controls')
 messageControls.addEventListener('submit', sendMessage, true)
 
-function pressed(e) {
-    // Has the enter key been pressed?
-    if ((window.event ? event.keyCode : e.which) === 13) {
-        // If it has been so, manually submit the <form>
-        messageControls.submit();
-    }
-}
+
 
 document.getElementsByTagName('textarea')[0].addEventListener("keydown", function (event) {
     if (event.key === 'Enter') {
