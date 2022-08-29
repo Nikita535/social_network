@@ -12,7 +12,6 @@ import sosal_network.repository.ProfileInfoRepository;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
@@ -41,7 +40,8 @@ public class ChatMessageService {
     public List<User> getChatFriends(User user, int page) {
         return friendRepository.findFriendByFirstUserOrSecondUser(user, PageRequest.of(page, 8)).stream().
                 map(friend -> Objects.equals(friend.getFirstUser(), user) ?
-                        friend.getSecondUser() : friend.getFirstUser()).collect(Collectors.toList());
+                        friend.getSecondUser() : friend.getFirstUser())
+                .sorted(Comparator.comparing(friend ->showLastMessage(user, (User) friend).getTime()).reversed()).toList();
     }
 
 }

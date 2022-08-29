@@ -32,29 +32,30 @@ function createPostLine(postInformation) {
         "                                 <p>\n" + postInformation.full_text +
         "                                 </p>\n" +
         "                              </div>\n"
-
-    for (let j = 0; j < images.length; j++) {
-        let imgcontainer = document.createElement('div')
-        imgcontainer.classList.add("card-body")
-        let postsource = images[j] != null ? '/image/' +
-            images[j].id : 'https://bootdey.com/img/Content/avatar/avatar6.png'
-        imgcontainer.innerHTML = "<img src=\"" + postsource + "\" alt=\"\">"
-        images_post.innerHTML += imgcontainer.outerHTML
+    if (images != null) {
+        for (let j = 0; j < images.length; j++) {
+            let imgcontainer = document.createElement('div')
+            imgcontainer.classList.add("card-body")
+            let postsource = images[j] != null ? '/image/' +
+                images[j].id : 'https://bootdey.com/img/Content/avatar/avatar6.png'
+            imgcontainer.innerHTML = "<img src=\"" + postsource + "\" alt=\"\">"
+            images_post.innerHTML += imgcontainer.outerHTML
+        }
+        post.appendChild(images_post)
     }
-    post.appendChild(images_post)
-    post.innerHTML +=
-        "                          <div class=\"timeline-likes\">\n" +
-        "                                 <div class=\"stats-right\">\n" +
-        // "                                    <span class=\"stats-text\">259 Shares</span>\n" +
-        "                                    <span class=\"stats-text\">" + comments.length + " Comments</span>\n" +
-        "                                 </div>\n" +
-        "                                 <div class=\"stats\" id=\"likes-" + postInformation["id"] + "\">\n" +
-        "                                    <span class=\"fa-stack fa-fw stats-icon\">\n" +
-        "                                    <a class=\"fa fa-heart fa-stack-2x fa-inverse\"></a>\n" +
-        "                                    </span>\n" +
-        "                                    <span class=\"stats-total\">" + postInformation["likes"].length + "</span>\n" +
-        "                                 </div>\n" +
-        "                              </div>\n"
+        post.innerHTML +=
+            "                          <div class=\"timeline-likes\">\n" +
+            "                                 <div class=\"stats-right\">\n" +
+            // "                                    <span class=\"stats-text\">259 Shares</span>\n" +
+            "                                    <span class=\"stats-text\">" + comments.length + " Comments</span>\n" +
+            "                                 </div>\n" +
+            "                                 <div class=\"stats\" id=\"likes-" + postInformation["id"] + "\">\n" +
+            "                                    <span class=\"fa-stack fa-fw stats-icon\">\n" +
+            "                                    <a class=\"fa fa-heart fa-stack-2x fa-inverse\"></a>\n" +
+            "                                    </span>\n" +
+            "                                    <span class=\"stats-total\">" + postInformation["likes"].length + "</span>\n" +
+            "                                 </div>\n" +
+            "                              </div>\n"
 
 
     let like = post.querySelector(".fa-heart")
@@ -109,7 +110,7 @@ function createPostLine(postInformation) {
     if (currentUser["id"] === user["id"]) {
         const createLine = document.getElementById("postLine").firstChild["nextSibling"]
         createLine.parentNode.insertBefore(post, createLine.nextSibling);
-    }else {
+    } else {
         const createLine = document.getElementById("postLine")
         createLine.insertBefore(post, createLine.firstChild)
     }
@@ -166,17 +167,19 @@ const sendPost = async (event) => {
     let images = form.parentNode.querySelector("#imageList").files
 
     if (PostContent && stompClientPost) {
-
-       let imageConverted = createPostImage(images)
-       let imageValue
-       await imageConverted.then(async function (value) {
-           imageValue = value
-       })
+        let imageValue
+        console.log(images)
+        if (images.length !== 0) {
+            let imageConverted = createPostImage(images)
+            await imageConverted.then(async function (value) {
+                imageValue = value
+            })
+        }
 
         const post = {
             user: currentUser,
             full_text: PostInput.value,
-            images: imageValue
+            images: imageValue != null ? imageValue : null
         }
 
         stompClientPost.send("/app/post.send/" + username_post, {}, JSON.stringify(post))

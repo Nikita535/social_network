@@ -62,6 +62,7 @@ const onPushError = (error) => {
 const onPushReceived = (payload) => {
     const message = JSON.parse(payload.body);
     createPushLine(message);
+    fetchLastMessage(message)
 }
 
 document.addEventListener('DOMContentLoaded', pushConnect, true)

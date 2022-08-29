@@ -1,13 +1,10 @@
 package sosal_network.controller;
 
 
-import netscape.javascript.JSObject;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.user.SimpUserRegistry;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -24,9 +21,7 @@ import sosal_network.service.FriendService;
 import sosal_network.service.UserService;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Controller
 public class ChatController {
@@ -60,7 +55,6 @@ public class ChatController {
             throw new UserWasBanedException();
         }
 
-
         model.addAttribute("user", userService.findUserByUsername(authenticatedUser.getUsername()));
         model.addAttribute("friends", friendService.getAcceptedFriends(authenticatedUser.getUsername()));
         model.addAttribute("userService", userService);
@@ -69,7 +63,7 @@ public class ChatController {
 
     @RequestMapping(value = "/chat/{username}", method = RequestMethod.GET)
     @ResponseBody
-    public List<Object> getChat1(@PathVariable String username, @AuthenticationPrincipal User authenticatedUser) {
+    public List<Object> getChatRoom(@PathVariable String username, @AuthenticationPrincipal User authenticatedUser) {
         User friend = userRepository.findByUsername(username);
 
         List<Object> response = new ArrayList<>();
@@ -102,14 +96,13 @@ public class ChatController {
         long userFromId = userService.getUserAuth().getId();
         String userTo = userService.findUserById(userToId).getUsername();
         String topic;
-
         if (userFromId > userToId)
             topic = "/topic/" + userToId+ "/" + userFromId + "}";
         else
             topic = "/topic/" + userFromId + "/" + userToId + "}";
-
-        if (userRegistry.getUser(userTo.replace("\"", "")) != null)
+        if (userRegistry.getUser(userTo) != null) {
             isConnected = userRegistry.getUser(userTo).getSessions().toString().contains(topic);
+        }
 
         return isConnected;
     }
