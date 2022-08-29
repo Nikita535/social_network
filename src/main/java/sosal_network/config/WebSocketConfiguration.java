@@ -23,6 +23,7 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
         registry.addEndpoint("/chat-example").withSockJS();
         registry.addEndpoint("/post-comments").withSockJS();
         registry.addEndpoint("/post-post").withSockJS();
+        registry.addEndpoint("/push-notifications").withSockJS();
     }
 
     @Override

@@ -18,7 +18,7 @@
 
 </head>
 <body>
-<div class="container" th:if="${#authentication.getPrincipal().getActive() and user.profileInfo!=null}">
+<div class="container" style="position: relative" th:if="${#authentication.getPrincipal().getActive() and user.profileInfo!=null}">
     <div class="profile-page tx-13">
         <div class="row">
             <div class="col-12 grid-margin">
@@ -204,9 +204,14 @@
                         </div>
                     </div>
 
+                        <!-- Position it -->
+                        <div style="position: fixed; bottom:30px;right: 30px;" id="push-notification">
+
+                            <!-- Then put toasts within -->
+
+                        </div>
                 </div>
             </div>
-
 
         </div>
     </div>
@@ -221,6 +226,7 @@
 <script src="/message/message.js"></script>
 <script src="/message/messageScroll.js"></script>
 <script src="/message/chat.js"></script>
+<script src="/message/pushNotifications.js"></script>
 
 <section class="error-404-section section-padding"
          th:if="${#authentication.getPrincipal().getActive()==false or user.profileInfo==null }">

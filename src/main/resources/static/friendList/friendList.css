@@ -7,6 +7,12 @@
     margin-bottom: 20px;
 }
 
+.toast{
+    min-width: 300px;
+    min-height: 50px;
+    transition-duration: .5s;
+}
+
 .people-nearby .google-maps .map{
     height: 300px;
     width: 100%;

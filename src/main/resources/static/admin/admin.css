@@ -5,6 +5,12 @@ body {
     background-size: cover;
 }
 
+.toast{
+    min-width: 300px;
+    min-height: 50px;
+    transition-duration: .5s;
+}
+
 #myInput {
     color: white;
     background: transparent;

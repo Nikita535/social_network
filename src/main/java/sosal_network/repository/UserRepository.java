@@ -30,6 +30,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
      **/
     User findByUserEmail(String email);
 
+    User findUserById(Long id);
+
 
     @Query(value = "select * from jpa.users where id in (select first_user_id from jpa.friends where (second_user_id = ?1 and invite_status ='ACCEPTED' ) union select second_user_id from jpa.friends where (first_user_id = ?1 and invite_status ='ACCEPTED'))", nativeQuery = true)
     Page<User> findFriendUsers(User user, Pageable pageable);

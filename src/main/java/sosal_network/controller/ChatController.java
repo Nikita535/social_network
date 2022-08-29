@@ -87,18 +87,25 @@ public class ChatController {
         return chatMessage;
     }
 
-    @RequestMapping(value = "/isUserInChat/{userTo}/{userFromId}/{userToId}", method = RequestMethod.POST)
+    @MessageMapping("/push.send/{username}")
+    @SendTo("/topic/push/{username}")
+    public ChatMessage pushMessage(@Payload final ChatMessage chatMessage) {
+        return chatMessage;
+    }
+
+
+    @RequestMapping(value = "/isUserInChat/{userFromId}/{userToId}", method = RequestMethod.POST)
     @ResponseBody
-    public boolean newUser(@PathVariable String userTo, @PathVariable long userFromId,
-                           @PathVariable long userToId){
+    public boolean userInChatDetection(@PathVariable long userFromId, @PathVariable long userToId){
 
         boolean isConnected = false;
+        String userTo = userService.findUserById(userToId).getUsername();
         String topic;
 
         if (userFromId > userToId)
-            topic = "/" + userToId+ "/" + userFromId + "}";
+            topic = "/topic/" + userToId+ "/" + userFromId + "}";
         else
-            topic = "/" + userFromId + "/" + userToId + "}";
+            topic = "/topic/" + userFromId + "/" + userToId + "}";
 
         if (userRegistry.getUser(userTo.replace("\"", "")) != null)
             isConnected = userRegistry.getUser(userTo).getSessions().toString().contains(topic);

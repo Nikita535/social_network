@@ -135,6 +135,10 @@ public class UserService implements UserDetailsService {
     }
 
 
+    public User findUserById(Long id) {
+        return userRepository.findUserById(id);
+    }
+
     @Transactional
     public Page<User> findFriendUsers(User user, int page) {
         return userRepository.findFriendUsers(user, PageRequest.of(page, 10));

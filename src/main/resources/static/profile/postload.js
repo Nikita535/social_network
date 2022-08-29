@@ -2,7 +2,7 @@ let posts = document.getElementsByClassName('post')
 
 let page = 0
 let isLoading = true
-console.log(user)
+let user = userFrom
 
 $(window).scroll(function () {
     if ($(document).height() <= $(window).scrollTop() + $(window).height() + 100 && !isLoading) {

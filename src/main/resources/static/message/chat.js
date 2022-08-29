@@ -31,7 +31,6 @@ function creatingTheChat(data){
     userTo = data[0]
     setName(data[0])
     createMessages(data[1])
-
     connect()
 }
 

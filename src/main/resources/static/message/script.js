@@ -2,7 +2,16 @@
 
 let stompClient
 let username
-var currentLocation = document.location.protocol + "//" + document.location.host;
+let currentLocation = document.location.protocol + "//" + document.location.host;
+
+function checkInChat(){
+    jQuery.ajax({
+        type: 'POST',
+        url: currentLocation + "/isUserInChat/" + userFrom["id"] + "/" + userTo["id"],
+        contentType: 'application/json',
+        success: isUserInChatHandler
+    });
+}
 
 
 function createMessageLine(message) {
@@ -76,17 +85,36 @@ const onConnected = () => {
         stompClient.subscribe('/topic/' + userTo["id"] + "/" + userFrom["id"], onMessageReceived,
             { id: '/topic/' + userTo["id"] + "/" + userFrom["id"]})
 
-    jQuery.ajax({
-        type: 'POST',
-        url: currentLocation + "/isUserInChat/" + userTo["username"] + "/" + userFrom["id"] + "/" + userTo["id"],
-        contentType: 'application/json',
-        success: isUserInChatHandler
-    });
+    checkInChat()
 }
 
-
 function isUserInChatHandler(data){
-    console.log(data)
+    let isConnected = data
+    const messageInput = document.querySelector('#message')
+    const messageContent = messageInput.value.trim();
+    let d = new Date();
+    let ye = new Intl.DateTimeFormat('ru', {year: 'numeric'}).format(d);
+    let mo = new Intl.DateTimeFormat('ru', {month: '2-digit'}).format(d);
+    let da = new Intl.DateTimeFormat('ru', {day: '2-digit'}).format(d);
+    let time = new Intl.DateTimeFormat('ru',
+        {
+            hour: "numeric",
+            minute: "numeric",
+        }).format(d)
+
+    console.log(`${da}/${mo}/${ye} ${time}`)
+
+    if (messageContent && stompClient) {
+        const chatMessage = {
+            userFrom: userFrom,
+            userTo: userTo,
+            content: messageInput.value,
+            time: `${da}/${mo}/${ye} ${time}`
+        }
+        if (!isConnected)
+            stompClient.send("/app/push.send/" + userTo["username"], {}, JSON.stringify(chatMessage))
+        messageInput.value = ''
+    }
 }
 
 const onError = (error) => {
@@ -94,6 +122,7 @@ const onError = (error) => {
 }
 
 const sendMessage = () => {
+    checkInChat()
     const messageInput = document.querySelector('#message')
     const messageContent = messageInput.value.trim();
     let d = new Date();
