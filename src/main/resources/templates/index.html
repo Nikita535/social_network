@@ -60,12 +60,12 @@
 
 
                             <script th:inline="javascript">
-                                window.isFriend = /*[[${isFriend}]]*/ 'false';
-                                window.friendAccepted = /*[[${friendAccepted}]]*/ 'false';
-                                window.isInviteSend = /*[[${isInviteSend}]]*/ 'false';
-                                window.isInviteRecieved = /*[[${isInviteRecieved}]]*/ 'false';
-                                window.usernameOfSession = /*[[${#authentication.getPrincipal().username}]]*/ '';
-                                window.usernameOfPage = /*[[${user.username}]]*/ '';
+                                isFriend = /*[[${isFriend}]]*/ 'false';
+                                friendAccepted = /*[[${friendAccepted}]]*/ 'false';
+                                isInviteSend = /*[[${isInviteSend}]]*/ 'false';
+                                isInviteRecieved = /*[[${isInviteRecieved}]]*/ 'false';
+                                usernameOfSession = /*[[${#authentication.getPrincipal().username}]]*/ '';
+                                usernameOfPage = /*[[${user.username}]]*/ '';
                             </script>
 
                             <script src="/profile/profileInfoFlow.js"></script>
@@ -491,7 +491,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.4.0/sockjs.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
 <script th:inline="javascript">
-    var userFrom = [[${user}]];
+    var user = [[${user}]];
+    var userFrom = [[${currentUser}]]
     var currentUser = [[${currentUser}]];
     if ([[${#authentication.getPrincipal().username}]]===[[${user.username}]]) {
         document.getElementById("postAdd").addEventListener("click", sendPost, true)

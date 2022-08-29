@@ -94,11 +94,12 @@ public class ChatController {
     }
 
 
-    @RequestMapping(value = "/isUserInChat/{userFromId}/{userToId}", method = RequestMethod.POST)
+    @RequestMapping(value = "/isUserInChat/{userToId}", method = RequestMethod.POST)
     @ResponseBody
-    public boolean userInChatDetection(@PathVariable long userFromId, @PathVariable long userToId){
+    public boolean userInChatDetection(@PathVariable long userToId){
 
         boolean isConnected = false;
+        long userFromId = userService.getUserAuth().getId();
         String userTo = userService.findUserById(userToId).getUsername();
         String topic;
 

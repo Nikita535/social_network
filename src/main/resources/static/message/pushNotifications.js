@@ -52,8 +52,7 @@ const pushConnect = () => {
 
 
 const onPushConnected = () => {
-    pushStompClient.subscribe("/topic/push/" + userFrom["username"], onPushReceived,
-        { id: '/topic/push/' + userFrom["username"]})
+    pushStompClient.subscribe("/topic/push/" + userFrom["username"], onPushReceived)
 }
 
 const onPushError = (error) => {

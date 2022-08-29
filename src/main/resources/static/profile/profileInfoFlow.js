@@ -1,11 +1,5 @@
 let $name=document.getElementById("friendStatus");
-var isFriend = window.isFriend;
-var friendAccepted = window.friendAccepted;
-var isInviteSend = window.isInviteSend;
-var isInviteRecieved = window.isInviteRecieved;
-var usernameOfSession = window.usernameOfSession;
-var usernameOfPage = window.usernameOfPage;
-var currentLocation = document.location.protocol + "//" + document.location.host;
+let currentLocation = document.location.protocol + "//" + document.location.host;
 
 
 

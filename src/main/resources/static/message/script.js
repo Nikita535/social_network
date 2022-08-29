@@ -7,9 +7,9 @@ let currentLocation = document.location.protocol + "//" + document.location.host
 function checkInChat(){
     jQuery.ajax({
         type: 'POST',
-        url: currentLocation + "/isUserInChat/" + userFrom["id"] + "/" + userTo["id"],
+        url: currentLocation + "/isUserInChat/" + userTo["id"],
         contentType: 'application/json',
-        success: isUserInChatHandler
+        success: sendPushNotification
     });
 }
 
@@ -84,47 +84,13 @@ const onConnected = () => {
     else
         stompClient.subscribe('/topic/' + userTo["id"] + "/" + userFrom["id"], onMessageReceived,
             { id: '/topic/' + userTo["id"] + "/" + userFrom["id"]})
-
-    checkInChat()
-}
-
-function isUserInChatHandler(data){
-    let isConnected = data
-    const messageInput = document.querySelector('#message')
-    const messageContent = messageInput.value.trim();
-    let d = new Date();
-    let ye = new Intl.DateTimeFormat('ru', {year: 'numeric'}).format(d);
-    let mo = new Intl.DateTimeFormat('ru', {month: '2-digit'}).format(d);
-    let da = new Intl.DateTimeFormat('ru', {day: '2-digit'}).format(d);
-    let time = new Intl.DateTimeFormat('ru',
-        {
-            hour: "numeric",
-            minute: "numeric",
-        }).format(d)
-
-    console.log(`${da}/${mo}/${ye} ${time}`)
-
-    if (messageContent && stompClient) {
-        const chatMessage = {
-            userFrom: userFrom,
-            userTo: userTo,
-            content: messageInput.value,
-            time: `${da}/${mo}/${ye} ${time}`
-        }
-        if (!isConnected)
-            stompClient.send("/app/push.send/" + userTo["username"], {}, JSON.stringify(chatMessage))
-        messageInput.value = ''
-    }
 }
 
 const onError = (error) => {
     console.log(error)
 }
 
-const sendMessage = () => {
-    checkInChat()
-    const messageInput = document.querySelector('#message')
-    const messageContent = messageInput.value.trim();
+function constructMessageObject(messageInput){
     let d = new Date();
     let ye = new Intl.DateTimeFormat('ru', {year: 'numeric'}).format(d);
     let mo = new Intl.DateTimeFormat('ru', {month: '2-digit'}).format(d);
@@ -135,21 +101,36 @@ const sendMessage = () => {
             minute: "numeric",
         }).format(d)
 
-    console.log(`${da}/${mo}/${ye} ${time}`)
+    return  {
+        userFrom: userFrom,
+        userTo: userTo,
+        content: messageInput.value,
+        time: `${da}/${mo}/${ye} ${time}`
+    }
+}
 
-    if (messageContent && stompClient) {
-        const chatMessage = {
-            userFrom: userFrom,
-            userTo: userTo,
-            content: messageInput.value,
-            time: `${da}/${mo}/${ye} ${time}`
-        }
+function sendPushNotification(data){
+    let isConnected = data
+    const messageInput = document.querySelector('#message')
+    const messageContent = messageInput.value.trim();
+
+    const chatMessage = constructMessageObject(messageInput)
+    if (messageContent && stompClient && !isConnected)
+        stompClient.send("/app/push.send/" + userTo["username"], {}, JSON.stringify(chatMessage))
+    messageInput.value = ''
+}
+
+const sendMessage = () => {
+    checkInChat()
+    const messageInput = document.querySelector('#message')
+    const messageContent = messageInput.value.trim();
+
+    const chatMessage = constructMessageObject(messageInput)
+    if (messageContent && stompClient)
         if (userFrom["id"] < userTo["id"])
             stompClient.send("/app/chat.send/" + userFrom["id"] + "/" + userTo["id"], {}, JSON.stringify(chatMessage))
         else
             stompClient.send("/app/chat.send/" + userTo["id"] + "/" + userFrom["id"], {}, JSON.stringify(chatMessage))
-        messageInput.value = ''
-    }
 }
 
 
@@ -158,7 +139,6 @@ const onMessageReceived = (payload) => {
     createMessageLine(message);
 }
 
-//document.addEventListener('DOMContentLoaded', connect, true)
 const messageControls = document.querySelector('#message-controls')
 messageControls.addEventListener('submit', sendMessage, true)
 
