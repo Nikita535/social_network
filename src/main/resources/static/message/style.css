@@ -24,7 +24,7 @@ body {
     border-right: 1px solid #e0e0e3;
     padding-bottom: 50px;
     height: 100%;
-    width: 240px;
+    width: 280px;
     background: #fff;
 }
 
@@ -36,7 +36,7 @@ body {
 
 @media (min-width:768px) {
     #messages-main .ms-body {
-        padding-left: 240px;
+        padding-left: 280px;
     }
 }@media (max-width:767px) {
     #messages-main .ms-menu {
@@ -95,6 +95,9 @@ body {
 }
 .message-feed.right>.pull-right {
     margin-left: 15px;
+}
+.message-feed.left>.pull-left {
+    margin-right: 15px;
 }
 .message-feed:not(.right) .mf-content {
     background: #03a9f4;
@@ -159,6 +162,7 @@ body {
     width: 50px;
 }
 .list-group.lg-alt .list-group-item {
+
     border-bottom: #c7c7cc 1px solid;
     padding: 0.5rem 0.75rem;
     height: 80px;

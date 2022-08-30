@@ -4,12 +4,12 @@ let stompClient
 let username
 let currentLocation = document.location.protocol + "//" + document.location.host;
 
-function checkInChat(){
+function checkInChat() {
     jQuery.ajax({
         type: 'POST',
-        url: currentLocation + "/isUserInChat/" + userFrom["id"] + "/" + userTo["id"],
+        url: currentLocation + "/isUserInChat/" + userTo["id"],
         contentType: 'application/json',
-        success: isUserInChatHandler
+        success: sendPushNotification
     });
 }
 
@@ -43,7 +43,8 @@ function createMessageLine(message) {
     avatar.className = 'img-avatar'
     var source
 
-
+    console.log(message.userFrom)
+    console.log(message.userFrom.username)
     if (message["userFrom"].id === userFrom.id) {
         flexBox.classList.add('right')
         avatarContainer.classList.add('pull-right')
@@ -55,6 +56,7 @@ function createMessageLine(message) {
         source = userTo["image"] != null ? '/image/' +
             userTo["image"]["id"] : 'https://bootdey.com/img/Content/avatar/avatar6.png'
     }
+
     avatar.src = source
     avatarContainer.appendChild(avatar)
     flexBox.appendChild(avatarContainer)
@@ -63,6 +65,31 @@ function createMessageLine(message) {
     const chat = document.querySelector('#chat')
     chat.appendChild(flexBox)
     chat.scrollTop = chat.scrollHeight
+}
+
+function fetchLastMessage(message) {
+    let friendListItem
+    let lastMessageText = message.content.length < 7 ? message.content : message.content.substr(0, 7) + '...'
+    let lastMessageUser
+    console.log()
+
+    if (message.userFrom.id === userFrom.id) {
+        lastMessageUser = 'Вы: '
+        friendListItem = document.getElementById(message.userTo.username)
+    } else {
+        lastMessageUser = message.userTo.profileInfo.name + ": "
+
+        friendListItem = document.getElementById(message.userFrom.username)
+    }
+
+    friendListItem.querySelectorAll('.list-group-item-text')[0].innerHTML = lastMessageUser + lastMessageText
+    friendListItem.querySelectorAll('.list-group-item-text')[1].innerHTML = message.time.split(" ")[1].substring(0, 5)
+    let friendListItemContainer = friendListItem.parentNode
+    let friendList = friendListItemContainer.parentNode
+    friendList.removeChild(friendListItemContainer)
+    friendList.insertBefore(friendListItemContainer, friendList.firstChild)
+
+
 }
 
 
@@ -79,52 +106,18 @@ const connect = () => {
 const onConnected = () => {
     if (userFrom["id"] < userTo["id"])
         stompClient.subscribe('/topic/' + userFrom["id"] + "/" + userTo["id"], onMessageReceived,
-             { id: '/topic/' + userFrom["id"] + "/" + userTo["id"]})
+            {id: '/topic/' + userFrom["id"] + "/" + userTo["id"]})
 
     else
         stompClient.subscribe('/topic/' + userTo["id"] + "/" + userFrom["id"], onMessageReceived,
-            { id: '/topic/' + userTo["id"] + "/" + userFrom["id"]})
-
-    checkInChat()
-}
-
-function isUserInChatHandler(data){
-    let isConnected = data
-    const messageInput = document.querySelector('#message')
-    const messageContent = messageInput.value.trim();
-    let d = new Date();
-    let ye = new Intl.DateTimeFormat('ru', {year: 'numeric'}).format(d);
-    let mo = new Intl.DateTimeFormat('ru', {month: '2-digit'}).format(d);
-    let da = new Intl.DateTimeFormat('ru', {day: '2-digit'}).format(d);
-    let time = new Intl.DateTimeFormat('ru',
-        {
-            hour: "numeric",
-            minute: "numeric",
-        }).format(d)
-
-    console.log(`${da}/${mo}/${ye} ${time}`)
-
-    if (messageContent && stompClient) {
-        const chatMessage = {
-            userFrom: userFrom,
-            userTo: userTo,
-            content: messageInput.value,
-            time: `${da}/${mo}/${ye} ${time}`
-        }
-        if (!isConnected)
-            stompClient.send("/app/push.send/" + userTo["username"], {}, JSON.stringify(chatMessage))
-        messageInput.value = ''
-    }
+            {id: '/topic/' + userTo["id"] + "/" + userFrom["id"]})
 }
 
 const onError = (error) => {
     console.log(error)
 }
 
-const sendMessage = () => {
-    checkInChat()
-    const messageInput = document.querySelector('#message')
-    const messageContent = messageInput.value.trim();
+function constructMessageObject(messageInput) {
     let d = new Date();
     let ye = new Intl.DateTimeFormat('ru', {year: 'numeric'}).format(d);
     let mo = new Intl.DateTimeFormat('ru', {month: '2-digit'}).format(d);
@@ -133,35 +126,50 @@ const sendMessage = () => {
         {
             hour: "numeric",
             minute: "numeric",
+            second: "numeric"
         }).format(d)
 
-    console.log(`${da}/${mo}/${ye} ${time}`)
+    return {
+        userFrom: userFrom,
+        userTo: userTo,
+        content: messageInput.value,
+        time: `${da}/${mo}/${ye} ${time}`
+    }
+}
 
-    if (messageContent && stompClient) {
-        const chatMessage = {
-            userFrom: userFrom,
-            userTo: userTo,
-            content: messageInput.value,
-            time: `${da}/${mo}/${ye} ${time}`
-        }
+function sendPushNotification(data) {
+    let isConnected = data
+    const messageInput = document.querySelector('#message')
+    const messageContent = messageInput.value.trim();
+
+    const chatMessage = constructMessageObject(messageInput)
+    if (messageContent && stompClient && !isConnected)
+        stompClient.send("/app/push.send/" + userTo["username"], {}, JSON.stringify(chatMessage))
+    messageInput.value = ''
+}
+
+const sendMessage = () => {
+    checkInChat()
+    const messageInput = document.querySelector('#message')
+    const messageContent = messageInput.value.trim();
+
+    const chatMessage = constructMessageObject(messageInput)
+    if (messageContent && stompClient)
         if (userFrom["id"] < userTo["id"])
             stompClient.send("/app/chat.send/" + userFrom["id"] + "/" + userTo["id"], {}, JSON.stringify(chatMessage))
         else
             stompClient.send("/app/chat.send/" + userTo["id"] + "/" + userFrom["id"], {}, JSON.stringify(chatMessage))
-        messageInput.value = ''
-    }
 }
 
 
 const onMessageReceived = (payload) => {
-    const message = JSON.parse(payload.body);
-    createMessageLine(message);
+    const message = JSON.parse(payload.body)
+    createMessageLine(message)
+    fetchLastMessage(message)
 }
 
-//document.addEventListener('DOMContentLoaded', connect, true)
 const messageControls = document.querySelector('#message-controls')
 messageControls.addEventListener('submit', sendMessage, true)
-
 
 
 document.getElementsByTagName('textarea')[0].addEventListener("keydown", function (event) {

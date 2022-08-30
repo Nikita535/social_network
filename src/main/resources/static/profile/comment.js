@@ -2,7 +2,6 @@
 
 let stompClient
 let username
-let commentId;
 
 
 function createMessageLine(comment) {
