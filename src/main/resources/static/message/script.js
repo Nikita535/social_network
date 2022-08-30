@@ -15,6 +15,8 @@ function checkInChat() {
 
 
 function createMessageLine(message) {
+
+
     const flexBox = document.createElement('div')
     flexBox.classList.add('message-feed')
 
