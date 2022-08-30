@@ -8,7 +8,7 @@ let push_container = document.getElementById("push-notification")
 function createPushLine(message) {
     console.log(message)
     const flexBox = document.createElement('div')
-    flexBox.classList.add('toast', 'fade', 'show')
+    flexBox.classList.add('toast', 'show')
 
     const toast_header = document.createElement('div')
     toast_header.classList.add("toast-header")
@@ -28,14 +28,16 @@ function createPushLine(message) {
     flexBox.querySelector(".toast-body").innerHTML = message["content"]
 
     flexBox.querySelector(".close").addEventListener('click', function (event) {
-        flexBox.classList.remove("show")
-        flexBox.classList.add("hide")
+        flexBox.parentNode.removeChild(flexBox)
     })
 
     setTimeout(function () {
-        flexBox.classList.add("hide")
+        flexBox.parentNode.removeChild(flexBox)
     }, 10000);
 
+
+    if (push_container.childNodes.length === 3)
+        push_container.removeChild(push_container.firstChild)
     push_container.append(flexBox)
 }
 
