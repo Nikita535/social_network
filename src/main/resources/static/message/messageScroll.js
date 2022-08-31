@@ -30,6 +30,8 @@ function loadFriendMessage() {
                     : jsonResponse[1][i]["content"].length < 7 ? profile["name"] + ": " + jsonResponse[1][i]["content"]
                         : profile["name"] + ": " + jsonResponse[1][i]["content"].substr(0, 7) + "..." : "";
 
+                let time = jsonResponse[1][i] != null ? jsonResponse[1][i].time.split(" ")[1].substring(0, 5) : "";
+
                 let source = friend["image"] != null ? '/image/' + friend["image"]["id"] : 'https://bootdey.com/img/Content/avatar/avatar6.png'
 
 
@@ -44,7 +46,7 @@ function loadFriendMessage() {
                     + profile["surname"] + " " + profile["name"] + "</div>\n"
                     + "<div class=\"mt-2 d-flex align-items-center justify-content-between\">"
                     + "<small class=\"list-group-item-text c-gray\">" + message + "</small> "
-                    + "<small class=\"list-group-item-text c-gray\">" + jsonResponse[1][i].time.split(" ")[1].substring(0, 5) + "</small>"
+                    + "<small class=\"list-group-item-text c-gray\">" + time + "</small>"
                     + "</div>"
                     + "                                </div>\n"
                     + "                            </a>\n"

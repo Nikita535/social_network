@@ -36,6 +36,13 @@ public class PostController {
         return post;
     }
 
+    @MessageMapping("/post.delete/{username}")
+    @SendTo("/topic/postDelete/{username}")
+    public long deletePost(@Payload final long id) {
+        postService.deletePostById(id);
+        return id;
+    }
+
     @RequestMapping(value = "/post/create", method = RequestMethod.POST)
     @ResponseBody
     public List<Image> processReloadData(@RequestParam("file") List<MultipartFile> files) {

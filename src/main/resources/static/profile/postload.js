@@ -70,7 +70,9 @@ function loadPosts() {
                     "                              <div class=\"timeline-header\">\n" +
                     "                                 <span class=\"userimage\"><img src=\"" + source + "\" alt=\"\"></span>\n" +
                     "                                 <span class=\"username\">" + user.profileInfo.name + " " + user.profileInfo.surname + "<small></small></span>\n" +
-                    "                                 <span class=\"pull-right text-muted\">" + jsonResponse[i].fromNow + "</span>" +
+                    "                                 <div class=\"deleteOfButton pull-right\">" +
+                    "                                       <span class=\"text-muted\">" + jsonResponse[i].fromNow + "</span>" +
+                    "                                 </div>" +
                     "                              </div>\n" +
                     "                              <div class=\"timeline-content\">\n" +
                     "                                 <p>\n" + jsonResponse[i].full_text +
@@ -153,6 +155,10 @@ function loadPosts() {
                 const messageControls = post.querySelector(".commentForm")
                 messageControls.addEventListener('submit', sendComment, true)
                 post.querySelector(".fa-heart").addEventListener('click', setLike, true)
+                if (user.id === currentUser.id) {
+                    post.querySelector(".deleteOfButton").innerHTML += "<div class=\"pull-right fa fa-trash\" aria-hidden=\"true\"></div>"
+                    post.querySelector(".fa-trash").addEventListener('click', sendDeletingPost, true)
+                }
             }
             isLoading = false
             posts = document.getElementsByClassName('post')

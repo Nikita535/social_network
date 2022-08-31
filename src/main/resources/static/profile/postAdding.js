@@ -26,7 +26,9 @@ function createPostLine(postInformation) {
         "                              <div class=\"timeline-header\">\n" +
         "                                 <span class=\"userimage\"><img src=\"" + source + "\" alt=\"\"></span>\n" +
         "                                 <span class=\"username\">" + user.profileInfo.name + " " + user.profileInfo.surname + "<small></small></span>\n" +
-        "                                 <span class=\"pull-right text-muted\">" + postInformation.fromNow + "</span>" +
+        "                                 <div class=\"deleteOfButton pull-right\">" +
+        "                                       <span class=\"text-muted\">" + postInformation.fromNow + "</span>" +
+        "                                 </div>" +
         "                              </div>\n" +
         "                              <div class=\"timeline-content\">\n" +
         "                                 <p>\n" + postInformation.full_text +
@@ -41,9 +43,9 @@ function createPostLine(postInformation) {
             imgcontainer.innerHTML = "<img src=\"" + postsource + "\" alt=\"\">"
             images_post.innerHTML += imgcontainer.outerHTML
         }
-        post.appendChild(images_post)
     }
-        post.innerHTML +=
+    post.appendChild(images_post)
+    post.innerHTML +=
             "                          <div class=\"timeline-likes\">\n" +
             "                                 <div class=\"stats-right\">\n" +
             // "                                    <span class=\"stats-text\">259 Shares</span>\n" +
@@ -118,6 +120,11 @@ function createPostLine(postInformation) {
     const messageControls = post.querySelector(".commentForm")
     messageControls.addEventListener('submit', sendComment, true)
     post.querySelector(".fa-heart").addEventListener('click', setLike, true)
+
+    if (user.id === currentUser.id) {
+        post.querySelector(".deleteOfButton").innerHTML += "<div class=\"pull-right fa fa-trash\" aria-hidden=\"true\"></div>"
+        post.querySelector(".fa-trash").addEventListener('click', sendDeletingPost, true)
+    }
 }
 
 

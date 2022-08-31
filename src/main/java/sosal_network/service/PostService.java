@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import sosal_network.entity.Post;
 import sosal_network.entity.User;
 import sosal_network.repository.PostRepository;
@@ -36,6 +37,11 @@ public class PostService {
 
     public void save(Post post) {
         postRepository.save(post);
+    }
+
+    @Transactional
+    public void deletePostById(long id) {
+        postRepository.deleteById(id);
     }
 
     public void setLike(Long postId, User currentUser) {
