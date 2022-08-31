@@ -45,6 +45,9 @@ import java.util.*;
 @Slf4j
 @Service
 public class UserService implements UserDetailsService {
+
+    private static final int USER_PAGE_SIZE=10;
+    private static final int INVITE_PAGE_SIZE=5;
     /**
      * Bean репозитория пользователя
      **/
@@ -141,32 +144,32 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public Page<User> findFriendUsers(User user, int page) {
-        return userRepository.findFriendUsers(user, PageRequest.of(page, 10));
+        return userRepository.findFriendUsers(user, PageRequest.of(page, USER_PAGE_SIZE));
     }
 
     @Transactional
     public Page<User> findFriendUsersWithSearch(User user, String searchLine, int page) {
-        return userRepository.findFriendUsersWithSearch(user, searchLine, PageRequest.of(page, 10));
+        return userRepository.findFriendUsersWithSearch(user, searchLine, PageRequest.of(page, USER_PAGE_SIZE));
     }
 
     @Transactional
     public List<User> findStrangers(User user, int page) {
-        return userRepository.findStrangers(user, PageRequest.of(page, 10));
+        return userRepository.findStrangers(user, PageRequest.of(page, USER_PAGE_SIZE));
     }
 
     @Transactional
     public List<User> findStrangersWithSearch(User user, String searchLine, int page) {
-        return userRepository.findStrangersWithSearch(user, searchLine, PageRequest.of(page, 10));
+        return userRepository.findStrangersWithSearch(user, searchLine, PageRequest.of(page, USER_PAGE_SIZE));
     }
 
     @Transactional
     public List<User> fiendReceivedInvites(User user, int page) {
-        return userRepository.fiendReceivedInvites(user, PageRequest.of(page, 5));
+        return userRepository.fiendReceivedInvites(user, PageRequest.of(page, INVITE_PAGE_SIZE));
     }
 
     @Transactional
     public List<User> fiendReceivedInvitesWithSearch(User user, String searchLine, int page) {
-        return userRepository.fiendReceivedInvitesWithSearch(user, searchLine, PageRequest.of(page, 5));
+        return userRepository.fiendReceivedInvitesWithSearch(user, searchLine, PageRequest.of(page, INVITE_PAGE_SIZE));
     }
 
 

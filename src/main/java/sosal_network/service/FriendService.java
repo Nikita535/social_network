@@ -111,6 +111,10 @@ public class FriendService {
         User userFromSession = userService.findUserByUsername(username);
         List<Friend> friendsByFirstUser = findFriendsByFirstUser(userFromSession);
         List<Friend> friendsBySecondUser = findFriendsBySecondUser(userFromSession);
+        return getUsers(friendsByFirstUser, friendsBySecondUser);
+    }
+
+    private List<User> getUsers(List<Friend> friendsByFirstUser, List<Friend> friendsBySecondUser) {
         List<User> friends = new ArrayList<>();
         for (Friend friend : friendsByFirstUser) {
             friends.add(userService.findUserByUsername(friend.getSecondUser().getUsername()));
@@ -125,14 +129,7 @@ public class FriendService {
         User userFromSession = userService.findUserByUsername(username);
         List<Friend> friendsByFirstUser = findFriendsByFirstUser(userFromSession).stream().filter(x -> x.getInviteStatus() == InviteStatus.ACCEPTED).toList();
         List<Friend> friendsBySecondUser = findFriendsBySecondUser(userFromSession).stream().filter(x -> x.getInviteStatus() == InviteStatus.ACCEPTED).toList();
-        List<User> friends = new ArrayList<>();
-        for (Friend friend : friendsByFirstUser) {
-            friends.add(userService.findUserByUsername(friend.getSecondUser().getUsername()));
-        }
-        for (Friend friend : friendsBySecondUser) {
-            friends.add(userService.findUserByUsername(friend.getFirstUser().getUsername()));
-        }
-        return friends;
+        return getUsers(friendsByFirstUser, friendsBySecondUser);
     }
 
     @Transactional

@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class PostService {
 
+    private final static int POST_PAGE_SIZE = 5;
     @Autowired
     private PostRepository postRepository;
 
@@ -51,7 +52,7 @@ public class PostService {
 
 
     public List<Post> showLastPosts(User user, int page) {
-        Pageable pageable = PageRequest.of(page, 5);
+        Pageable pageable = PageRequest.of(page, POST_PAGE_SIZE);
         return postRepository.findAllByUserOrderByIdDesc(user, pageable).stream().peek(p -> p.setFromNow(showTimeAgo(p))).collect(Collectors.toList());
     }
 
