@@ -36,6 +36,7 @@ import javax.mail.MessagingException;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -50,6 +51,9 @@ public class UserService implements UserDetailsService {
      **/
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private FriendService friendService;
 
     /**
      * Bean репозитория кода активации
@@ -157,6 +161,19 @@ public class UserService implements UserDetailsService {
     @Transactional
     public List<User> findStrangersWithSearch(User user, String searchLine, int page) {
         return userRepository.findStrangersWithSearch(user, searchLine, PageRequest.of(page, 10));
+    }
+
+    @Transactional
+    public List<User> findPossibleFriendsByMutualFriends(User user){
+        return userRepository.findPossibleFriendsByMutualFriends(user,
+                friendService.getAcceptedFriends(user.getUsername()).stream().map(User::getId).collect(Collectors.toList()));
+    }
+
+    @Transactional
+    public List<Long> findMutualFriends(Long userId, List<User> possibleFriends){
+        return possibleFriends.stream().map(possibleFriend -> userRepository.findMutualFriends(
+                userId, possibleFriend.getId()
+        )).toList();
     }
 
     @Transactional

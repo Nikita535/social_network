@@ -18,6 +18,7 @@ import sosal_network.service.FriendService;
 import sosal_network.service.PostService;
 import sosal_network.service.UserService;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -75,7 +76,10 @@ public class UserController {
         if (banRepository.findBanInfoById(authenticatedUser.getBanInfo().getId()).isBanStatus()) {
             throw new UserWasBanedException("user was banned");
         }
+        List<User> possibleFriends = userService.findPossibleFriendsByMutualFriends(authenticatedUser);
 
+        model.addAttribute("possibleFriends", possibleFriends);
+        model.addAttribute("quantityOfMutualFriends", userService.findMutualFriends(authenticatedUser.getId(), possibleFriends));
         model.addAttribute("postService", postService);
         model.addAttribute("user", userService.findUserByUsername(username.get()));
         model.addAttribute("currentUser", userService.findUserByUsername(authenticatedUser.getUsername()));
