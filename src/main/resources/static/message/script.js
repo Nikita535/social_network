@@ -2,7 +2,8 @@
 
 let stompClient
 let username
-let currentLocation = document.location.protocol + "//" + document.location.host;
+let currentLocation = document.location.protocol + "//" + document.location.host
+const chat = document.querySelector('#chat')
 
 function checkInChat() {
     jQuery.ajax({
@@ -31,7 +32,7 @@ function createMessageLine(message) {
     const clock = document.createElement('i')
     clock.classList.add('fa', 'fa-clock-o')
 
-    clock.innerText = message.time
+    clock.innerText = message.time.substring(0, message.time.length - 3)
     date.appendChild(clock)
 
 
@@ -41,10 +42,8 @@ function createMessageLine(message) {
     const avatarContainer = document.createElement('div')
     const avatar = document.createElement('img')
     avatar.className = 'img-avatar'
-    var source
+    let source
 
-    console.log(message.userFrom)
-    console.log(message.userFrom.username)
     if (message["userFrom"].id === userFrom.id) {
         flexBox.classList.add('right')
         avatarContainer.classList.add('pull-right')
@@ -62,16 +61,25 @@ function createMessageLine(message) {
     flexBox.appendChild(avatarContainer)
     flexBox.appendChild(messageElement)
 
-    const chat = document.querySelector('#chat')
-    chat.appendChild(flexBox)
+    return flexBox
+
+}
+
+function fetchMessages(message) {
+    chat.insertBefore(createMessageLine(message), chat.firstChild)
+}
+
+function sendCreatedMessage(message) {
+
+    chat.appendChild(createMessageLine(message))
     chat.scrollTop = chat.scrollHeight
 }
 
+
 function fetchLastMessage(message) {
     let friendListItem
-    let lastMessageText = message.content.length < 7 ? message.content : message.content.substr(0, 7) + '...'
+    let lastMessageText = message.content.length < 7 ? message.content : message.content.substring(0, 7) + '...'
     let lastMessageUser
-    console.log()
 
     if (message.userFrom.id === userFrom.id) {
         lastMessageUser = 'Вы: '
@@ -88,7 +96,6 @@ function fetchLastMessage(message) {
     let friendList = friendListItemContainer.parentNode
     friendList.removeChild(friendListItemContainer)
     friendList.insertBefore(friendListItemContainer, friendList.firstChild)
-
 
 }
 
@@ -164,7 +171,7 @@ const sendMessage = () => {
 
 const onMessageReceived = (payload) => {
     const message = JSON.parse(payload.body)
-    createMessageLine(message)
+    sendCreatedMessage(message)
     fetchLastMessage(message)
 }
 

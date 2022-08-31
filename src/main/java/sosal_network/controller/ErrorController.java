@@ -30,6 +30,6 @@ public class ErrorController implements org.springframework.boot.web.servlet.err
                 return "error-500";
             }
         }
-        return "error";
+        return "error-500";
     }
 }

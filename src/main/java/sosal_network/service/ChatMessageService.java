@@ -12,7 +12,6 @@ import sosal_network.repository.ProfileInfoRepository;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Stream;
 
 @Service
 public class ChatMessageService {
@@ -26,15 +25,15 @@ public class ChatMessageService {
     @Autowired
     ProfileInfoRepository profileInfoRepository;
 
-    public List<ChatMessage> showAllMessages(User userFrom, User userTo) {
-        return Stream.concat(messageRepository.findChatMessagesByUserFromAndUserTo(userFrom, userTo).stream(),
-                        messageRepository.findChatMessagesByUserFromAndUserTo(userTo, userFrom).stream()).
-                sorted(Comparator.comparing(ChatMessage::getTime)).toList();
+    private static final int MESSAGE_PAGE_SIZE=10;
+
+    public List<ChatMessage> showAllMessages(User userFrom, User userTo,int page) {
+        return messageRepository.findChatMessagesByUserFromAndUserTo(userFrom,userTo,PageRequest.of(page,MESSAGE_PAGE_SIZE));
     }
 
     public ChatMessage showLastMessage(User userFrom, User userTo) {
-        List<ChatMessage> aLLMessages = showAllMessages(userFrom, userTo);
-        return aLLMessages.size() != 0 ? aLLMessages.get(aLLMessages.size() - 1) : null;
+        List<ChatMessage> allMessages = showAllMessages(userFrom, userTo,0);
+        return allMessages.size() != 0 ? allMessages.get(0) : null;
     }
 
     public List<User> getChatFriends(User user, int page) {

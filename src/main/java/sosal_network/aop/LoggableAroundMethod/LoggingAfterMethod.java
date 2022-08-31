@@ -31,11 +31,10 @@ public class LoggingAfterMethod {
 
     @AfterReturning(pointcut = "executeLogging()",returning = "returnValue")
     public void logMethodCallAfter(JoinPoint joinPoint,Object returnValue){
-        StringBuilder message = new StringBuilder("Method: ");
-        message.append(joinPoint.getSignature().getName()).append(" !");
-        message.append("return: " + returnValue);
+        String message = "Method: " + joinPoint.getSignature().getName() + " !" +
+                "return: " + returnValue;
 
-        log.info(message.toString());
+        log.info(message);
     }
 
 

@@ -1,7 +1,7 @@
 let friendMessage = document.getElementById('friendMessageScroll')
 
 let page = 0
-var isLoading = false;
+let isLoading = false;
 
 $(friendMessage).scroll(function () {
     if ($(friendMessage).height() <= $(window).scrollTop() + $(window).height() && !isLoading) {
@@ -56,8 +56,6 @@ function loadFriendMessage() {
             let allFriends = friendMessage.querySelectorAll(".friendListener")
             for (let j = 0; j < allFriends.length; j++)
                 allFriends[j].addEventListener('click', getChatMessages, true)
-
-            console.log(page)
             isLoading = false;
             page += 1
         }

@@ -61,15 +61,15 @@ public class ChatController {
         return "messages";
     }
 
-    @RequestMapping(value = "/chat/{username}", method = RequestMethod.GET)
+    @RequestMapping(value = "/chat/{username}/{page}", method = RequestMethod.GET)
     @ResponseBody
-    public List<Object> getChatRoom(@PathVariable String username, @AuthenticationPrincipal User authenticatedUser) {
+    public List<Object> getChatRoom(@PathVariable String username,@PathVariable int page, @AuthenticationPrincipal User authenticatedUser) {
         User friend = userRepository.findByUsername(username);
 
         List<Object> response = new ArrayList<>();
 
         response.add(friend);
-        response.add(chatMessageService.showAllMessages(authenticatedUser, friend));
+        response.add(chatMessageService.showAllMessages(authenticatedUser, friend,page));
         return response;
     }
 
