@@ -4,9 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import sosal_network.Enum.Role;
 import sosal_network.entity.Post;
 import sosal_network.entity.User;
@@ -18,6 +16,7 @@ import sosal_network.service.FriendService;
 import sosal_network.service.PostService;
 import sosal_network.service.UserService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -76,10 +75,7 @@ public class UserController {
         if (banRepository.findBanInfoById(authenticatedUser.getBanInfo().getId()).isBanStatus()) {
             throw new UserWasBanedException("user was banned");
         }
-        List<User> possibleFriends = userService.findPossibleFriendsByMutualFriends(authenticatedUser);
 
-        model.addAttribute("possibleFriends", possibleFriends);
-        model.addAttribute("quantityOfMutualFriends", userService.findMutualFriends(authenticatedUser.getId(), possibleFriends));
         model.addAttribute("postService", postService);
         model.addAttribute("user", userService.findUserByUsername(username.get()));
         model.addAttribute("currentUser", userService.findUserByUsername(authenticatedUser.getUsername()));
@@ -130,5 +126,21 @@ public class UserController {
             throw new UserWasBanedException();
         }
         return friendService.deleteFriend(username.get(), where);
+    }
+
+    @RequestMapping(value = "/possibleFriends/{username}", method = RequestMethod.GET)
+    @ResponseBody
+    public List<Object> possibleFriends(@PathVariable String username, @AuthenticationPrincipal User authenticatedUser){
+        if (authenticatedUser == null || username.isEmpty() || !Objects.equals(userService.
+                findUserByUsername(username).getUsername(), userService.getUserAuth().getUsername())) {
+            throw new BadRequestException();
+        }
+        return userService.findPossibleAndMutualFriends(authenticatedUser);
+    }
+
+    @RequestMapping(value = "/addPossibleFriend/{userId}", method = RequestMethod.GET)
+    @ResponseBody
+    public void addPossibleFriend(@PathVariable Long userId){
+        friendService.addPossibleFriend(userService.findUserById(userId).getUsername());
     }
 }

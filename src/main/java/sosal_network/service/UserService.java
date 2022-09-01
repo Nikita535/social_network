@@ -166,6 +166,16 @@ public class UserService implements UserDetailsService {
         return userRepository.findStrangersWithSearch(user, searchLine, PageRequest.of(page, USER_PAGE_SIZE));
     }
 
+    public List<Object> findPossibleAndMutualFriends(User user){
+        List<Object> allInformation = new ArrayList<>();
+        List<User> possibleFriends = findPossibleFriendsByMutualFriends(user).stream().filter(elem->
+                userRepository.findMutualFriends(user.getId(), elem.getId()) > 0).collect(Collectors.toList());
+
+        allInformation.add(possibleFriends);
+        allInformation.add(findMutualFriends(user.getId(), possibleFriends));
+        return allInformation;
+    }
+
     @Transactional
     public List<User> findPossibleFriendsByMutualFriends(User user){
         return userRepository.findPossibleFriendsByMutualFriends(user,
