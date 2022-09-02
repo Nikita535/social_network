@@ -1,6 +1,7 @@
 package sosal_network.controller;
 
 
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import sosal_network.entity.ChatMessage;
+import sosal_network.entity.Post;
 import sosal_network.entity.User;
 import sosal_network.exception.UserWasBanedException;
 import sosal_network.repository.BanRepository;
@@ -115,6 +117,14 @@ public class ChatController {
         allInfo.add(chatFriends);
         allInfo.add(lastMessages);
         return allInfo;
+    }
+
+    @RequestMapping(value ="/deleteMessages", method = RequestMethod.DELETE)
+    @ResponseBody
+    public List<Long> deleteMapping(@RequestParam(name = "deleteMessages") List<Long> selectedMessagesIds, @AuthenticationPrincipal User user)
+    {
+        List<Long> deletedMessages = chatMessageService.deleteMessagesByIds(selectedMessagesIds, user);
+        return deletedMessages;
     }
 
 }

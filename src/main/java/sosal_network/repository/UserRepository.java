@@ -76,7 +76,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "                             where (friends.second_user_id = ?1 and friends.invite_status ='ACCEPTED') \n" +
             "                             union select second_user_id\n" +
             "                             from jpa.friends\n" +
-            "                             where (friends.first_user_id = ?1 and friends.invite_status ='ACCEPTED') )\n" +
+            "                             where (friends.first_user_id = ?1 and (friends.invite_status ='ACCEPTED' or friends.invite_status ='PENDING' )) )\n" +
             "                             and ( ( mainuser.username not like 'ADMIN') and ( mainuser.username not like :#{#user.username}))\n" +
             "          order by" +
             "               ( select count(*) FROM\n" +
@@ -87,7 +87,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "                       ( select users.id from jpa.friends, jpa.users\n" +
             "                               where (friends.invite_status ='ACCEPTED' and ((friends.second_user_id = mainuser.id and users.id = friends.first_user_id) or (friends.first_user_id = mainuser.id and users.id = friends.second_user_id)))\t\t\t \n" +
             "                       ) two \n" +
-            "               using( id ) ) DESC \n", nativeQuery = true)
+            "               using( id ) ) DESC LIMIT 5\n", nativeQuery = true)
     List<User> findPossibleFriendsByMutualFriends(User user, List<Long> friendIds);
 
     @Query(value = "     select count(*) FROM \n" +

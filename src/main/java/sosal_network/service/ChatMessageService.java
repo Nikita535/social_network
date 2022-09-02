@@ -3,12 +3,15 @@ package sosal_network.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import sosal_network.entity.ChatMessage;
 import sosal_network.entity.User;
 import sosal_network.repository.FriendRepository;
 import sosal_network.repository.MessageRepository;
 import sosal_network.repository.ProfileInfoRepository;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -40,7 +43,21 @@ public class ChatMessageService {
         return friendRepository.findFriendByFirstUserOrSecondUser(user, PageRequest.of(page, 8)).stream().
                 map(friend -> Objects.equals(friend.getFirstUser(), user) ?
                         friend.getSecondUser() : friend.getFirstUser())
-                .sorted(Comparator.comparing(friend ->showLastMessage(user, (User) friend).getTime()).reversed()).toList();
+                .sorted(Comparator.comparing(friend -> showLastMessage(user, (User) friend) != null ?
+                showLastMessage(user, (User) friend).getTime() : LocalDateTime.MIN).reversed()).toList();
+    }
+
+    @Transactional
+    public List<Long> deleteMessagesByIds(List<Long> selectedMessagesIds, User user){
+        List<Long> deletedMessages = new ArrayList<>();
+        for (int i = 0; i < selectedMessagesIds.size(); i++) {
+            ChatMessage message = messageRepository.findChatMessagesById(selectedMessagesIds.get(i));
+            if (Objects.equals(message.getUserFrom().getId(), user.getId())) {
+                messageRepository.deleteById(selectedMessagesIds.get(i));
+                deletedMessages.add(selectedMessagesIds.get(i));
+            }
+        }
+        return deletedMessages;
     }
 
 }

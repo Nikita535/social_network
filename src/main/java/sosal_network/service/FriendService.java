@@ -176,6 +176,13 @@ public class FriendService {
         return friend.getFirstUser().equals(userFromSession) && friend.getInviteStatus() == InviteStatus.PENDING;
     }
 
+    public void addPossibleFriend(String username){
+        if (isInviteReceived(username))
+            resultInvite(username, 1, null);
+        else
+            sendInvite(username, null);
+    }
+
     @Transactional
     public boolean existsByFirstUserAndSecondUser(User firstUser, User secondUser) {
         return friendRepository.existsByFirstUserAndSecondUser(firstUser, secondUser);

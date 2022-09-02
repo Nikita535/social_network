@@ -142,7 +142,7 @@
 
                             <ul class="ah-actions actions">
                                 <li>
-                                    <a href="">
+                                    <a id="deleteMessage">
                                         <i class="fa fa-trash"></i>
                                     </a>
                                 </li>
@@ -191,8 +191,14 @@
                         </div>
 
                         <form class="msb-reply" id="message-controls">
+
+                            <label class="clipButton">
+                                <i style="color: #9E9E9E" class="fa fa-paperclip fa-lg add-tooltip fa-flip-horizontal"
+                                     data-original-title="Add Photo" data-toggle="tooltip"></i>
+                                <input type="file" id="imageList" name="imageList" multiple accept="image/*" hidden>
+                            </label>
                             <textarea id="message" placeholder="А че писать то?"></textarea>
-                            <button type="submit"><i class="fa fa-paper-plane-o"></i></button>
+                            <button class="sendButton pull-right" type="submit"><i class="fa fa-paper-plane-o"></i></button>
                         </form>
 
                     </div>

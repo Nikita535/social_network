@@ -24,6 +24,16 @@ a:not([href]) {
     text-decoration: none;
 }
 
+.possibleFriends{
+    font-size: 15px;
+
+    color: #000c2f;
+}
+
+.quantityOfPossibleFriends{
+    font-size: 13px;
+}
+
 .profile-page .profile-header .cover {
     position: relative;
     border-radius: .25rem .25rem 0 0;
@@ -75,6 +85,10 @@ a:not([href]) {
     height: 100%;
     z-index: 1;
     background: linear-gradient(rgba(255, 255, 255, 0.1), #fff 99%);
+}
+
+.card-body{
+    padding: 1.1rem;
 }
 
 .profile-page .profile-header .cover .cover-body {

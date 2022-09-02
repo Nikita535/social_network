@@ -217,9 +217,13 @@ function addReceivedPerson(person) {
         "                                        </div>\n" +
         "                                    </div>\n";
 
-    personContainer.querySelector("." + person["username"]).appendChild(addButton(person["username"]));
-    personContainer.querySelector("." + person["username"]).appendChild(denyButton(person["username"]));
+
+    if (currentUser.id === user.id) {
+        personContainer.querySelector("." + person["username"]).appendChild(addButton(person["username"]));
+        personContainer.querySelector("." + person["username"]).appendChild(denyButton(person["username"]));
+    }
     $name.appendChild(personContainer);
+
 }
 
 
@@ -244,17 +248,14 @@ function addPerson(person, isStranger = false, isSend = true, fromRight = false)
         "                                        </div>\n" +
         "                                    </div>\n";
 
-    if (isStranger === false) {
+    if (currentUser.id === user.id && isStranger === false) {
         personContainer.querySelector("." + person["username"]).appendChild(deleteButton(person["username"]));
         personContainer.classList.add("deleteFriendClass")
-        $name.appendChild(personContainer);
-    } else if (isSend === false) {
+    } else if (currentUser.id === user.id && isSend === false)
         personContainer.querySelector("." + person["username"]).appendChild(sendButton(person["username"]));
-        $name.appendChild(personContainer);
-    } else {
+     else if (currentUser.id === user.id)
         personContainer.querySelector("." + person["username"]).appendChild(alreadySendButton(person["username"]));
-        $name.appendChild(personContainer);
-    }
+    $name.appendChild(personContainer);
 }
 
 // Создание запросов
