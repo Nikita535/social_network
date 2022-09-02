@@ -2,9 +2,24 @@
 
 let stompClient
 let username
+let commentPage = 1
 
 
-function createMessageLine(comment) {
+function loadMoreComments(post) {
+    let xhr = new XMLHttpRequest()
+    let url = "http://localhost:8080/" + post.id + "/comment/" + commentPage
+    xhr.open("GET", url)
+    xhr.onload = function (ev) {
+        let jsonResponse = JSON.parse(xhr.responseText);
+        for (let i = 0; i < jsonResponse.length; i++) {
+            createCommentLine(jsonResponse[i])
+        }
+    }
+    xhr.send()
+    commentPage++
+}
+
+function createCommentLine(comment) {
     let commentsContainer = document.createElement('li')
     commentsContainer.classList.add("media")
     let userImage = comment["user"].image != null ? '/image/' +
@@ -19,7 +34,13 @@ function createMessageLine(comment) {
         "                                    </div>\n" +
         comment["content"] +
         "                                 </div> "
-    document.getElementById("comment-" + comment["post"]["id"]).appendChild(commentsContainer)
+    const postForComment = document.getElementById("comment-" + comment["post"]["id"])
+    const showMoreButton = postForComment.querySelector('.showMore')
+    postForComment.appendChild(commentsContainer)
+    const button = document.createElement('div')
+    button.classList.add('text-center', 'media')
+    button.appendChild(showMoreButton)
+    postForComment.appendChild(button)
 }
 
 
@@ -81,7 +102,7 @@ const sendComment = (event) => {
 
 const onMessageReceived = (payload) => {
     const comment = JSON.parse(payload.body);
-    createMessageLine(comment);
+    createCommentLine(comment);
 }
 
 document.addEventListener('DOMContentLoaded', connect, true)

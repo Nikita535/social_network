@@ -14,6 +14,10 @@ $(function () {
     loadPosts()
 })
 
+function log() {
+    console.log('gg')
+}
+
 const setLike = (event) => {
     let likeButton = event.target
 
@@ -37,7 +41,6 @@ const setLike = (event) => {
     }
 
 }
-
 
 
 function loadPosts() {
@@ -116,7 +119,7 @@ function loadPosts() {
                     like.classList.add("text-black-50")
 
 
-                for (let j = 0; j < comments.length; j++) {
+                for (let j = 0; j < 3; j++) {
                     let commentsContainer = document.createElement('li')
                     commentsContainer.classList.add("media")
                     let userImage = comments[j]["user"].image != null ? '/image/' +
@@ -133,6 +136,14 @@ function loadPosts() {
                         "                                 </div> "
                     comments_post.appendChild(commentsContainer)
                 }
+                const loadMore = document.createElement('div')
+                loadMore.classList.add('text-center','media')
+                loadMore.innerHTML = "<a class=\"showMore media-body\">Показать больше...</a>"
+
+                comments_post.appendChild(loadMore)
+
+
+
 
                 post.appendChild(comments_post)
 
@@ -159,11 +170,16 @@ function loadPosts() {
                     post.querySelector(".deleteOfButton").innerHTML += "<div class=\"pull-right fa fa-trash\" aria-hidden=\"true\"></div>"
                     post.querySelector(".fa-trash").addEventListener('click', sendDeletingPost, true)
                 }
+                document.querySelector('.showMore').addEventListener('click',function ()
+                {
+                    loadMoreComments(jsonResponse[i])
+                },true)
             }
             isLoading = false
             posts = document.getElementsByClassName('post')
             page += 1
         }
+
 
     }
     xhr.send()
