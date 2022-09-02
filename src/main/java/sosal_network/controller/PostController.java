@@ -5,16 +5,17 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import sosal_network.entity.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.ResponseBody;
+import sosal_network.entity.Post;
+import sosal_network.entity.User;
 import sosal_network.repository.BanRepository;
 import sosal_network.service.ImageService;
 import sosal_network.service.PostService;
 import sosal_network.service.UserService;
 
-import java.io.IOException;
-import java.util.*;
+import java.util.List;
 
 @Controller
 public class PostController {
@@ -43,19 +44,6 @@ public class PostController {
         return id;
     }
 
-    @RequestMapping(value = "/post/create", method = RequestMethod.POST)
-    @ResponseBody
-    public List<Image> processReloadData(@RequestParam("file") List<MultipartFile> files) {
-        return files.stream().map(file -> {
-            try {
-                Image image = imageService.toImageEntity(file);
-                imageService.save(image);
-                return image;
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }).toList();
-    }
 
 
     @GetMapping("/post/{username}/{page}")

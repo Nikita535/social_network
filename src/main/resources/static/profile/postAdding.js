@@ -155,7 +155,7 @@ async function createPostImage(images) {
     for (let i = 0; i < images.length; i++) {
         formData.append("file", images[i]);
     }
-    const response = await fetch(currentLocation + "/post/create", {
+    const response = await fetch(currentLocation + "/image/create", {
         method: "POST",
         body: formData,
     }).then((data) => {

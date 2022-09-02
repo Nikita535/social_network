@@ -1,7 +1,6 @@
 package sosal_network.controller;
 
 
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -11,8 +10,9 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import sosal_network.entity.ChatMessage;
-import sosal_network.entity.Post;
+import sosal_network.entity.Image;
 import sosal_network.entity.User;
 import sosal_network.exception.UserWasBanedException;
 import sosal_network.repository.BanRepository;
@@ -20,8 +20,10 @@ import sosal_network.repository.MessageRepository;
 import sosal_network.repository.UserRepository;
 import sosal_network.service.ChatMessageService;
 import sosal_network.service.FriendService;
+import sosal_network.service.ImageService;
 import sosal_network.service.UserService;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,13 +43,14 @@ public class ChatController {
     BanRepository banRepository;
     @Autowired
     private ChatMessageService chatMessageService;
+    @Autowired
+    private ImageService imageService;
 
     @Autowired
     private UserService userService;
 
     @Autowired
     private FriendService friendService;
-
 
 
     @GetMapping("/messages")
@@ -65,13 +68,13 @@ public class ChatController {
 
     @RequestMapping(value = "/chat/{username}/{page}", method = RequestMethod.GET)
     @ResponseBody
-    public List<Object> getChatRoom(@PathVariable String username,@PathVariable int page, @AuthenticationPrincipal User authenticatedUser) {
+    public List<Object> getChatRoom(@PathVariable String username, @PathVariable int page, @AuthenticationPrincipal User authenticatedUser) {
         User friend = userRepository.findByUsername(username);
 
         List<Object> response = new ArrayList<>();
 
         response.add(friend);
-        response.add(chatMessageService.showAllMessages(authenticatedUser, friend,page));
+        response.add(chatMessageService.showAllMessages(authenticatedUser, friend, page));
         return response;
     }
 
@@ -92,14 +95,14 @@ public class ChatController {
 
     @RequestMapping(value = "/isUserInChat/{userToId}", method = RequestMethod.POST)
     @ResponseBody
-    public boolean userInChatDetection(@PathVariable long userToId){
+    public boolean userInChatDetection(@PathVariable long userToId) {
 
         boolean isConnected = false;
         long userFromId = userService.getUserAuth().getId();
         String userTo = userService.findUserById(userToId).getUsername();
         String topic;
         if (userFromId > userToId)
-            topic = "/topic/" + userToId+ "/" + userFromId + "}";
+            topic = "/topic/" + userToId + "/" + userFromId + "}";
         else
             topic = "/topic/" + userFromId + "/" + userToId + "}";
         if (userRegistry.getUser(userTo) != null) {
@@ -108,7 +111,8 @@ public class ChatController {
 
         return isConnected;
     }
-    @RequestMapping(value ="/reloadMessageFriends/{page}", method = RequestMethod.GET)
+
+    @RequestMapping(value = "/reloadMessageFriends/{page}", method = RequestMethod.GET)
     @ResponseBody
     public List<Object> showFriendsMessages(@PathVariable int page, @AuthenticationPrincipal User authenticatedUser) {
         List<Object> allInfo = new ArrayList<>();
@@ -119,12 +123,24 @@ public class ChatController {
         return allInfo;
     }
 
-    @RequestMapping(value ="/deleteMessages", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/deleteMessages", method = RequestMethod.DELETE)
     @ResponseBody
-    public List<Long> deleteMapping(@RequestParam(name = "deleteMessages") List<Long> selectedMessagesIds, @AuthenticationPrincipal User user)
-    {
-        List<Long> deletedMessages = chatMessageService.deleteMessagesByIds(selectedMessagesIds, user);
-        return deletedMessages;
+    public List<Long> deleteMapping(@RequestParam(name = "deleteMessages") List<Long> selectedMessagesIds, @AuthenticationPrincipal User user) {
+        return chatMessageService.deleteMessagesByIds(selectedMessagesIds, user);
+    }
+
+    @RequestMapping(value = "/message/create", method = RequestMethod.POST)
+    @ResponseBody
+    public List<Image> processReloadData(@RequestParam("file") List<MultipartFile> files) {
+        return files.stream().map(file -> {
+            try {
+                Image image = imageService.toImageEntity(file);
+                imageService.save(image);
+                return image;
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }).toList();
     }
 
 }
