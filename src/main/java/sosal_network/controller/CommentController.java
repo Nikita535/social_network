@@ -2,6 +2,8 @@ package sosal_network.controller;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -13,7 +15,8 @@ import sosal_network.entity.Comment;
 import sosal_network.service.CommentService;
 import sosal_network.service.PostService;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 public class CommentController {
@@ -34,9 +37,14 @@ public class CommentController {
 
     @GetMapping("/{postId}/comment/{page}")
     @ResponseBody
-    List<Comment> loadComments(@PathVariable long postId,@PathVariable int page)
-    {
-        return commentService.findCommentsByPostOrderByTime( postService.findPostById(postId),page);
+    Map<String, Object> loadComments(@PathVariable long postId, @PathVariable int page) {
+        Map<String, Object> response = new HashMap<>();
+        Page<Comment> comments =commentService.findCommentsByPostOrderByTime(postService.findPostById(postId), page);
+        response.put("comments", comments.toList());
+        response.put("currentPage", comments.getNumber());
+        response.put("totalItems", comments.getTotalElements());
+        response.put("totalPages", comments.getTotalPages());
+        return response;
     }
 
 }

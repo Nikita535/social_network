@@ -14,9 +14,6 @@ $(function () {
     loadPosts()
 })
 
-function log() {
-    console.log('gg')
-}
 
 const setLike = (event) => {
     let likeButton = event.target
@@ -94,7 +91,7 @@ function loadPosts() {
                     "                          <div class=\"timeline-likes\">\n" +
                     "                                 <div class=\"stats-right\">\n" +
                     // "                                    <span class=\"stats-text\">259 Shares</span>\n" +
-                    "                                    <span class=\"stats-text\">" + comments.length + " Comments</span>\n" +
+                    "                                    <span class=\"stats-text\"> </span>\n" +
                     "                                 </div>\n" +
                     "                                 <div class=\"stats\" id=\"likes-" + jsonResponse[i]["id"] + "\">\n" +
                     "                                    <span class=\"fa-stack fa-fw stats-icon\">\n" +
@@ -117,32 +114,6 @@ function loadPosts() {
                     like.classList.add("text-danger")
                 else
                     like.classList.add("text-black-50")
-
-
-                for (let j = 0; j < 3; j++) {
-                    let commentsContainer = document.createElement('li')
-                    commentsContainer.classList.add("media")
-                    let userImage = comments[j]["user"].image != null ? '/image/' +
-                        comments[j]["user"].image.id : 'https://bootdey.com/img/Content/avatar/avatar6.png'
-                    commentsContainer.innerHTML +=
-                        "                                <div class=\"profile-picture bg-gradient bg-primary mb-4\">\n" +
-                        "                                    <img src=\"" + userImage + "\" width=\"44\" height=\"44\">\n" +
-                        "                                </div>\n" +
-                        "                                <div class=\"media-body\">\n" +
-                        "                                    <div class=\"media-title mt-0 mb-1\">\n" +
-                        "                                        <a href=\"#\">" + comments[j]["user"]["username"] + "</a> <small>" + comments[j]["time"] + "</small>\n" +
-                        "                                    </div>\n" +
-                        comments[j]["content"] +
-                        "                                 </div> "
-                    comments_post.appendChild(commentsContainer)
-                }
-                const loadMore = document.createElement('div')
-                loadMore.classList.add('text-center','media')
-                loadMore.innerHTML = "<a class=\"showMore media-body\">Показать больше...</a>"
-
-                comments_post.appendChild(loadMore)
-
-
 
 
                 post.appendChild(comments_post)
@@ -170,10 +141,7 @@ function loadPosts() {
                     post.querySelector(".deleteOfButton").innerHTML += "<div class=\"pull-right fa fa-trash\" aria-hidden=\"true\"></div>"
                     post.querySelector(".fa-trash").addEventListener('click', sendDeletingPost, true)
                 }
-                document.querySelector('.showMore').addEventListener('click',function ()
-                {
-                    loadMoreComments(jsonResponse[i])
-                },true)
+                loadCommentsToPost(jsonResponse[i], 0)
             }
             isLoading = false
             posts = document.getElementsByClassName('post')
@@ -183,7 +151,52 @@ function loadPosts() {
 
     }
     xhr.send()
+}
 
+function loadCommentsToPost(post, page) {
+    let commentRequest = new XMLHttpRequest()
+    let url = "http://localhost:8080/" + post.id + "/comment/" + page
+    commentRequest.open("GET", url)
+    commentRequest.onload = function (ev) {
+        let comments_post = document.querySelector('#comment-' + post.id)
+        if (commentRequest != null && JSON.parse(commentRequest.responseText).comments.length > 0) {
+
+            let jsonResponse = JSON.parse(commentRequest.responseText);
+            let comments = jsonResponse.comments
+            comments_post.parentNode.querySelector('.stats-text').innerHTML = ' комментариев: ' + jsonResponse.totalItems
+            for (let i = 0; i < comments.length; i++) {
+                let commentsContainer = document.createElement('li')
+                commentsContainer.classList.add("media")
+                let userImage = comments[i]["user"].image != null ? '/image/' +
+                    comments[i]["user"].image.id : 'https://bootdey.com/img/Content/avatar/avatar6.png'
+                commentsContainer.innerHTML +=
+                    "                                <div class=\"profile-picture bg-gradient bg-primary mb-4\">\n" +
+                    "                                    <img src=\"" + userImage + "\" width=\"44\" height=\"44\">\n" +
+                    "                                </div>\n" +
+                    "                                <div class=\"media-body\">\n" +
+                    "                                    <div class=\"media-title mt-0 mb-1\">\n" +
+                    "                                        <a href=\"#\">" + comments[i]["user"]["username"] + "</a> <small>" + comments[i]["time"] + "</small>\n" +
+                    "                                    </div>\n" +
+                    comments[i]["content"] +
+                    "                                 </div> "
+                comments_post.appendChild(commentsContainer)
+            }
+            if (jsonResponse.currentPage + 1 < jsonResponse.totalPages) {
+                const loadMore = document.createElement('div')
+                loadMore.classList.add('text-center', 'media')
+                loadMore.innerHTML = "<a class=\"showMore media-body\">Показать больше...</a>"
+
+                comments_post.appendChild(loadMore)
+                document.querySelector('.showMore').addEventListener('click', function () {
+                    loadMoreComments(post, jsonResponse.currentPage + 1)
+                }, true)
+            }
+        } else {
+            comments_post.parentNode.querySelector('.stats-text').innerHTML = ' комментариев: 0'
+        }
+
+    }
+    commentRequest.send()
 }
 
 
