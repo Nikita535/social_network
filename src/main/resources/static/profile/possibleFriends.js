@@ -1,7 +1,8 @@
 let possibleFriendsContainer = document.getElementById("possibleFriendsContainer")
 
 $(function (){
-    loadPossibleFriends()
+    if (currentUser.id === user.id)
+        loadPossibleFriends()
 })
 function loadPossibleFriends() {
    jQuery.ajax({

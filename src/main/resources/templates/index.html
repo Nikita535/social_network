@@ -335,7 +335,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-12 grid-margin">
+                    <div th:if="${currentUser.id}==${user.id}"class="col-md-12 grid-margin">
                         <div class="card rounded">
                             <div class="card-body" id="possibleFriendsContainer">
                                 <h6 class="card-title">Возможные друзья</h6>

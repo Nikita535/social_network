@@ -36,6 +36,23 @@ function createMessageLine(message) {
     date.appendChild(clock)
 
 
+    let images_post = document.createElement('div')
+    images_post.classList.add("timeline-footer")
+    let images = message.images
+    if (images != null) {
+        for (let j = 0; j < images.length; j++) {
+            let imgcontainer = document.createElement('div')
+            imgcontainer.classList.add("card-body")
+            let postsource = images[j] != null ? '/image/' +
+                images[j].id : 'https://bootdey.com/img/Content/avatar/avatar6.png'
+            imgcontainer.innerHTML = "<img src=\"" + postsource + "\" alt=\"\">"
+            images_post.innerHTML += imgcontainer.outerHTML
+        }
+
+        messageText.appendChild(images_post)
+    }
+
+
     messageElement.appendChild(messageText)
     messageElement.appendChild(date)
 
@@ -144,6 +161,25 @@ function constructMessageObject(messageInput) {
     }
 }
 
+async function createMessageImage(images) {
+    var request = {};
+    let elem;
+    request.images = images; // some data
+
+    let formData = new FormData();
+    for (let i = 0; i < images.length; i++) {
+        formData.append("file", images[i]);
+    }
+    const response = await fetch(currentLocation + "/message/create", {
+        method: "POST",
+        body: formData,
+    }).then((data) => {
+        elem = data.json();
+    })
+    return elem
+}
+
+
 function sendPushNotification(data) {
     let isConnected = data
     const messageInput = document.querySelector('#message')
@@ -155,17 +191,30 @@ function sendPushNotification(data) {
     messageInput.value = ''
 }
 
-const sendMessage = () => {
+const sendMessage = async () => {
     checkInChat()
+    let images = document.querySelector("#imageList").files
+
     const messageInput = document.querySelector('#message')
     const messageContent = messageInput.value.trim();
 
     const chatMessage = constructMessageObject(messageInput)
-    if (messageContent && stompClient)
+    if (messageContent && stompClient) {
+        let imageValue
+        if (images.length !== 0) {
+            let imageConverted = createMessageImage(images)
+            await imageConverted.then(async function (value) {
+                imageValue = value
+            })
+        }
+        chatMessage.images = imageValue != null ? imageValue : null
+
         if (userFrom["id"] < userTo["id"])
             stompClient.send("/app/chat.send/" + userFrom["id"] + "/" + userTo["id"], {}, JSON.stringify(chatMessage))
         else
             stompClient.send("/app/chat.send/" + userTo["id"] + "/" + userFrom["id"], {}, JSON.stringify(chatMessage))
+    }
+    document.querySelector('#imageList').value = ''
 }
 
 

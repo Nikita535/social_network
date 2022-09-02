@@ -9,6 +9,7 @@ import sosal_network.repository.FriendRepository;
 import sosal_network.repository.MessageRepository;
 import sosal_network.repository.ProfileInfoRepository;
 
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -40,7 +41,8 @@ public class ChatMessageService {
         return friendRepository.findFriendByFirstUserOrSecondUser(user, PageRequest.of(page, 8)).stream().
                 map(friend -> Objects.equals(friend.getFirstUser(), user) ?
                         friend.getSecondUser() : friend.getFirstUser())
-                .sorted(Comparator.comparing(friend ->showLastMessage(user, (User) friend).getTime()).reversed()).toList();
+                .sorted(Comparator.comparing(friend -> showLastMessage(user, (User) friend) != null ?
+                showLastMessage(user, (User) friend).getTime() : LocalDateTime.MIN).reversed()).toList();
     }
 
 }

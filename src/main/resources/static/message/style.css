@@ -105,13 +105,13 @@ body {
     box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
 }
 .message-feed.right .mf-content {
-    background: #eee;
+    background: #faf9f9;
 }
 .mf-content {
-    padding: 12px 17px 13px;
-    border-radius: 2px;
+    padding: 9px 10px 7px;
+    border-radius: 8px;
     display: inline-block;
-    max-width: 80%
+    max-width: 67%
 }
 .mf-date {
     display: block;
@@ -126,15 +126,29 @@ body {
 }
 .msb-reply {
     box-shadow: 0 -20px 20px -5px #fff;
+    display: flex;
     position: relative;
     border-top: 1px solid #eee;
     background: #f8f8f8;
 }
+
+.clipButton{
+    display: block;
+    position: relative;
+    width: 10%;
+}
+
+.sendButton{
+    display: block;
+    position: relative;
+    width: 10%;
+}
+
 .four-zero, .lc-block {
     box-shadow: 0 1px 11px rgba(0, 0, 0, .27);
 }
 .msb-reply textarea {
-    width: 100%;
+    width: 80%;
     font-size: 13px;
     border: 0;
     padding: 10px 15px;
@@ -143,17 +157,29 @@ body {
     background: 0 0;
 }
 .msb-reply button {
-    position: absolute;
+    position: relative;
     top: 0;
     right: 0;
     border: 0;
-    height: 100%;
-    width: 60px;
+    height: 60px;
     font-size: 25px;
     color: #2196f3;
+    padding: 10px 15px;
     background: 0 0;
 }
-.msb-reply button:hover {
+
+.msb-reply label {
+    position: relative;
+    top: 0;
+    right: 0;
+    border: 0;
+    height: 60px;
+    font-size: 25px;
+    color: #2196f3;
+    padding: 10px 15px 10px 18px;
+    background: 0 0;
+}
+.msb-reply button:hover, label:hover {
     background: #f2f2f2;
 }
 .img-avatar {

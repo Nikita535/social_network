@@ -192,6 +192,8 @@ const sendPost = async (event) => {
         stompClientPost.send("/app/post.send/" + username_post, {}, JSON.stringify(post))
         PostInput.value = ''
     }
+
+    form.parentNode.querySelector("#imageList").value = ''
     event.preventDefault();
 }
 
