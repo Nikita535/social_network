@@ -10,6 +10,7 @@ const getChatMessages = async (event) => {
     friendUsername = form.id
     messagePage = 0
     userToInformation.style = "display: block"
+    document.querySelector("#deleteMessage").addEventListener('click', deleteMessage, true)
     userToNoneInformation.style = "display: none"
     deletingPreviousChat.innerHTML = ""
 

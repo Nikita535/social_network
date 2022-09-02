@@ -14,6 +14,48 @@ function checkInChat() {
     });
 }
 
+async function deleteMessagesHandler(promise) {
+    let selectedMessagesIds
+    await promise.then(async function (value) {
+        selectedMessagesIds = value
+    })
+    for (let i = 0; i < selectedMessagesIds.length; i++) {
+        chat.removeChild(chat.querySelector('[data-cmid="' + selectedMessagesIds[i] + '"]'))
+    }
+    const selectedMessages = chat.querySelectorAll(".selectedMessage")
+    for (let i = 0; i < selectedMessages.length; i++) {
+        selectedMessages[i].classList.remove("selectedMessage")
+    }
+
+}
+
+
+async function deleteMessage() {
+    const selectedMessages = chat.querySelectorAll(".selectedMessage")
+    let selectedMessagesIds = []
+    for (let i = 0; i < selectedMessages.length; i++)
+        selectedMessagesIds.push(parseFloat(selectedMessages[i]["dataset"]["cmid"]))
+
+    let formData = new FormData();
+    for (let i = 0; i < selectedMessagesIds.length; i++) {
+        formData.append("deleteMessages", selectedMessagesIds[i]);
+    }
+    const response = await fetch(currentLocation + "/deleteMessages", {
+        method: "DELETE",
+        body: formData,
+    }).then((selectedMessagesIds) => {
+        deleteMessagesHandler(selectedMessagesIds.json())
+    })
+}
+
+function selectedMessages(event){
+    let message = event.currentTarget
+    if (message.classList.contains("selectedMessage"))
+        message.classList.remove("selectedMessage")
+    else
+        message.classList.add("selectedMessage")
+}
+
 
 function createMessageLine(message) {
     const flexBox = document.createElement('div')
@@ -77,6 +119,9 @@ function createMessageLine(message) {
     avatarContainer.appendChild(avatar)
     flexBox.appendChild(avatarContainer)
     flexBox.appendChild(messageElement)
+    flexBox.setAttribute("data-cmid", message.id)
+
+    flexBox.addEventListener('click', selectedMessages, true)
 
     return flexBox
 

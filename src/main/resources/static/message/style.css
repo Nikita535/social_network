@@ -107,6 +107,10 @@ body {
 .message-feed.right .mf-content {
     background: #faf9f9;
 }
+
+.selectedMessage{
+    background-color: #eae9e9;
+}
 .mf-content {
     padding: 9px 10px 7px;
     border-radius: 8px;
