@@ -1,10 +1,23 @@
-FROM gradle:7.4.2-jdk17-alpine AS build
-COPY --chown=gradle:gradle . /home/gradle/src
-WORKDIR /home/gradle/src
-RUN gradle build -x test
+FROM gradle AS TEMP_BUILD_IMAGE
+ENV APP_HOME=/usr/app/
+WORKDIR $APP_HOME
+COPY build.gradle settings.gradle $APP_HOME
 
-FROM openjdk:17
+COPY gradle $APP_HOME/gradle
+COPY --chown=gradle:gradle . /home/gradle/src
+USER root
+RUN chown -R gradle /home/gradle/src
+
+RUN gradle build || return 0
+COPY . .
+RUN gradle clean build
+
+FROM amazoncorretto:17
+ENV ARTIFACT_NAME=demo-0.0.1-SNAPSHOT.jar
+ENV APP_HOME=/usr/app/
+
+WORKDIR $APP_HOME
+COPY --from=TEMP_BUILD_IMAGE $APP_HOME/build/libs/$ARTIFACT_NAME .
+
 EXPOSE 8080
-RUN mkdir /app
-COPY --from=build /home/gradle/src/build/libs/demo-0.0.1-SNAPSHOT.jar /app/demo-0.0.1-SNAPSHOT.jar
-ENTRYPOINT ["java","-jar","/app/demo-0.0.1-SNAPSHOT.jar"]
+ENTRYPOINT exec java -jar ${ARTIFACT_NAME}
