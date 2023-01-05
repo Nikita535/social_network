@@ -8,7 +8,11 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 import sosal_network.service.UserService;
 
 
@@ -18,54 +22,57 @@ import sosal_network.service.UserService;
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+public class WebSecurityConfig {
 
-
-    /**
-     * Метод создания бина кодировщика паролей
-     **/
     @Bean
-    public BCryptPasswordEncoder bCryptPasswordEncoder() {
+    public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
     @Autowired
-    private UserService userService;
+    UserService userService;
 
-    /**
-     * Метод разрешения доступа к страницам
-     **/
-    @Override
-    protected void configure(HttpSecurity httpSecurity) throws Exception {
 
-        httpSecurity
-                .csrf()
-                .disable()
-                .authorizeRequests().antMatchers("/login",
-                        "/logout", "/register", "/activate/*", "/recovery",
-                        "/recoveryPage/*", "/recover/*", "/recoveryPage", "/invalidToken", "/register/info/*", "/registerContinue", "/registerContinue/*").permitAll()
-                .anyRequest().authenticated()
-                .and()
-                .formLogin()
-                .loginPage("/login")
-                .defaultSuccessUrl("/")
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+                .csrf(AbstractHttpConfigurer::disable);
+        http
+                .authorizeRequests()
+                .antMatchers("/login",
+                        "/logout", "/activate/*", "/recovery",
+                        "/recoveryPage/*", "/recover/*", "/recoveryPage", "/invalidToken", "/register/info/*", "/registerContinue", "/registerContinue/*")
                 .permitAll()
-                .and()
-                .logout().deleteCookies("JSESSIONID")
-                .permitAll()
-                .logoutSuccessUrl("/login")
-                .and()
-                .rememberMe().key("uniqueAndSecret").tokenValiditySeconds(86400).userDetailsService(userService);
+                .antMatchers("/register")
+                .not().fullyAuthenticated()
+                .antMatchers("/admin","/ban/*","/unban/*")
+                .hasRole("ADMIN")
+                .anyRequest()
+                .authenticated();
+        http
+                .formLogin(form -> form
+                        .loginPage("/login").permitAll()
+                        .loginProcessingUrl("/login")
+                        .usernameParameter("username")
+                        .passwordParameter("password")
+                        .defaultSuccessUrl("/")
+                        .failureUrl("/login?error=true")
+                );
+        http.
+                logout()
+                .invalidateHttpSession(true)
+                .clearAuthentication(true)
+                .deleteCookies("JSESSIONID").permitAll();
+
+        http.rememberMe().key("uniqueAndSecret").tokenValiditySeconds(86400).userDetailsService(userService);
+
+        return http.build();
     }
 
 
-    /**
-     * метод разрешения подгрузки стилей
-     **/
-    @Override
-    public void configure(WebSecurity web) throws Exception {
-        web
-                .ignoring()
-                .antMatchers("/resources/**", "/**/**/**.css", "/**/**/**.js", "/**/**/**.gif");
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.ignoring().antMatchers("/resources/**", "/**/**/**.css", "/**/**/**.js", "/**/**/**.gif");
     }
+
 }

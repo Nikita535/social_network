@@ -149,12 +149,8 @@ public class RegisterController {
         ActivationToken activationToken = activationTokenRepository.findByToken(code);
         if (activationToken != null && activationToken.compareDate()) {
             userService.activateUser(code);
-            if (userService.getUserAuth() != null) {
-                return "redirect:/";
-            } else {
                 redirectAttributes.addFlashAttribute("activateUser", true);
                 return "redirect:/login";
-            }
         } else
             return "invalidToken";
     }

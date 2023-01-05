@@ -214,12 +214,14 @@ public class UserService implements UserDetailsService {
             return;
         }
 
+
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         user.setRoles(Collections.singleton(Role.ROLE_USER));
-        user.setActive(true);
+        user.setActive(false);
         user.setRegistrationDate(LocalDate.now());
         user.setBanInfo(new BanInfo("", BanStatus.NONE, false));
         save(user);
+        createActivationCode(user.getUserEmail());
     }
 
 
